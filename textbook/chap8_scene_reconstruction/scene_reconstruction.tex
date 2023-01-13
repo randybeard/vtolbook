@@ -1,0 +1,523 @@
+%!TEX root =../quadrotorbook.tex
+\chapter{Scene Reconstruction}
+\label{chap:scene_reconstruction}
+
+In this chapter we will consider the problem of reconstruction a local voxel grid representation of the world based on a video sequence collected by the camera.  A high-level architecture for scene reconstruction is shown in Figure~\ref{fig:scene_reconstruction_architecture}.
+%
+\begin{marginfigure}[0in]
+	\includegraphics[width=\linewidth]{chap8_scene_reconstruction/figures/scene_reconstruction_architecture}
+	\caption{Architecture for Scene Reconstruction}
+	\label{fig:scene_reconstruction_architecture}  
+\end{marginfigure}
+%
+The camera image at time $k-1$ is used to identify good features in the image.  Those features are then tracked to the image $I_k$ to produce a set of feature pairs in calibrated normalized homogeneous coordinates, denoted $\mathcal{P}_k = \{(\bar{\epsilonbf}_i^{k-1},\bar{\epsilonbf}_i^{k}), i=1,\dots, N\}$.  The feature pairs are then used to reconstruct the 3D points corresponding to the feature points.  In this chapter we will assume that the camera's rotation and translation between images is known, and therefore the 3D reconstruction algorithm as access to these quantities denoted in Figure~\ref{fig:scene_reconstruction_architecture} as $(R_{k-1}^k \pbf_{k-1/k}^k)$.  The 3D scene points are used to update the rolling voxel grid described in Chapter~\ref{chap:trajectory_planning}.
+	
+In Section~\ref{sec:imu_integration} we review how IMU integration can be used to obtain the relative pose $(R_{k-1}^k \pbf_{k-1/k}^k)$.  
+%	
+Section~\ref{sec:essential_matrix} derives  the essential matrix and discusses some of its properties. 
+%
+Section~\ref{sec:homography_matrix} describes the homography matrix and some of its properties.  
+%
+Section~\ref{sec:point_reconstruction} gives several simple point reconstruction algorithms.
+%
+Section~\ref{sec:voxel_map_updates} describes how to update the rolling voxel map given point cloud information.
+
+Embedded papers describe more sophisticated reconstruction techniques.
+
+
+
+%------------------------------------------------
+\section{IMU Integration}
+\label{sec:imu_integration}
+The methods used in this chapter will depend on knowledge of the relative pose between camera frames.  Let $\mathcal{F}_{k}$ be the camera frame at time $k$, then the relative pose is given by $(R_{k-1}^k, \pbf_{k-1/k}^k)$, where $R_{k-1}^k\in SO(3)$ is the rotation matrix from $\mathcal{F}_{k-1}$ to $\mathcal{F}_k$, and $\pbf_{k-1/k}^k\in\mathbb{E}^3$ is the position of $\mathcal{F}_{k-1}$ relative to $\mathcal{F}_k$, expressed in $\mathcal{F}_k$. 
+
+In this section we show how the relative pose $(R_{k-1}^k, \pbf_{k-1/k}^k)$ can be obtained from an IMU rigidly attached to the camera.  The discussion in this section follows in some respects, the development in (Forster 2017)\cite{ForsterCarloneDellaert17}.  
+We will assume in this section that the IMU is rigidly attached to the camera and that the IMU has been calibrated and the biases have been removed.  Then the output of the IMU is the 
+angular velocity $\omegabf_{c/i}^c$ and the specific acceleration $\abf_{c/i}^c$, 
+where $\mathbf{F}_c$ is the camera frame and $\mathcal{F}_i$ is the inertial frame. 
+We will assume that the camera moves according to 
+The equations of motion are given by
+\begin{align}
+\dot{\pbf}_{c/i}^i &= \vbf_{c/i}^i  \label{eq:camera_motion_p} \\
+\dot{\vbf}_{c/i}^i &= g \ebf_3 + R_c^i\abf_{c/i}^c, \label{eq:camera_motion_v} \\
+\dot{R}_c^i &= R_c^i \ss{\omegabf_{c/i}^c}. \label{eq:camera_motion_R}
+\end{align}
+We begin by developing a sampled-data version of the equations of motion.
+\begin{lemma}
+	Suppose that the camera evolves according to \eqref{eq:camera_motion} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution equations are given by
+	\begin{align}
+	R_{\ell+1}^i &= R_{\ell}^i \exp\left(\ss{\omegabf_{\ell/i}^{\ell}} T_s \right)
+	\label{eq:R_imu_int_1} \\
+	\vbf_{\ell+1/i}^{i} &= \vbf_{\ell/i}^{i} + T_s g \ebf_3 + T_s R_{\ell}^i \abf_{\ell/i}^{\ell} \label{eq:v_imu_int_1} \\
+	\pbf_{\ell+1/i}^{i} &= \pbf_{\ell/i}^{i} + T_s\vbf_{\ell/i}^i + \frac{T_s^2}{2} g\ebf_3 + \frac{T_s^2}{2} R_{\ell}^i \abf_{\ell/i}^{\ell} \label{eq:p_imu_int_1}.
+	\end{align}
+\end{lemma}
+\begin{proof}
+	We have shown in Lemma~\ref{} that for a constant angular velocity, the solution of Equation~\eqref{eq:camera_motion_R} is \eqref{eq:R_imu_int_1}.
+	For a constant input, integrating~\eqref{eq:camera_motion_v} gives
+	\begin{align*}
+	\vbf_{c/i}^i(t) &= \vbf_{c/i}^i(t_0) + \int_{t_0}^t \left(g\ebf_3 + R_c^i \abf_{c/i}^c\right)d\tau \\
+		&= \vbf_{c/i}^i(t_0) + \int_{t_0}^t d\tau \left(g\ebf_3 + R_c^i \abf_{c/i}^c\right) \\
+		&= \vbf_{c/i}^i(t_0) + (t-t_0) \left(g\ebf_3 + R_c^i \abf_{c/i}^c\right).
+	\end{align*}
+	Letting the camera frame at time $t_\ell$ be denoted as $\mathcal{F}_\ell$, and letting $t=t_{\ell+1}$ and $t_0=t_{\ell}$ gives Equation~\eqref{eq:v_imu_int_1}.  Similarly, integrating Equation~\eqref{eq:camera_motion_p} gives
+	\begin{align*}
+	\pbf_{c/i}^c(t) &= \pbf_{c/i}^c(t_0) + \int_{t_0}^t \vbf_{c/i}^i(\tau)d\tau \\
+		&= \pbf_{c/i}^c(t_0) + \int_{t_0}^t \left(\vbf_{c/i}^i(t_0) + \int_{t_0}^\tau \left(g\ebf_3 + R_c^i \abf_{c/i}^c\right)d\sigma \right) d\tau \\
+		&= \pbf_{c/i}^c(t_0) + (t-t_0)\vbf_{c/i}^i(t_0) + \frac{(t-t_0)^2}{2}\left(g\ebf_3 + R_c^i \abf_{c/i}^c\right),
+	\end{align*}
+	and Equation~\eqref{eq:p_imu_int_1} follows by letting $t=t_{\ell+1}$ and $t_0=t_{\ell}$.
+\end{proof}
+Since the relative pose does not include the inertial frame, we would like to remove references to the inertial frame in Equations~\eqref{eq:p_imu_int_1}--\eqref{eq:R_imu_int_1}.  The next lemma does so.
+\begin{lemma}
+	Suppose that the camera evolves according to \eqref{eq:camera_motion} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution from IMU sample $\ell$ to IMU sample $\ell+1$ is given by
+	\begin{align}
+	R_{\ell}^{\ell+1} &= \exp\left(-\ss{\omegabf_{\ell/i}^{\ell}} T_s \right)
+		\label{eq:R_imu_int_2} \\
+	\vbf_{\ell/\ell+1}^{\ell+1} &= R_{\ell}^{\ell+1}\left( \vbf_{\ell-1/\ell}^{\ell} 
+		+ T_s \left(R_{\ell-1}^\ell \abf_{\ell-1/i}^{\ell-1} - \abf_{\ell/i}^\ell \right) \right)  \label{eq:v_imu_int_2} \\
+	\pbf_{\ell/\ell+1}^{\ell+1} &= R_{\ell}^{\ell+1}\left(\pbf_{\ell-1/\ell}^{\ell} 
+		+T_s\vbf_{\ell-1/\ell}^{\ell} + \frac{T_s^2}{2}\left(R_{\ell-1}^\ell \abf_{\ell-1/i}^{\ell-1} - \abf_{\ell/i}^{\ell}\right)\right).
+		\label{eq:p_imu_int_2}
+\end{align}
+\end{lemma}
+\begin{proof}
+	The relative pose between IMU measurements is given by
+	\[
+	R_{\ell}^{\ell+1} = R_{\ell+1}^{i\top}R_{\ell}^i 
+		= \exp\left(-\ss{\omegabf_{\ell/i}^{\ell}} T_s \right)
+	\]
+	where the second equation follow from Equation~\eqref{eq:R_imu_int_1}.
+	For the relative velocity, we have from Equation~\eqref{eq:v_imu_int_1} that
+	\begin{align*}
+	\vbf_{\ell/\ell+1}^{\ell+1} 
+	&= R_{\ell+1}^{i\top}\left(\vbf_{\ell/i}^i - \vbf_{\ell+1/i}^i\right) \\
+	&= 	R_{\ell+1}^{i\top}\Big(\vbf_{\ell-1/i}^i + T_s g\ebf_3 + T_s R_{\ell-1}^i 
+		\abf_{\ell-1/i}^{\ell-1} 
+		\\ &\qquad\qquad
+		- \vbf_{\ell/i}^i - T_s g\ebf_3 - T_s R_{\ell}^i \abf_{\ell/i}^{\ell} \Big)  \\
+	&= 	R_{\ell}^{\ell+1} \Big(\vbf_{\ell-1/\ell}^{\ell}
+		+ T_s \left( R_{\ell-1}^{\ell} \abf_{\ell-1/i}^{\ell-1}
+		- \abf_{\ell/i}^{\ell} \right) \Big).
+	\end{align*}
+	Similarly, the relative translation vector is given by
+	\begin{align*}
+	\pbf_{\ell/\ell+1}^{\ell+1} 
+	&= R_{\ell+1}^{i\top}\left(\pbf_{\ell/i}^i - \pbf_{\ell+1/i}^i\right) \\
+	&= R_{\ell+1}^{i\top}\Big(\pbf_{\ell-1/i}^{i} + T_s\vbf_{\ell-1/i}^i + \frac{T_s^2}{2} g\ebf_3 + \frac{T_s^2}{2} R_{\ell-1}^i \abf_{\ell-1/i}^{\ell-1}
+	\\ &\qquad\qquad
+	-\pbf_{\ell/i}^{i} - T_s\vbf_{\ell/i}^i - \frac{T_s^2}{2} g\ebf_3 - \frac{T_s^2}{2} R_{\ell}^i \abf_{\ell/i}^{\ell} \Big) \\
+	&= R_{\ell}^{\ell+1}\Big(\pbf_{\ell-1/\ell}^{\ell} 
+	+ T_s \vbf_{\ell-1/\ell}^{\ell} 
+	+\frac{T_s^2}{2}\left(R_{\ell-1}^{\ell}\abf_{\ell-1/i}^{\ell-1} - \abf_{\ell/i}^{\ell}\right)\Big).
+	\end{align*}
+\end{proof}
+
+If there are $m$ IMU samples between camera frame $k-1$ and camera frame $k$, then the relative pose can be estimated using the following algorithm.
+\begin{description}
+	\item[Initialization.] At frame $k-1$, upon receiving IMU measurement $\ell=0$ at time $t_{k-1}$ initialize the relative pose as
+	\begin{align*}
+	R_{k-1}^1 &= \exp\left(-\ss{\omegabf_{0/i}^0}T_s\right) \\
+	\vbf_{k-1/1}^1 &= 0 \\
+	\pbf_{k-1/1}^1 &= 0.
+	\end{align*}
+	\item[Iteration.] For the $\ell^{th}$ IMU measurement $(\omegabf_{\ell/i}^\ell, \abf_{\ell/i}^\ell)$, $\ell=1,\dots,m$ let 
+	\begin{align*}
+	R_{k-1}^{\ell+1} &= R_\ell^{\ell+1} R_{k-1}^{\ell} \\
+	\vbf_{k-1/\ell+1}^{\ell+1} &=  R_{\ell}^{\ell+1}\vbf_{k-1/\ell}^{\ell} + \vbf_{\ell/\ell+1}^{\ell+1} \\
+	\pbf_{k-1/\ell+1}^{\ell+1} &= R_{\ell}^{\ell+1}\pbf_{k-1/\ell}^{\ell} + \pbf_{\ell/\ell+1}^{\ell+1},
+	\end{align*} 
+	where $R_{\ell}^{\ell+1}$, $\vbf_{\ell/\ell+1}^{\ell+1}$, and $\pbf_{\ell/\ell+1}^{\ell+1}$ are given by Equations~\eqref{eq:R_imu_int_2}--\eqref{eq:p_imu_int_2}.
+\end{description}
+When $\ell=m$, then $t_m=t_k$ and the algorithm has determined the relative pose $(R_{k-1}^k, \pbf_{k-1/k}^k)$.
+
+\rwbcomment{Note that this is different than other IMU integration methods in that the method uses the difference of accelerometer measurements.  It will be interesting to see if this work!}
+
+%------------------------------------------------
+\section{Essential Matrix}
+\label{sec:essential_matrix}
+Author: Jake Johnson
+
+Recall from Equations~\eqref{eq:pin_hole_pixel} and \eqref{eq:pin_hole_calibrated}, that the relationship between the 3D-position of a feature $\pbf_{f/c}^c = (p_x, p_y, p_z)^\top$, the homogeneous pixel coordinates $\bar{\mbf}_f = (m_x, m_y, 1)^\top$, and the homogeneous normalized (calibrated) coordinates $\epsilonbf_f = (\epsilon_x, \epsilon_y, 1)$ is given by
+\[
+\lambda_f K_c^{-1} \mbf_f = \lambda_f \epsilonbf_f = \pbf_{f/c}^c, 
+\]
+where $\lambda_f=p_z$ is the distance to the feature along the optical axis $\kbf_c$.
+
+Figure~\ref{fig:epipolar_geometry} shows the essence of epipolar geometry.  
+Let $\pbf_f$ be the 3D position of a feature point in the world, and let $\pbf_{f/a}^a$ be the position vector of the feature point relative to frame $\mathcal{F}_a$ expressed in frame $\mathcal{F}_a$, and similarly fro $\pbf_{f/b}^b$.
+	\begin{figure}
+		\includegraphics[width=\linewidth]{chap8_scene_reconstruction/figures/epipolar_geometry_quad}
+		\caption{Epipolar Geometry}
+		\label{fig:epipolar_geometry}
+	\end{figure}
+The relationship between $\pbf_{f/a}^a$ and $\pbf_{f/b}^b$ is given by
+\begin{equation}\label{eq:scene_geometric_relation}
+\pbf_{f/b}^b = R_a^b \pbf_{f/a}^a + \pbf_{a/b}^b,
+\end{equation}
+as shown in Figure~\ref{fig:epipolar_geometry}.  Multiplying both sides of  Equation~\eqref{eq:scene_geometric_relation} on the left by $\ss{\pbf_{a/b}^b}$ gives
+\[
+\ss{\pbf_{a/b}^b} \pbf_{f/b}^b = \ss{\pbf_{a/b}^b} R_a^b \pbf_{f/a}^a,
+\]
+where we have used the fact that $\ss{\pbf_{a/b}^b}\pbf_{a/b}^b = \pbf_{a/b}^b \times \pbf_{a/b}^b = 0$. Since $\ss{\pbf_{a/b}^b} \pbf_{f/b}^b = \pbf_{a/b}^b \times \pbf_{f/b}^b$ must be orthogonal to $\pbf_{f/b}^b$ we have that 
+\begin{equation}\label{eq:scene_epipolar_1}
+\pbf_{f/b}^{b\top} \ss{\pbf_{a/b}^b} R_a^b \pbf_{f/a}^a = 0.
+\end{equation}
+Dividing Equation~\eqref{eq:scene_epipolar_1} by the norm of $\pbf_{a/b}^b$, and defining
+\[
+\tbf_{a/b}^b\defeq \frac{\pbf_{a/b}^b}{\norm{\pbf_{a/b}^b}}
+\]
+gives
+\begin{equation}\label{eq:scene_epipolar_2}
+\pbf_{f/b}^{b\top} \ss{\tbf_{a/b}^b} R_a^b \pbf_{f/a}^a = 0.
+\end{equation}
+The matrix 
+\begin{equation}\label{eq:scene_essential_matrix}
+E = \ss{\tbf_{a/b}^b} R_a^b
+\end{equation}
+is called the essential matrix, and is completely defined by the relative pose $(R_a^b, \pbf_{a/b}^b)$.  
+\begin{theorem}
+	Given the geometry shown in Figure~\ref{fig:epipolar_geometry} with relative pose $(R_a^b, \pbf_{a/b}^b)$, and the associated essential matrix given in Equation~\eqref{eq:essential_matrix}.  Every pair of matching feature points  $(\bar{\epsilonbf}_{f/a}^a, \bar{\epsilonbf}_{f/b}^b)$ in frames $a$ and $b$, expressed in normalized (calibrated) coordinates satisfies the so-called {\em epipolar constraint}
+	\begin{equation}\label{eq:scene_epipolar_3}
+	\bar{\epsilonbf}_{f/b}^{b\top} ~E~ \bar{\epsilonbf}_{f/a}^a = 0.
+	\end{equation}
+\end{theorem}
+\begin{proof}
+The normalized pixel coordinates of the feature point projected on to image $a$ and image $b$ satisfy
+\begin{align*}
+\lambda_a \bar{\epsilonbf}_{f/a}^a &= \pbf_{f/a}^a \\
+\lambda_b \bar{\epsilonbf}_{f/b}^b & \ pbf_{f/b}^b,
+\end{align*}
+where $\lambda_a$ and $\lambda_b$ are the distances to the feature point along the optical axes in frame $a$ and $b$, respectively.  Substituting into Equation~\eqref{eq:scene_epipolar_2} gives
+\begin{equation}\label{eq:scene_epipolar_3}
+\bar{\epsilonbf}_{f/b}^{b\top} E \bar{\epsilonbf}_{f/a}^a = 0.
+\end{equation}
+\end{proof}
+
+There is a related result for uncalibrated coordinates.
+\begin{theorem}
+	Define the {\em fundamental matrix} as
+	\begin{equation}\label{eq:scene_fundamental_matrix}
+	F = K_c^{-\top} E K_c^{-1},
+	\end{equation}
+	where $K_c$ is the camera calibration matrix.  Then every set of matching pixels $(\bar{\mbf}_{f/a}^a, \bar{\mbf}_{f/b}^b)$ in homogeneous (uncalibrated) coordinates satisfies
+	\begin{equation}\label{eq:scene_epipolar_4}
+	\bar{\mbf}_{f/b}^{b\top} ~F~ \bar{\mbf}_{f/a}^a = 0.
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	Follows directly from Equation~\eqref{eq:scene_epipolar_3} and the fact that $\bar{\epsilonbf} = K_c^{-1} \bar{\mbf}$.
+\end{proof}
+
+The essential matrix invokes several interesting geometrical relationships.  For example, consider the relationship
+\begin{align*}
+\ellbf_a &= E^\top \bar{\epsilonbf}^b\\
+	&= R_a^{b\top} \ss{\tbf_{a/b}^b}^\top \bar{\epsilonbf}^b \\
+	&= R_b^a (\bar{\epsilonbf}^b \times \tbf_{a/b}^b),
+\end{align*}
+from which it is clear that $\ellbf_a$ is a vector (expressed in frame $a$) that is perpendicular to both $\bar{\epsilonbf}^b$ and $\tbf_{a/b}^b$.  Therefore $\ellbf_a$ is perpendicular to the epipolar plane containing $\pbf_{a/b}$, $\pbf_{f/a}$ and $\pbf_{f/b}$.  Since $\ellbf_a$ is in homogenous coordinates, it defines the line in image $a$ where the epipolar plane intersects image $a$.  
+%
+Similarly, consider the relationship
+\begin{align*}
+\ell_b &= E \bar{\epsilonbf}^a \\
+       &= \ss{\tbf_{a/b}^b}R_a^b \bar{\epsilonbf}^a \\
+       &= R_a^b R_a^{b\top} \ss{\tbf_{a/b}^b}R_a^b \bar{\epsilonbf}^a \\
+       &= R_a^b \ss{R_a^{b\top}\tbf_{a/b}^b} \bar{\epsilonbf}^a\\
+       &= R_a^b \ss{\tbf_{a/b}^a} \bar{\epsilonbf}^a \\
+       &= R_a^b (\tbf_{a/b}^a \bar{\epsilonbf}^a),
+\end{align*}
+from which it is clear that $\ell_b$ is a vector (expressed in frame $b$) that is perpendicular to both $\bar{\epsilonbf}^a$ and $\tbf_{a/b}^a$.  Therefore $\ellbf_b$ is also perpendicular to the epipolar plane containing $\pbf_{a/b}$, $\pbf_{f/a}$ and $\pbf_{f/b}$.  Since $\ellbf_b$ is in homogenous coordinates, it defines the line in image $b$ where the epipolar plane intersects image $b$.  
+%
+The lines $\ellbf_a$ and $\ellbf_b$ are called the epipolar lines.  
+
+As shown in Figure~\ref{fig:epipolar_geometry}, the vector $\pbf_{a/b}^b$ intersects the two image planes (typically outside the field-of-view) at the points $\bar{\ebf}_a$ and $\bar{\ebf}_b$ which are called the epipoles.  Since any line the image can be defined by the cross product of two points on the line, the epipoles are defined by the relationship
+\begin{align*}
+\ellbf_a &= \bar{\epsilonbf}^a \times \bar{\ebf}^a \\
+\ellbf_b &= \bar{\epsilonbf}^b \times \bar{\ebf}^b.
+\end{align*}
+
+\rwbcomment{Add:  (1) How to compute $E$ from matching image points. (2) Given $E$, how to fine $R$ and $\tbf$. (3) Other interesting facts about epipolar geometry.}  
+	
+%-------------------------------------------------------
+\subsection{Point Triangulation}
+	
+	We desire to recover point locations in 3-space given two camera views of the same point. In the ideal case where there is no noise or discretization in pixel coordinates of the imaged point, this can be done using a simple triangulation method. However, consider the case shown in Fig.~\ref{fig:noise}. If there is any noise in homogeneous image coordinates in either of the images, the rays from camera centers through the noisy image coordinates will never intersect, and the epipolar constraint will not be satisfied. A simple way to overcome this issue is to pick the midpoint of the line segment of minimum length that connects the two rays as the 3D point. However, this method of error minimization is not projective-invariant \cite{Hartley2004}. A more suitable method is presented in Section \ref{sec:mle_triang}.
+	
+	\begin{figure}
+		\includegraphics[width=\linewidth]{chap8_scene_reconstruction/figures/epipolar_noise}
+		\caption{Effect of noise on epipolar geometry.}
+		\label{fig:noise}
+	\end{figure}
+	
+%--------------------------------------------------------	
+\subsection{Naive Point Triangulation}
+\label{sec:naive}
+In this section we will describe a simple method for point triangulation when the relative pose $(R_a^b, \pbf_{a/b}^b)$ are known.
+\begin{theorem}
+	Suppose that the relative pose $(R_a^b, \pbf_{a/b}^b)$ is known, and that the normalized (calibrated) pixel coordinates of a feature are known, i.e.,
+	\begin{align*}
+	\bar{\epsilonbf}_{f/a}^a &= \lambda_a \pbf_{f/a}^a \\
+	\bar{\epsilonbf}_{f/b}^b &= \lambda_b \pbf_{f/b}^b.
+	\end{align*}
+	Then the unknown scales are given by
+	\begin{align*}
+	\lambda_a &= -\norm{\pbf_{a/b}^b}\frac{(R_a^b\bar{\epsilonbf}_{f/a}^a)^\top \ss{\bar{\epsilonbf}_{f/b}^b} E R_a^{b\top} \bar{\epsilonbf}_{f/b}^b}
+	{\norm{\ss{\bar{\epsilonbf}_{f/b}^b}R_a^b\bar{\epsilonbf}_{f/a}^a}},
+	\\
+	\lambda_b &= \norm{\pbf_{a/b}^b} \frac{\bar{\epsilonbf}_{f/b}^{b\top}\ss{R_a^b\bar{\epsilonbf}_{f/a}^a} E \bar{\epsilonbf}_{f/a}^a}
+	{\norm{\ss{R_a^b\bar{\epsilonbf}_{f/a}^a}\bar{\epsilonbf}_{f/b}^b}},
+	\end{align*}
+	where $E=\ss{\frac{\pbf_{a/b}^b}{\norm{\pbf_{a/b}^b}}}R_a^b$ is the essential matrix.
+\end{theorem}
+\begin{proof}
+	From Equation~\eqref{eq:scene_geometric_relation}  we have
+	\[
+	\pbf_{f/b}^b = R_a^b \pbf_{f/a}^a + \pbf_{a/b}^b.
+	\]
+	In terms of calibrated pixel coordinates we have
+	\[
+	\lambda_b \epsilonbf_{f/b}^b = \lambda_a R_a^b \epsilonbf_{f/a}^a + \pbf_{a/b}^b,
+	\]	
+	where $\lambda_a$ and $\lambda_b$ are unknown scales.  
+	Multiplying both sides by $\ss{R_a^b \epsilonbf_{f/a}^a}$ gives
+	\[
+	\lambda_b \ss{R_a^b \epsilonbf_{f/a}^a} \epsilonbf_{f/b}^b  = \ss{R_a^b \epsilonbf_{f/a}^a} \pbf_{a/b}^b.
+	\]	
+	Multiplying booth sides by $(\ss{R_a^b \epsilonbf_{f/a}^a} \epsilonbf_{f/b}^b)^\top$, and solving for the scale $\lambda_b$ gives
+	\[
+	\lambda_b = \frac{(\ss{R_a^b \epsilonbf_{f/a}^a} \epsilonbf_{f/b}^b)^\top \ss{R_a^b \epsilonbf_{f/a}^a} \pbf_{a/b}^b}{\norm{\ss{R_a^b \epsilonbf_{f/a}^a} \epsilonbf_{f/b}^b}^2}.
+	\]
+	The numerator can be simplified as
+	\begin{align*}
+	& (\ss{R_a^b \epsilonbf_{f/a}^a} \epsilonbf_{f/b}^b)^\top \ss{R_a^b \epsilonbf_{f/a}^a} \pbf_{a/b}^b \\
+	=& -\epsilonbf_{f/b}^{b\top} \ss{R_a^b \epsilonbf_{f/a}^a}  \ss{R_a^b \epsilonbf_{f/a}^a} \pbf_{a/b}^b \\
+	=& \epsilonbf_{f/b}^{b\top} \ss{R_a^b \epsilonbf_{f/a}^a} \ss{\pbf_{a/b}^b} R_a^b \epsilonbf_{f/a}^a  \\
+	=& \norm{\pbf_{a/b}^b} \epsilonbf_{f/b}^{b\top} \ss{R_a^b \epsilonbf_{f/a}^a} E \epsilonbf_{f/a}^a.
+	\end{align*}
+	The formula for $\lambda_a$ is derived similarly.
+\end{proof}
+
+\rwbcomment{Revise stuff below to fit notation.}
+
+	
+	
+	Defining $\mathbf{X_a} = [p_a^\top, 1]^\top, \mathbf{X_b} = [p_b^\top, 1]^\top$, from Euclidean geometry, we have that
+	\begin{equation}
+	\mathbf{X_b} = \left[\begin{matrix} R_a^b & t_{a/b}^b \\ \mathbf{0} & 1 \end{matrix}\right] \mathbf{X_a}.
+	\end{equation}
+	so
+	\begin{equation}
+	p_b = R_a^b p_a + t_{a/b}^b.
+	\label{eq:point_trans}
+	\end{equation}
+	Assuming the translation between the two camera frames is only known up to some scale $\gamma$, and assuming normalized homogeneous image coordinates,
+	\begin{equation}
+	z_b \mathbf{\bar{x}_b} = z_a R_a^b \mathbf{\bar{x}_a} + \gamma t_{a/b}^b,
+	\label{eq:homo_trans}
+	\end{equation}
+	where we have used the relationship given in Eq. \ref{eq:norm} \cite{Ma2003}. Note that if either $z_a$ or $z_b$ is known, the other can easily be found using Eq. \ref{eq:point_trans}. We can therefore eliminate the dependence on one of them, which is done by multiplying both sides of Eq. \ref{eq:homo_trans} by $\ss{\mathbf{\bar{x}_b}}$, and we get
+	\begin{equation}
+	z_a \ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} + \gamma \ss{\mathbf{\bar{x}_b}} t_{a/b}^b = \left[\begin{matrix}\ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} & \ss{\mathbf{\bar{x}_b}} t_{a/b}^b \end{matrix}\right] \left[\begin{matrix} z_a \\ \gamma \end{matrix}\right] = M\lambda = 0,
+	\label{eq:triang2}
+	\end{equation}
+	with $M \in \mathbb{R}^{3\times 2}$ and $\lambda \in \mathbb{R}^2$. Note that $\lambda$ must be in the null space of $M$, so for Eq. \ref{eq:triang2} to have a nontrivial solution that is unique, $M$ must be of rank 1. Also, if $\lambda$ is a solution, then so is $k\lambda$, with $k \in \mathbb{R}$. So $\lambda$ is a solution up to some arbitrary scale.
+	
+	\begin{theorem}
+		Eq. \ref{eq:triang2} has a nontrivial solution that is unique if $\mathbf{\bar{x}_a}$ and $\mathbf{\bar{x}_b}$ satisfy the epipolar constraint, and the point $p_a$ does not lie along the epipolar baseline.
+	\end{theorem}
+	
+	\begin{proof}
+		1. Imagine that $\mathbf{\bar{x}_a}$ and $\mathbf{\bar{x}_b}$ do not satisfy the epipolar constraint, i.e.
+		\begin{equation}
+		\mathbf{\bar{x}_b}^\top E_{ab} \mathbf{\bar{x}_a} = \epsilon, \qquad \epsilon \neq 0.
+		\end{equation}
+		In order for $M$ to be rank 1, we must be able to write its columns as a linear combination of one another, i.e.
+		\begin{equation}
+		c_1 \ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} + c_2 \ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0,
+		\label{eq:rank1_cons}
+		\end{equation}
+		where $c_1$ and $c_2$ are not both 0. Multiplying both sides of Eq. \ref{eq:rank1_cons} by $t_{a/b}^{b\top}$, and using the result in \ref{eq:left_skew}, we get 
+		\begin{align}
+		&c_1 t_{a/b}^{b\top} \ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} + c_2 t_{a/b}^{b\top} \ss{\mathbf{\bar{x}_b}} t_{a/b}^b \\
+		&\quad = -c_1 \mathbf{\bar{x}_b}^\top \ss{t_{a/b}^b} R_a^b \mathbf{\bar{x}_a} - c_2 \mathbf{\bar{x}_b}^\top \ss{t_{a/b}^b} t_{a/b}^b \\
+		&\quad = -c_1 \mathbf{\bar{x}_b}^\top E_{ab} \mathbf{\bar{x}_a} \\
+		&\quad = -c_1 \epsilon = 0.
+		\end{align}
+		Therefore, if the epipolar constraint is not satisfied, then $c_1$ must be 0 to satisfy this relationship. Plugging $c_1 = 0$ into Eq. \ref{eq:rank1_cons}, we have
+		\begin{equation}
+		c_2 \ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0.
+		\label{eq:rank1_cons2}
+		\end{equation}
+		Note that $\ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0$ only when $\mathbf{\bar{x}_b}$ is imaged at the epipole in frame $\mathcal{B}$. In any other case, Eq. \ref{eq:rank1_cons2} is only satisfied if $c_2 = 0$. Therefore, if $\mathbf{\bar{x}_a}$ and $\mathbf{\bar{x}_b}$ do not satisfy the epipolar constraint, $M$ has rank 2 and Eq. \ref{eq:triang2} has only the trivial solution.
+		
+		Also note that if the epipolar constraint is satisfied and the imaged point $p$ lies along the epipolar baseline (i.e. $\ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0$), then $M$ will have rank 0, and any $\lambda$ will be a solution of Eq. \ref{eq:triang2}.
+	\end{proof}
+	
+	\marginnote{
+		If the translation between frame $t_{a/b}^b$ is known to scale, then forcing $\gamma=1$ will result in point triangulations that are also to scale. 
+	} % end marginnote
+	
+	If we wish to resolve $n$ points from two images, the value of $\gamma$ remains the same for each. Defining the vector $\Lambda = [z_a^1, z_a^2, \cdots, z_a^n, \gamma]^\top$, we get
+	\begin{equation}
+	A\Lambda = \left[\begin{matrix}\ss{\mathbf{\bar{x}_b^1}} R_a^b \mathbf{\bar{x}_a^1} & \mathbf{0} & \cdots & \mathbf{0} & \ss{\mathbf{\bar{x}_b^1}} t_{a/b}^b \\ \mathbf{0} & \ss{\mathbf{\bar{x}_b^2}} R_a^b \mathbf{\bar{x}_a^2} & \cdots & \mathbf{0} & \ss{\mathbf{\bar{x}_b^2}} t_{a/b}^b \\ \vdots & \vdots & \ddots & \vdots & \vdots \\ \mathbf{0} & \mathbf{0} & \cdots & \ss{\mathbf{\bar{x}_b^n}} R_a^b \mathbf{\bar{x}_a^n} & \ss{\mathbf{\bar{x}_b^n}} t_{a/b}^b \end{matrix}\right] \left[ \begin{matrix} z_a^1 \\ z_a^2 \\ \vdots \\ \gamma \end{matrix}\right] = \mathbf{0}.
+	\end{equation}
+	
+%--------------------------------------------------------	
+	\subsection{Point Triangulation Using Maximum Likelihood Estimation}
+	\label{sec:mle_triang}
+	
+	\rwbcomment{Revise to fit notation.}
+	
+	The solution obtained in section \ref{sec:naive} assumed that the normalized image points $\mathbf{\bar{x}_a}$ and $\mathbf{\bar{x}_b}$ satisfy the epipolar constraint. However, image coordinates are likely to be subject to noise caused by imperfect feature matching, discretization, imperfect camera models, inaccurate distortion correction, etc. This noise causes the epipolar constraint to not be satisfied. 
+	
+	We seek to obtain a new point correspondence $\mathbf{\hat{\bar{x}}_a}$, $\mathbf{\hat{\bar{x}}_b}$ that minimizes the distance between measured and new points such that the epipolar constraint is satisfied, as shown in Fig. \ref{fig:noise_corr}. This results in the problem
+	\begin{equation}
+	\min_{\mathbf{\hat{\bar{x}}_a},\mathbf{\hat{\bar{x}}_b}} \quad d(\mathbf{\bar{x}_a}, \mathbf{\hat{\bar{x}}_a})^2 + d(\mathbf{\bar{x}_b}, \mathbf{\hat{\bar{x}}_b})^2 \quad \text{s.t.} \quad \mathbf{\hat{\bar{x}}_b}^\top E_{ab} \mathbf{\hat{\bar{x}}_a} = 0,
+	\label{eq:cost}
+	\end{equation}
+	where $d(*,*)$ is the 2-norm between the two points. 
+	
+	This problem can be solved using any iterative minimization strategy. However, section 12.5 of \cite{Hartley2004} presents an analytical solution that involves finding the roots of a six-degree polynomial. Additionally, section 12.4 presents the solution to the first order approximation of Eq. \ref{eq:cost} that can be used so long as the error in image coordinates is around 1 pixel.
+	
+	After a solution to Eq. \ref{eq:cost} is obtained, the method presented in section \ref{sec:naive} can be used to obtain the triangulation for $\mathbf{X_a}$.
+	
+	\begin{figure}
+		\includegraphics[width=\linewidth]{chap8_scene_reconstruction/figures/epipolar_noise_corr}
+		\caption{Maximum likelihood estimate of image correspondence that satisfies the epipolar constraint.}
+		\label{fig:noise_corr}
+	\end{figure}
+
+
+
+%------------------------------------------------
+\section{Simple point reconstruction methods}
+\label{sec:point_reconstruction}
+
+The point reconstruction problem is depicted graphically in Figure~\ref{fig:scene_reconstruction}, where the airc
+
+\begin{figure}[h]
+	\includegraphics[width=0.8\linewidth]{chap8_scene_reconstruction/figures/point_reconstruction}
+	\caption{The point reconstruction problem.}
+	\label{fig:point_reconstruction}
+\end{figure}
+
+
+%------------------------------------------------
+\section{Updating the rolling voxel map}
+\label{sec:voxel_map_updates}
+\marginnote{This section is inspired by a similar discussion in (Thrun, 2006)\cite{ThrunBurgardFox06}.}
+Associated with every voxel in the rolling voxel world is a probability that the voxel is occupied by an object.  The probability that a voxel is occupied at time $k$ will be a function of the output of the vision sensor at times $k, k-1, \dots, 0$.  Let $X_\ell[k]$ be a binary random variable representing the state of the $\ell^{th}$ voxel at time $k$, with the following possible values:
+\[
+X_\ell[k] = \begin{cases}
+	\text{O} & \text{~meaning voxel $\ell$ is occupied with an object at time $k$} \\
+	\text{E} & \text{~meaning voxel $\ell$ is empty at time $k$}
+\end{cases}. 
+\]
+Let $Z_{\ell}[k]$ be a binary random variable representing the measurement of the $\ell^{th}$ voxel at time $k$ with the following possible value:
+\[
+Z_\ell[k] = \begin{cases}
+\text{O} & \text{~meaning the sensor measures an object in voxel $\ell$ at time $k$} \\
+\text{E} & \text{~meaning the sensor does not measure an object in voxel $\ell$ at time $k$}
+\end{cases}.
+\]
+
+Let
+\[
+\pi_\ell[k] = P(X_\ell[k] = \text{O}|Z_\ell[k:0]).
+\]
+Using Bayes law $P(A|B,C) = \frac{P(B|A,C)P(A|C)}{P(B|C)}$ we get that
+\begin{align*}
+P(X_\ell[k] = \text{O}~|~Z_\ell[k:0]) &= \frac{P(Z_\ell[k] ~|~ X_\ell[k] = \text{O}, Z_\ell[k-1:0])P(X_\ell[k] = \text{O}~|~ Z_\ell[k-1:0])}{P(Z_\ell[k] ~|~ Z_\ell[k-1:0])} \\
+&= \frac{P(Z_\ell[k] ~|~ X_\ell = \text{O})P(X_\ell[k] = \text{O}~|~ Z_\ell[k-1:0])}{P(Z_\ell[k] ~|~ Z_\ell[k-1:0])},
+\end{align*}
+where
+\begin{align*}
+P(Z_\ell[k] ~|~ Z_\ell[k-1:0]) 
+	&= P(Z_\ell[k] ~|~ X_\ell[k] = \text{O}, Z_\ell[k-1:0])P(X_\ell[k] = \text{O}~|~ Z_\ell[k-1:0]) 
+	\\ &\quad
+	+ P(Z_\ell[k] ~|~ X_\ell = \text{E}, Z_\ell[k-1:0])P(X_\ell[k] = \text{E}~|~ Z_\ell[k-1:0]) \\
+	&= P(Z_\ell[k] ~|~ X_\ell[k] = \text{O})P(X_\ell[k] = \text{O}~|~ Z_\ell[k-1:0]) 
+	\\ &\quad
+	+ P(Z_\ell[k] ~|~ X_\ell[k] = \text{E})P(X_\ell[k] = \text{E}~|~ Z_\ell[k-1:0]),
+\end{align*}
+and where we have used the assumption that the measurement at time $k$ only depends on the state at time $k$.
+Define the {\em a priori} probability as
+\[
+\bar{\pi}_\ell[k] \defeq P(X_\ell[k] = \text{O}|Z_\ell[k-1:0]),
+\]
+and also define the probability of detection and probability of false alarm as
+\begin{align*}
+p_D &\defeq P(Z_\ell[k]=\text{O} ~|~ X_\ell[k]=\text{O}) \\
+p_{FA} &\defeq P(Z_\ell[k]=\text{O} ~|~ X_\ell[k]=\text{E}),
+\end{align*}
+then the probability update law becomes
+\[
+\pi_\ell[k] = \begin{cases}
+\frac{p_D \bar{\pi}_\ell[k]}{p_D\bar{\pi}_\ell[k]+p_{FA}(1-\bar{\pi}_\ell[k])} &\quad Z_k=\text{O} \\
+\frac{(1-p_D) \bar{\pi}_\ell[k]}{(1-p_D)\bar{\pi}_\ell[k]+(1-p_{FA})(1-\bar{\pi}_\ell[k])} &\quad Z_k=\text{E}
+\end{cases}.
+\]
+The {\em a priori} probability of occupancy is given by
+\begin{align*}
+\bar{\pi}_\ell[k] &= P(X_\ell[k] = \text{O}|Z_\ell[k-1:0]) \\
+&= P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{O}, Z_\ell[k-1:0])
+   P(X_\ell[k-1] = \text{O}~|~Z_\ell[k-1:0]) 
+   \\ &\quad
+ + P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{E}, Z_\ell[k-1:0])
+   P(X_\ell[k-1] = \text{E}~|~Z_\ell[k-1:0]) \\
+&= P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{O})
+   \pi_\ell[k-1]
+   \\ &\quad
+ + P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{E})
+   (1-\pi_\ell[k-1]),
+\end{align*}
+where we have used the assumption that state transitions do not depend on the measurements.  Define the static and transition probabilities as
+\begin{align*}
+p_{s} &= P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{O}) \\
+p_ {t}&= P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{E}),
+\end{align*}
+then the {\em a priori} probability is given as
+\[
+\bar{\pi}_\ell[k] = p_{s}\pi_\ell[k-1] + p_{t}(1-\pi_\ell[k-1]).
+\]
+If voxel $\ell$ is not measured at time $k$, then 
+\[
+P(X_\ell[k]=O ~|~ Z_\ell[0:k]) = P(X_\ell[k]=O ~|~ Z_\ell[0:k-1]),
+\]
+which implies that
+\[
+\pi_\ell[k] = \bar{\pi}_\ell[k].
+\]
+
+In summary we have the following result.
+\begin{lemma}
+	Define the probability of detection $p_{_D}$, the probability of false alarm $p_{_{FA}}$, the probability of a static voxel $p_{s}$, and the probability of a transitioning voxel $p_{t}$ as
+	\begin{align*}
+		p_{_D} &= P(Z_\ell[k]=\text{O} ~|~ X_\ell[k]=\text{O}) \\
+		p_{_{FA}} &= P(Z_\ell[k]=\text{O} ~|~ X_\ell[k]=\text{E}), \\
+		p_s &= P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{O}) \\
+		p_t &= P(X_\ell[k] = \text{O}~|~ X_\ell[k-1]=\text{E}).
+	\end{align*}
+	Then the optimal Bayes filter for the $\ell^{th}$ voxel cell is given by
+	\begin{align*}
+		\bar{\pi}_\ell[k] &= p_{s}\pi_\ell[k-1] + p_{t}(1-\pi_\ell[k-1]) \\
+		\pi_\ell[k] &= \begin{cases}
+		\frac{p_{_D} \bar{\pi}_\ell[k]}{p_{_D}\bar{\pi}_\ell[k]+p_{_{FA}}(1-\bar{\pi}_\ell[k])} &\quad Z_\ell[k]=\text{O} \\
+		\frac{(1-p_{_D}) \bar{\pi}_\ell[k]}{(1-p_{_D})\bar{\pi}_\ell[k]+(1-p_{_{FA}})(1-\bar{\pi}_\ell[k])} &\quad Z_\ell[k]=\text{E}  \\
+		\bar{\pi}_\ell[k] &\quad \text{no measurement}
+		\end{cases}.
+	\end{align*}
+	
+	
+\end{lemma}
+
+
+
+%------------------------------------------------
+\clearpage
+\section{Inverse Depth Parametrization for Monocular SLAM, TRO, 2008}
+\includepdf[pages=-,scale=.8,pagecommand={}]{chap8_scene_reconstruction/papers/CiveraDavisonMartinez08.pdf}
+
+
+
+

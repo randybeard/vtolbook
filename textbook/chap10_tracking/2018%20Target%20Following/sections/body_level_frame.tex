@@ -1,0 +1,216 @@
+\section{The Body-Level Frame}
+
+The target-following problem will be cast in the body-level frame.  The basic idea is that the body-level frame is the un-rolled and un-pitched body frame.  The heading direction for the body frame and the body-level frame will be identical, but the $z$-axis of the body level frame will always point down along the gravity vector.
+Letting $\ell$ denote the body-level frame, we have that
+\[
+R_b^i = R_\ell^i R_b^\ell,
+\]
+or 
+\[
+R_\ell^i =  R_b^i (R_b^\ell)^\top.
+\]
+To make things concrete, if $\phi$, $\theta$, and $\psi$ are the roll, pitch, and yaw Euler angles, then 
+\begin{align*}
+R_b^i &= R_z(\psi) R_y(\theta) R_x(\phi) \\
+	&\defeq \begin{pmatrix} \cos\psi & -\sin\psi & 0 \\ \sin\psi & \cos\psi & 0 \\ 0 & 0 & 1 \end{pmatrix}
+	\begin{pmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{pmatrix}
+	\begin{pmatrix} 1 & 0 & 0 \\ 0 & \cos\phi & -\sin\phi \\ 0 & \sin\phi & \cos\phi \end{pmatrix}.
+\end{align*}
+In this case $R_\ell^i = R_z(\psi)$ and $R_b^\ell = R_y(\theta)R_x(\phi)$.
+
+
+%----------------------------------------------
+\subsection{Equations of Motion of the Body-Level Frame}
+
+Since the origin of the body-level frame is coincident with the origin of the body frame, we have that
+\begin{align*}
+\mathbf{p}_{\ell/i} &= \mathbf{p}_{b/i} \\	
+\mathbf{v}_{\ell/i} &= \mathbf{v}_{b/i}.
+\end{align*}
+Therefore, using Equation~\eqref{eq:eom_p_b/i^i} and~\eqref{eq:eom_v_b/i^i} we get that the translational equations of motion in the body-level frame are given by
+\begin{align*}
+	\dot{\mathbf{p}}_{\ell/i}^i &= \mathbf{v}_{\ell/i}^i\\
+	m\dot{\mathbf{v}}_{\ell/i}^i &= mg\mathbf{e}_3^i + \mu R_\ell^i R_b^\ell \Pi_{\mathbf{e}_3}(R_b^\ell)^\top (R_\ell^i)^\top \mathbf{v}_{\ell/i}^i + TR_\ell^i R_b^\ell \mathbf{e}_3^b.
+\end{align*}
+
+The angular velocity of the body, resolved in the body-level frame, is given by
+\[
+\boldsymbol{\omega}_{b/i}^\ell = R_b^\ell \boldsymbol{\omega}_{b/i}^b.
+\]
+Since the body-level frame only rotates about its own $\mathbf{e}_3$-axis, we have that
+\begin{equation}\label{eq:omega_l/i^l}
+\boldsymbol{\omega}_{\ell/i}^\ell 
+	= \mathbf{e}_3 \mathbf{e}_3^\top \boldsymbol{\omega}_{b/i}^\ell
+	= \mathbf{e}_3 \mathbf{e}_3^\top R_b^\ell \boldsymbol{\omega}_{b/i}^b.
+\end{equation}
+From Equation~\eqref{eq:R_r^s}, the kinematic equation of motion for $R_\ell^i$ is given by
+\[
+\dot{R}_\ell^i = R_\ell^i(\boldsymbol{\omega}_{\ell/i}^\ell)^\wedge.
+\]
+
+Differentiating Equation~\eqref{eq:omega_l/i^l} gives
+\[
+\dot{\boldsymbol{\omega}}_{\ell/i}^\ell = \mathbf{e}_3\mathbf{e}_3^\top \left[ R_b^\ell \dot{\boldsymbol{\omega}}_{b/i}^b + \dot{R}_b^\ell \boldsymbol{\omega}_{b/i}^b \right].
+\]
+From Equation~\eqref{eq:R_r^s} we have that
+\[
+\dot{R}_b^\ell = R_b^\ell (\boldsymbol{\omega}_{b/\ell}^b)^\wedge,
+\]
+where 
+\[
+\boldsymbol{\omega}_{b/\ell}^b = \boldsymbol{\omega}_{b/i}^b - \boldsymbol{\omega}_{\ell/i}^b,
+\]
+which implies that
+\begin{align*}
+\dot{\boldsymbol{\omega}}_{\ell/i}^\ell &= \mathbf{e}_3\mathbf{e}_3^\top \left[ R_b^\ell \dot{\boldsymbol{\omega}}_{b/i}^b + R_b^\ell (\boldsymbol{\omega}_{b/i}^b - \boldsymbol{\omega}_{\ell/i}^b)^\wedge \boldsymbol{\omega}_{b/i}^b \right] \\
+&= \mathbf{e}_3\mathbf{e}_3^\top \left[ R_b^\ell \dot{\boldsymbol{\omega}}_{b/i}^b - R_b^\ell (\boldsymbol{\omega}_{\ell/i}^b)^\wedge \boldsymbol{\omega}_{b/i}^b \right] \\
+&= \mathbf{e}_3\mathbf{e}_3^\top R_b^\ell \left[  J^{-1}\mathbf{M}^b - J^{-1}(\boldsymbol{\omega}_{b/i}^b)^\wedge (J\boldsymbol{\omega}_{b/i}^b) + (\boldsymbol{\omega}_{b/i}^b)^\wedge \boldsymbol{\omega}_{\ell/i}^b \right] \\
+\end{align*}
+
+Using Equation~\eqref{eq:R_r^s} and the fact that $(Rv)^\wedge = Rv^\wedge R^\top$ we get that
+\[
+\dot{R}_r^s = (\boldsymbol{\omega}_{r/s}^s)^\wedge R_r^s,
+\]
+which implies that
+\[
+\dot{R}_b^\ell = (\boldsymbol{\omega}_{b/\ell}^\ell)^\wedge R_b^\ell.
+\]
+Using the facts that $\boldsymbol{\omega}_{b/\ell}^\ell = \boldsymbol{\omega}_{b/i}^\ell - \boldsymbol{\omega}_{\ell/i}^\ell$ and $\boldsymbol{\omega}_{b/i}^\ell = R_b^\ell \boldsymbol{\omega}_{b/i}^b$, we have that
+\begin{align*}
+\dot{\boldsymbol{\omega}}_{b/\ell}^\ell &= 	\dot{\boldsymbol{\omega}}_{b/i}^\ell - \dot{\boldsymbol{\omega}}_{\ell/i}^\ell \\
+&= R_b^\ell \dot{\boldsymbol{\omega}}_{b/i}^b + R_b^\ell(\boldsymbol{\omega}_{b/\ell}^b)^\wedge \boldsymbol{\omega}_{b/i}^b - \dot{\boldsymbol{\omega}}_{\ell/i}^\ell \\
+&= R_b^\ell\left[  J^{-1}\mathbf{M}^b - J^{-1}(\boldsymbol{\omega}_{b/i}^b)^\wedge (J\boldsymbol{\omega}_{b/i}^b) + (\boldsymbol{\omega}_{b/i}^b)^\wedge \boldsymbol{\omega}_{\ell/i}^b \right]- \dot{\boldsymbol{\omega}}_{\ell/i}^\ell \\
+&= (I-\mathbf{e}_3\mathbf{e}_3^\top) R_b^\ell\left[  J^{-1}\mathbf{M}^b - J^{-1}(\boldsymbol{\omega}_{b/i}^b)^\wedge (J\boldsymbol{\omega}_{b/i}^b) + (\boldsymbol{\omega}_{b/i}^b)^\wedge \boldsymbol{\omega}_{\ell/i}^b \right].
+\end{align*}
+
+Summarizing, the dynamics in the body-level frame are given by
+\begin{align}
+	\dot{\mathbf{p}}_{\ell/i}^i &= \mathbf{v}_{\ell/i}^i \label{eq:pdot_l/i^i}\\
+	m\dot{\mathbf{v}}_{\ell/i}^i &= mg\mathbf{e}_3^i + \mu R_\ell^i R_b^\ell \Pi_{\mathbf{e}_3}(R_b^\ell)^\top (R_\ell^i)^\top \mathbf{v}_{\ell/i}^i + TR_\ell^i R_b^\ell \mathbf{e}_3^b \label{eq:vdot_l/i^i}\\
+	\dot{R}_\ell^i &= R_\ell^i(\boldsymbol{\omega}_{\ell/i}^\ell)^\wedge \label{eq:Rdot_l^i}\\
+	\dot{\boldsymbol{\omega}}_{\ell/i}^\ell &=\mathbf{e}_3\mathbf{e}_3^\top R_b^\ell \left[  J^{-1}\mathbf{M}^b - J^{-1}(\boldsymbol{\omega}_{b/i}^b)^\wedge (J\boldsymbol{\omega}_{b/i}^b) + (\boldsymbol{\omega}_{b/i}^b)^\wedge \boldsymbol{\omega}_{\ell/i}^b \right] \label{eq:omegadot_l/i^l} \\
+	\dot{R}_b^\ell &= R_b^\ell (\boldsymbol{\omega}_{b/\ell}^b)^\wedge  \label{eq:Rdot_b^l} \\
+	\dot{\boldsymbol{\omega}}_{b/\ell}^\ell &= 	\Pi_{\mathbf{e}_3} R_b^\ell\left[  J^{-1}\mathbf{M}^b - J^{-1}(\boldsymbol{\omega}_{b/i}^b)^\wedge (J\boldsymbol{\omega}_{b/i}^b) + (\boldsymbol{\omega}_{b/i}^b)^\wedge \boldsymbol{\omega}_{\ell/i}^b \right]. \label{eq:omegadot_b/l^l}
+\end{align}
+
+
+%----------------------------------------------
+\subsection{Feedback Projecting Control}
+
+In this section we develop a feedback linearizing control that will facilitate tracking in the local level frame.  The first step is to let 
+\[
+\mathbf{M}^b = (\boldsymbol{\omega}_{b/i}^b)^\wedge(J\boldsymbol{\omega}_{b/i}^b - J(\boldsymbol{\omega}_{b/i}^b)^\wedge\boldsymbol{\omega}_{\ell/i}^b + J(R_b^\ell)^\top \begin{pmatrix}u_\phi \\ u_\theta \\ u_\psi \end{pmatrix}.
+\]
+Substituting into Equations~\eqref{eq:omegadot_l/i^l} and \eqref{eq:omegadot_b/l^l} gives
+\begin{align*}
+	\dot{\boldsymbol{\omega}}_{\ell/i}^\ell &=\mathbf{e}_3 u_\psi \\
+	\dot{\boldsymbol{\omega}}_{b/\ell}^\ell &= 	\begin{bmatrix} \mathbf{e}_1 & \mathbf{e}_2 \end{bmatrix}\begin{pmatrix}u_\phi \\ u_\theta \end{pmatrix} \defeq E_{12}u_{12}.
+\end{align*}
+
+Ignoring the drag term, i.e., setting $\mu=0$, Equations~\eqref{eq:pdot_l/i^i} and~\eqref{eq:vdot_l/i^i} become
+\[
+\ddot{\mathbf{p}}_{\ell/i}^i = g\mathbf{e}_3 + \frac{T}{m}R_\ell^i R_b^\ell \mathbf{e}_3.
+\]
+Throughout the paper, we will use the "breve" mark to denote a desired quantity.  Accordingly, by selecting $\breve{\mathbf{u}}_{\ell/i}^i$ as the desired acceleration in the body level frame, $\breve{\mathbf{R}}_b^\ell\in SO(3)$ as the desired rotation from body to body-level frames, and $\breve{T}\in\mathbb{R}$ as the desired thrust, we get that
+\[
+\frac{\breve{T}}{m} \breve{R}_b^\ell \mathbf{e}_3 = (R_\ell^i)^\top\left(\breve{\mathbf{u}}_{\ell/i}^i - g\mathbf{e}_3\right).
+\]
+Letting
+\[
+\breve{R}_b^\ell = \begin{bmatrix} \breve{\mathbf{r}}_{1}, & \breve{\mathbf{r}}_{2}, & \breve{\mathbf{r}}_{3}\end{bmatrix}
+\]
+we get that 
+\begin{align*}
+\breve{T} &= m\norm{\breve{\mathbf{u}}_{\ell/i}^i - g\mathbf{e}_3} \\
+\breve{\mathbf{r}}_{3} &= \frac{(R_\ell^i)^\top (\breve{\mathbf{u}}_{\ell/i}^i - g\mathbf{e}_3)}{\norm{\breve{\mathbf{u}}_{\ell/i}^i - g\mathbf{e}_3}}.
+\end{align*}
+
+Since $R_b^\ell$ represents only the roll and pitch angles of the body, the first column of $\breve{R}_b^\ell$ is defined so that it is in the $x-z$ plane of the local-level frame, i.e., perpendicular to $\mathbf{e}_2$ and a $90$~degree rotation of $\breve{\mathbf{r}}_{3}$.  Therefore
+\[
+\breve{\mathbf{r}}_{1} = \frac{R_y(\frac{\pi}{2})(I-\mathbf{e}_2\mathbf{e}_2^\top)\breve{\mathbf{r}}_{3}}{\norm{(I-\mathbf{e}_2\mathbf{e}_2^\top)\breve{\mathbf{r}}_{3}}}.
+\]
+The second column of $\breve{R}_b^\ell$ is selected to form a right handed coordinate system as
+\[
+\breve{\mathbf{r}}_{2} = \breve{\mathbf{r}}_{3} \times \breve{\mathbf{r}}_{1}.
+\]
+
+Note that since
+\[
+R_y(\frac{\pi}{2})(I-\mathbf{e}_2\mathbf{e}_2^\top) = \begin{pmatrix}0 & 0 & 1 \\ 0 & 1 & 0 \\ -1 & 0 & 0\end{pmatrix}\begin{pmatrix}1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 1\end{pmatrix} = \begin{pmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{pmatrix},
+\]
+then if $\breve{\mathbf{r}}_{3} = (a, b, c)^\top$, then $\breve{\mathbf{r}}_{1} = (c, 0, -a)^\top/\sqrt{a^2+c^2}$, and $\breve{\mathbf{r}}_{2} = (-ab, a^2+c^2, -bc)^\top/\sqrt{a^2+c^2}$, which implies that 
+\[
+\breve{R}_b^\ell = \begin{pmatrix} \frac{c}{\alpha} & \frac{-ab}{\alpha} & a \\
+                               0 & \alpha & b \\
+                               \frac{-a}{\alpha} & \frac{-bc}{\alpha} & c
+               \end{pmatrix},
+\] 
+where $\alpha = \sqrt{a^2+c^2}$.
+
+Let $\dot{\breve{R}}_b^\ell$ be the time derivative of $\breve{R}_b^\ell$, which is assumed to be computed numerically.  Then since $\dot{\breve{R}}_b^\ell = (\breve{\boldsymbol{\omega}}_{b/\ell}^\ell)^\wedge\breve{R}_b^\ell$ we have that
+\[
+\breve{\boldsymbol{\omega}}_{b/\ell}^\ell = \left[\dot{\breve{R}}_b^\ell(\breve{R}_b^\ell)^\top \right]^\vee.
+\]
+Define the Lyapunov function
+\begin{align*}
+V &= \frac{1}{2}\norm{I-\breve{R}_b^\ell (R_b^\ell)^\top}^2 + \frac{1}{2}\norm{\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell}^2 \\
+  &= tr\left[I-\breve{R}_b^\ell (R_b^\ell)^\top\right]+ \frac{1}{2}\norm{\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell}^2.
+\end{align*}
+Then from Equation~\eqref{eq:lyapunov_derivative_2}, differentiation with respect to time gives
+\begin{align*}
+\dot{V} &= -tr\left[  \mathbb{P}_a\left(\breve{R}_b^\ell (R_b^\ell)^\top\right)\left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right)^\wedge \right] + \left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right)^\top\left(\dot{\boldsymbol{\omega}}_{b/\ell}^\ell-\dot{\breve{\boldsymbol{\omega}}}_{b/\ell}^\ell\right) \\
+&= 2\left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right)^\top \left( \mathbb{P}_a(\breve{R}_b^\ell (R_b^\ell)^\top)\right)^\vee + \left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right)^\top\left(\dot{\boldsymbol{\omega}}_{b/\ell}^\ell-\dot{\breve{\boldsymbol{\omega}}}_{b/\ell}^\ell\right) \\ 
+&= \left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right)^\top \left( E_{12}u_{12}-\dot{\breve{\boldsymbol{\omega}}}_{b/\ell}^\ell + 2\left( \mathbb{P}_a(\breve{R}_b^\ell (R_b^\ell)^\top)\right)^\vee \right).
+\end{align*}
+Therefore, select
+\[
+u_{12} = E_{12}^\top\left[\dot{\breve{\boldsymbol{\omega}}}_{b/\ell}^\ell - 2\left( \mathbb{P}_a(\breve{R}_b^\ell (R_b^\ell)^\top)\right)^\vee -  K_d\left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right) \right],
+\]
+and note that $E_{12}E_{12}^\top = \Pi_{\mathbf{e}_3}$ to get
+\begin{multline*}
+\dot{V} = - \left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right)^\top \Pi_{\mathbf{e}_3} K_d\left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right) \\
+   + \left(\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell\right)^\top \mathbf{e}_3\mathbf{e}_3^\top \left(\dot{\breve{\boldsymbol{\omega}}}_{b/\ell}^\ell - 2\left( \mathbb{P}_a(\breve{R}_b^\ell (R_b^\ell)^\top)\right)^\vee\right).
+\end{multline*}
+
+\rwbcomment{Need to show that second term on RHS is zero}
+
+\rwbcomment{Need to revise the stuff below to include $\Pi_{e_3}$.}
+
+Define $\tilde{R} = \breve{R}_b^\ell (R_b^\ell)^\top$ and $\tilde{\boldsymbol{\omega}}=\boldsymbol{\omega}_{b/\ell}^\ell-\breve{\boldsymbol{\omega}}_{b/\ell}^\ell$, 
+and define $E=\{(\tilde{R},\tilde{\boldsymbol{\omega}}) | \tilde{\boldsymbol{\omega}}=0\}$, 
+and let $M$ be the largest invariant set in $E$. Then for all trajectories in $M$ we have that
+\[
+\frac{d}{dt}\norm{I-\tilde{R}}^2 = -tr\left[\mathbb{P}_a(\tilde{R})\tilde{\boldsymbol{\omega}}^\wedge\right] \equiv 0,
+\]
+which implies that $\tilde{R}$ is a constant matrix.  
+Therefore for all trajectories in $M$
+\begin{align*}
+& \dot{\tilde{R}} = \tilde{R}(\boldsymbol{\omega}_{b/\ell}^b)^\wedge - (\breve{\boldsymbol{\omega}}_{b/\ell}^b)^\wedge \tilde{R} = 0 \\
+\implies & \tilde{R}(\boldsymbol{\omega}_{b/\ell}^b)^\wedge = (\breve{\boldsymbol{\omega}}_{b/\ell}^b)^\wedge \tilde{R} \\
+\implies & \tilde{R}(\boldsymbol{\omega}_{b/\ell}^b)^\wedge \tilde{R}^\top = (\breve{\boldsymbol{\omega}}_{b/\ell}^b)^\wedge  \\
+\implies & (\tilde{R}\boldsymbol{\omega}_{b/\ell}^b)^\wedge = (\breve{\boldsymbol{\omega}}_{b/\ell}^b)^\wedge  \\
+\implies & \tilde{R}\boldsymbol{\omega}_{b/\ell}^b = \breve{\boldsymbol{\omega}}_{b/\ell}^b,
+\end{align*}
+but since $\boldsymbol{\omega}_{b/\ell}^b=\breve{\boldsymbol{\omega}}_{b/\ell}^b$ on $M$, it must be that $\tilde{R}=I$ on $M$.  
+Therefore, by the LaSalle invariance principle, $R_b^\ell \to \breve{R}_b^\ell$ and $\boldsymbol{\omega}_{b/\ell}^b\to\breve{\boldsymbol{\omega}}_{b/\ell}^b$.
+
+
+
+
+
+
+
+
+
+
+
+
+\rwbcomment{The goal is to simplify the dynamics to the following:
+\begin{align*}
+\ddot{\mathbf{p}}_{\ell/i}^i &= \mathbf{u}_{\ell/i}^i \\
+\dot{R}_\ell^i &= R_\ell^i(\boldsymbol{\omega}_{\ell/i}^\ell)^\wedge \\
+\dot{\boldsymbol{\omega}}_{\ell/i}^\ell &= \mathbf{e}_3 u_\psi.
+\end{align*}
+
+}
+

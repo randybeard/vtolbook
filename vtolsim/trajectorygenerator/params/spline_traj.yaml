@@ -1,0 +1,74 @@
+trajectory_generator:
+
+  desired_speed: 2.0 #m/s
+  num_waypoints: 18
+  time_scale: .7
+  kr: 3 # highest desired derivative
+
+  basis_type: 'standard'
+
+  pos_basis_degree: 9
+  pos_continuity_derivative: 4 # continuous up to acceleration
+  pos_smoothness_derivative: 4 # minimizing snap
+
+  yaw_basis_degree: 9
+  yaw_continuity_derivative: 4 # continuous up to yaw rate
+  yaw_smoothness_derivative: 4 # minimizing yaw acceleration
+
+  # Use the current position and velocity for the first knot point
+  # if specified, the trajectory will be made one knot longer.
+  prepend_current_state: True 
+
+  # **Only specify derivatives higher than 0**
+  # since the node is used for waypoint following, it is assumed that
+  # all knot 0th derivatives will be constrained to be at waypoints.
+  # Knot_list supports:
+  #   - 'all' to have all knot values constrained at that derivative
+  #   - A list of indices. Negative indices index from the end of 
+  #   the knot sequence (-1 = end)
+  # Indexes are independent of the prepend_current_position flag
+  pos_knot_con_structure_high_d: [
+      # {'deriv': 1,
+      #     'knot_list': [-1]},
+  ]
+
+  yaw_knot_con_structure_high_d: []
+
+  # Specify values for constrained higher derivatives, should be the
+  # same shape as pos_knot_con_structure_high_d or 
+  # yaw_knot_con_structure_high_d.
+  pos_x_con_value_high_d: [
+      # {'deriv': 1,
+      #     'value_list': [0.]},
+  ]
+  pos_y_con_value_high_d: [
+      # {'deriv': 1,
+      #     'value_list': [0.]},
+  ]
+  pos_z_con_value_high_d: [
+      # {'deriv': 1,
+      #     'value_list': [ -0.1]},
+  ]
+  yaw_con_value_high_d: []
+
+  # if empty, the node will look for waypoints coming in on
+  # the waypoints topic, otherwise, waypoints given here will be used
+  static_waypoints:
+    [[0.0, -1.0, -4.0],
+    [0.0, -7.0, -4.0],
+    [0.0, -13.0, -4.0],
+    [0.0, -18.0, -4.0],
+    [6.0, -18.0, -4.0],
+    [13.0, -18.0, -4.0],
+    [20.0, -18.0, -4.0],
+    [27.0, -18.0, -4.0],
+    [32.0, -18.0, -4.0],
+    [36.0, -18.0, -4.0],
+    [41.0, -19.0, -4.0],
+    [46.0, -25.0, -4.0],
+    [46.0, -30.0, -4.0],
+    [47.0, -35.0, -4.0],
+    [47.0, -40.0, -4.0],
+    [47.0, -45.0, -4.0],
+    [47.0, -50.0, -4.0],
+    [47.0, -55.0, 0.0]]

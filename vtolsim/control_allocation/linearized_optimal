@@ -1,0 +1,60 @@
+  def _compute_linearized_optimization(self, thrust_torque_desired, v_body, airspeed):
+        
+        x_0, z_0, x_1, z_1 = calc_rectangular_rotor_components(self.previous_solution)
+        Gamma = .5 * VTOL.rho * airspeed**2 * VTOL.S_wing
+
+        Va_rear = (np.array([0.0, 0.0, -1.0]).T @ v_body)[0]
+        Va_right = (np.array([x_0, 0.0, -z_0]).T @ v_body)[0]
+        Va_left  = (np.array([x_1, 0.0, -z_1]).T @ v_body)[0]
+        self.thrust_torque_ders = dict()
+        self.thrust_torque_ders['thrust'], self.thrust_torque_ders['torque'], \
+            self.thrust_torque_ders['thrust_der'], self.thrust_torque_ders['torque_der'] = \
+            rotor_thrust_torque_der(self.previous_solution[CA_ROTOR_RIGHT:CA_ROTOR_REAR + 1], 
+            [Va_right, Va_left, Va_rear])
+
+        x0 = self.previous_solution
+        MAX_DIFF = .01
+        bounds = [(x0[0] - MAX_DIFF, x0[0] + MAX_DIFF),
+                  (x0[1] - MAX_DIFF, x0[1] + MAX_DIFF),
+                  (x0[2] - MAX_DIFF, x0[2] + MAX_DIFF),
+                  (x0[3] - MAX_DIFF, x0[3] + MAX_DIFF),
+                  (x0[4] - MAX_DIFF, x0[4] + MAX_DIFF),
+                  (x0[5] - MAX_DIFF, x0[5] + MAX_DIFF),
+                  (x0[6] - MAX_DIFF, x0[6] + MAX_DIFF)]
+        for i in range(7):
+            if bounds[i][0] < self.actuator_bounds[i][0]:
+                bounds[i] = (self.actuator_bounds[i][0], bounds[i][1])
+            if bounds[i][1] > self.actuator_bounds[i][1]:
+                bounds[i] = (bounds[i][0], self.actuator_bounds[i][1])
+        
+         # Non linear optimizer gets optimization output and gradient from nonlinear_ctrl_optimization output
+        res = minimize(
+            linearized_ctrl_optimization, 
+            x0,
+            args=(thrust_torque_desired, self.thrust_torque_ders, Gamma, self.K),
+            bounds=bounds,
+            # jac=True,
+            options={'maxiter': self.max_iter})
+        self.previous_solution = res.x
+
+        return res.x
+
+def linearized_ctrl_optimization(x, thrust_torque_desired, thrust_torque_ders, Gamma, K):
+    thrust = np.array(thrust_torque_ders['thrust'])
+    torque = np.array(thrust_torque_ders['torque'])
+    for i in range(CA_ROTOR_REAR + 1):
+        thrust[i] *= x[i]
+        torque[i] *= x[i]
+
+    thrust_torque_achieved = calc_thrust_torque_achieved(
+        x, thrust, torque, Gamma)
+
+    thrust_torque_diff = thrust_torque_desired - thrust_torque_achieved
+    diff_norm = 0.5 * thrust_torque_diff.T @ K @ thrust_torque_diff
+
+    # thrust_torque_der = calc_thrust_torque_achieved_der(
+    #     x, thrust_torque_ders['thrust'], thrust_torque_ders['torque'], 
+    #     thrust_torque_ders['thrust_der'], thrust_torque_ders['torque_der'], Gamma)
+    # diff_norm_der = -thrust_torque_der @ K @ thrust_torque_diff
+    
+    return diff_norm #, diff_norm_der

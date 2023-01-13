@@ -1,0 +1,8 @@
+<launch>
+
+    <rosparam command="load" file="$(find trajectorygenerator)/params/spline_traj.yaml"/>
+
+    <!-- Trajectory Generator -->
+    <node name="spline_traj_generator" pkg="trajectorygenerator" type="spline_traj_node.py" output="screen" required="true"/>
+
+</launch>

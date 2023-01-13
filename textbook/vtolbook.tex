@@ -1,0 +1,121 @@
+\documentclass[twoside]{tufte-book}
+
+%\hypersetup{colorlinks}% uncomment this line if you prefer colored hyperlinks (e.g., for onscreen viewing)
+
+%%
+% Book metadata
+\title{Vision-Based 
+       Estimation and 
+       Control of 
+       Multirotor and 
+       Winged-VTOL Systems}
+\author{Randal W. Beard}
+\publisher{Brigham Young University}
+
+\input{macros}
+
+
+%\includeonly{chap6_camera_features/camera_features}
+%\includeonly{chap7_optical_flow/optical_flow}
+%\includeonly{chap8_scene_reconstruction/scene_reconstruction}
+%\includeonly{chap9_visual_servoing/visual_servoing}
+%\includeonly{chap10_tracking/tracking}
+\begin{document}
+
+% Front matter
+\frontmatter
+
+
+\maketitle
+
+
+% v.4 copyright page
+\newpage
+\begin{fullwidth}
+~\vfill
+\thispagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+Copyright \copyright\ 2020 Randal W. Beard
+
+\par\smallcaps{Published by \thanklesspublisher}
+
+\par\smallcaps{Typeset using tufte-latex.github.io/tufte-latex/}
+
+\par\textit{Current version: \monthyear}
+\end{fullwidth}
+
+%\tableofcontents
+%\listoffigures
+%\listoftables
+%\hypertarget{contents}{}
+
+\cleardoublepage
+~\vfill
+\begin{doublespace}
+\noindent\fontsize{18}{22}\selectfont\itshape
+\nohyphenation
+Dedicated to ...
+\end{doublespace}
+\vfill
+\vfill
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter
+
+\setcounter{tocdepth}{2}
+\tableofcontents
+%\include{table_of_contents}
+
+
+
+\fancypagestyle{plain}{% for chapter starting pages
+  %\fancyhf{}% clears header fields
+  \rfoot{\hyperlink{contents}{TOC}}
+  }
+\rfoot{\hyperlink{contents}{TOC}}
+
+\include{contributors}
+\include{chap1_intro/introduction}
+
+% part I
+\part{Models \& Control \& Planning}
+\include{chap2_preliminaries/preliminaries}
+\include{chap3_multirotor/multirotor}
+\include{chap4_trajectory_following/trajectory_following}
+\include{chap5_trajectory_planning/trajectory_planning}
+
+% part II
+\part{Vision Based Flight}
+\include{chap6_camera_features/camera_features}
+\include{chap7_optical_flow/optical_flow}
+\include{chap8_scene_reconstruction/scene_reconstruction}
+\include{chap9_visual_servoing/visual_servoing}
+\include{chap10_tracking/tracking}
+
+% part III
+\part{Vision Based Estimation}
+\include{chap11_attitude_estimation/attitude_estimation}
+\include{chap12_trajectory_estimation/trajectory_estimation}
+\include{chap13_visual_odometry/visual_odometry}
+\include{chap14_slam/slam}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+%\include{appendix_holodeck/holodeck}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\backmatter %
+\bibliographystyle{plainnat}
+\bibliography{refs_tmp.bib,library_Beard,library_Jackson}
+%\bibliographystyle{ieeetr}
+%\addcontentsline{toc}{chapter}{Bibliography}
+
+%\makeindex
+\printindex
+
+\end{document}

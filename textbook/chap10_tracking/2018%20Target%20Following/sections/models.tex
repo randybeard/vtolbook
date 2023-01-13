@@ -1,0 +1,158 @@
+\section{Mathematical Models}
+
+\subsection{Preliminaries}
+
+Throughout this document, we will use bold face to denote a vector, and a superscript on the vector to denote the coordinate frame where the vector is expressed.  For example, $\mathbf{v}^r\in\mathbb{R}^3$ denotes the vector $\mathbf{v}$ expressed relative to coordinate frame $\mathcal{F}^r$.  The rotation matrix that transforms vectors expressed relative to frame $\mathcal{F}^r$ into vectors expressed relative to frame $\mathcal{F}^s$ is denoted $R_r^s\in SO(3)$.  
+
+Let $\boldsymbol{\omega}_{r/s}$ denote the angular velocity of frame $\mathcal{F}^r$ relative to frame $\mathcal{F}^s$.  Then the kinematic equations of motion for $R_r^s$ is given by
+\begin{equation}\label{eq:R_r^s}
+\dot{R}_r^s = R_r^s(\boldsymbol{\omega}_{r/s}^r)^\wedge,
+\end{equation}
+where the {\em wedge} operator is defined as
+\[
+\begin{pmatrix}a \\ b \\ c\end{pmatrix}^\wedge \defeq \begin{pmatrix} 0 & -c & b \\ c & 0 & -a \\ -b & a & 0 \end{pmatrix}. 
+\]
+Alternatively, the {\em vee} operator is defined as
+\[
+\begin{pmatrix} 0 & -c & b \\ c & 0 & -a \\ -b & a & 0 \end{pmatrix}^\vee \defeq \begin{pmatrix}a \\ b \\ c\end{pmatrix}. 
+\]
+
+Recall that the cross product is invariant under rotation, or in other words
+\[
+R(\mathbf{v}\times\mathbf{w}) = (R\mathbf{v})\times(R\mathbf{w}),
+\]
+when $R\in SO(3)$.
+Therefore
+\begin{align*}
+(R\mathbf{v})^\wedge\mathbf{w} &= (R\mathbf{v})\times \mathbf{w} \\
+&= R\left(\mathbf{v}\times (R^\top \mathbf{w})\right) \\
+&= R\mathbf{v}^\wedge R^\top \mathbf{w},
+\end{align*}
+which implies that
+\begin{equation}\label{eq:Rv^wedge}
+(R\mathbf{v})^\wedge = R\mathbf{v}^\wedge R^\top.
+\end{equation}
+Noting that $\boldsymbol{\omega}_{r/s}^s = R_r^s\boldsymbol{\omega}_{r/s}^r$, then from Equations~\eqref{eq:R_r^s} and~\eqref{eq:Rv^wedge} we have that
+\begin{align*}
+\dot{R}_r^s &= R_r^s(R_r^s\boldsymbol{\omega}_{r/s}^s)^\wedge \\
+&= R_r^s((R_r^s)^\top\boldsymbol{\omega}_{r/s}^s)^\wedge \\
+&= R_r^s (R_r^s)^\top (\boldsymbol{\omega}_{r/s}^s)^\wedge R_r^s \\
+&= (\boldsymbol{\omega}_{r/s}^s)^\wedge R_r^s \\
+\end{align*}
+
+The Frobenius norm of matrix $A\in\mathbb{R}^{n\times n}$ is defined as
+\[
+\norm{A} \defeq \sqrt{tr[A^\top A]},
+\]
+where $tr(M)$ is the trace of $M$.  We will have need of the following properties of the trace:
+\begin{description}
+\item{T.1.} $tr\left[ A^\top \right]=tr\left[ A \right]$,
+\item{T.2.} $tr\left[ AB \right] = tr\left[ BA \right]$,
+\item{T.3.} $tr\left[ \alpha A + \beta B \right] = \alpha tr\left[ A \right] + \beta tr\left[ B \right]$ where $\alpha$ and $\beta$ are scalars, 
+\item{T.4.} $tr\left[ AB \right] = 0$ when $A$ is a symmetric matrix and $B$ is a skew-symmetric matrix,
+\item{T.5.} $tr\left[ a^\wedge b^\wedge \right] = -2a^\top b$, where $a, b \in \mathbb{R}^3$.
+\end{description}
+
+When $\tilde{R}\in SO(3)$, properties T.1 and T.3 imply that if $V\defeq \frac{1}{2}\norm{I-\tilde{R}}^2$, then
+\begin{align*}
+V   &= \frac{1}{2} \norm{I-\tilde{R}}^2 \\
+	&= \frac{1}{2} tr\left[(I-\tilde{R})^\top(I-\tilde{R})\right] \\
+  	&= \frac{1}{2} tr\left[ I - \tilde{R} - \tilde{R}^\top + \tilde{R}^\top\tilde{R}\right] \\
+  	&= tr\left[I-\tilde{R}\right].
+\end{align*}
+Furthermore, if $\tilde{R}=\breve{R} R^\top$, where $\breve{R}, R\in SO(3)$ and 
+\begin{align*}
+\dot{R} &= \boldsymbol{\omega}^\wedge R \\	
+\dot{\breve{R}} &=  \breve{\boldsymbol{\omega}}^\wedge \breve{R},
+\end{align*}
+then
+\begin{align}
+\dot{V} &= -tr\left[ \dot{\tilde{R}} \right] \notag \\
+        &= -tr\left[ \dot{\breve{R}} R^\top + \breve{R} \dot{R}^\top \right] \notag\\
+        &= -tr\left[ \breve{\boldsymbol{\omega}}^\wedge \breve{R} R^\top + \breve{R} R^\top (\boldsymbol{\omega}^\top)^\wedge \right] \notag\\
+        &= -tr\left[ \breve{\boldsymbol{\omega}}^\wedge \tilde{R} - \tilde{R} \boldsymbol{\omega}^\wedge \right]. \label{eq:lyapunov_derivative_1}
+\end{align}
+Define the symetric and skew-symmetric operators as
+\begin{align*}
+\mathbb{P}_s (A) &\defeq \frac{1}{2}(A+A^\top) \\
+\mathbb{P}_a (A) &\defeq \frac{1}{2}(A-A^\top),
+\end{align*}
+and note that $A=\mathbb{P}_s(A)+\mathbb{P}_a(A)$.  Equation \eqref{eq:lyapunov_derivative_1} then become
+\begin{align}
+\dot{V} &= -tr\left[ \breve{\boldsymbol{\omega}}^\wedge (\mathbb{P}_s(\tilde{R})-\mathbb{P}_a(\tilde{R})) + (\mathbb{P}_s(\tilde{R})+\mathbb{P}_a(\tilde{R})) \boldsymbol{\omega}^\wedge \right] \notag\\
+&= -tr\left[ \breve{\boldsymbol{\omega}}^\wedge \mathbb{P}_a(\tilde{R}) - \mathbb{P}_a(\tilde{R}) \boldsymbol{\omega}^\wedge \right] \notag\\
+&= -tr\left[  \mathbb{P}_a(\tilde{R})(\boldsymbol{\omega}-\breve{\boldsymbol{\omega}})^\wedge \right] \label{eq:lyapunov_derivative_2}
+\end{align}
+where the second line follows from property T.4, and the third line follows from property T.2.
+
+
+
+
+\subsection{Equations of Motion}
+
+
+Let $\mathbf{p}_{b/i}^i$ denote the position of the vehicle/UAV with respect to the inertial frame, as expressed in inertial coordinate, and let $\mathbf{v}_{b/i}^i$ denote the velocity of the UAV with respect to the inertial frame, expressed in inertial coordinates.  Then the translational kinematics are given by
+\[
+\dot{\mathbf{p}}_{b/i}^i = \mathbf{v}_{b/i}^i.
+\]
+Let $R_b^i\in SO(3)$ denote the rotation matrix from body coordinates to inertial coordinates, and let $\boldsymbol{\omega}_{b/i}^b$ denote the angular velocity of the UAV with respect to inertial coordinates, expressed in the body frame of the UAV.  Then the rotational kinematics are given by
+\[
+\dot{R}_b^i = R_b^i \left(\boldsymbol{\omega}_{b/i}^b\right)^\wedge.
+\]
+
+
+Let $m$ and $J$ denote the mass and inertia of the vehicle respectively, $g$ the gravitational force exerted on a unit mass at sea level, $T\in\mathbb{R}^+$ the total thrust on the UAV, $\mathbf{f}_{\text{drag}}$ the drag force on the vehicle, and $M\in\mathbb{R}^3$ the applied moments, then Newton's law implies the following dynamic equations of motion:
+\begin{align*}
+m\dot{\mathbf{v}}_{b/i}^i &= mg\mathbf{e}_3^i + \mathbf{f}_{\text{drag}}^i + TR_b^i\mathbf{e}_3^b \\
+J\dot{\boldsymbol{\omega}}_{b/i}^b &= -\boldsymbol{\omega}_{b/i}^b \times J\boldsymbol{\omega}_{b/i}^b + \mathbf{M}^b,	
+\end{align*}
+where $\mathbf{e}_i^\ast$ is the three dimensional column vector with one in the $i^{th}$ row and zero in the other elements, and the superscript is added to emphasize the frame in which the unit vector is defined.  Note that $mg\mathbf{e}_3^i$ is the gravity term that is fixed in the inertial frame and points towards the center of the earth, and that $TR_b^i\mathbf{e}_3^b$ is the thrust vector that is fixed in the UAV body frame.
+
+As shown in~\cite{LeishmanMacDonaldBeard14}, the drag term is most easily described in the multirotor body frame as 
+\[
+\mathbf{f}_{\text{drag}}^b = \mu \Pi_{\mathbf{e}_3}\mathbf{v}_{b/i}^b,
+\]
+where $\mu$ is the drag coefficient and 
+\[
+\Pi_\mathbf{x} \defeq I-\mathbf{x}\mathbf{x}^\top,
+\]
+is the projection matrix onto the two dimensional subspace that is orthogonal to the unit vector $\mathbf{x}\in\mathbb{R}^3$.  Therefore, the drag force always acts orthogonal to the thrust vector and is contained in the body fixed plane $x-y$ plane of the multirotor.  The drag force in inertial coordinates is given by
+\[
+\mathbf{f}_{\text{drag}}^i = \mu R_b^i\Pi_{\mathbf{e}_3}(R_b^i)^\top \mathbf{v}_{b/i}^i.  
+\]
+
+We will assume in this paper that the camera is mounted on a gimbal and that the center of the camera and gimbal frame are both located at the center of the UAV body frame, which coincides with its center of mass.  Let $\boldsymbol{\ell}_o$ denote the unit vector that is aligned with the optical axis of the camera, and let $R_c^b\in SO(3)$ denote the rotation matrix from the camera frame to the body frame.  Then the optical axis in the body frame is given by 
+\[
+\boldsymbol{\ell}_o^b = R_c^b \mathbf{e}_3^c.  
+\]
+We will assume the ability to command the angular rates of the gimbal with respect to the body.  Therefore, the kinematics of the gimbal are given by
+\[
+\dot{R}_c^b = R_c^b\left(\boldsymbol{\omega}_{c/b}^c\right)^\wedge
+\]
+where $\boldsymbol{\omega}_{c/b}^c$ are the commanded angular rates of the gimbal.
+
+In summary, the equations of motion for the multirotor with gimbal are given by
+\begin{align}
+	\dot{\mathbf{p}}_{b/i}^i &= \mathbf{v}_{b/i}^i \label{eq:eom_p_b/i^i}\\
+	m\dot{\mathbf{v}}_{b/i}^i &= mg\mathbf{e}_3^i + \mu R_b^i\Pi_{\mathbf{e}_3}(R_b^i)^\top \mathbf{v}_{b/i}^i + TR_b^i\mathbf{e}_3^b \label{eq:eom_v_b/i^i}\\
+	\dot{R}_b^i &= R_b^i \left(\boldsymbol{\omega}_{b/i}^b\right)^\wedge \\
+	J\dot{\boldsymbol{\omega}}_{b/i}^b &= -\boldsymbol{\omega}_{b/i}^b \times J\boldsymbol{\omega}_{b/i}^b + \mathbf{M}^b \\
+	\dot{R}_c^b &= R_c^b\left(\boldsymbol{\omega}_{c/b}^c\right)^\wedge.
+\end{align}
+
+Note that if the UAV velocity vector is expressed in body coordinates, then the translational equations of motion become
+\begin{align*}
+	\dot{\mathbf{p}}_{b/i}^i &= R_b^i\mathbf{v}_{b/i}^b \\
+	m\dot{\mathbf{v}}_{b/i}^b &= -\boldsymbol{\omega}_{b/i}^b\times\mathbf{v}_{b/i}^b + mg(R_b^i)^\top\mathbf{e}_3^i + \mu \Pi_{\mathbf{e}_3} \mathbf{v}_{b/i}^b + T\mathbf{e}_3^b.
+\end{align*}
+
+Let $\mathbf{p}_{t/i}\in\mathbb{R}^3$ and $\mathbf{v}_{t/i}\in\mathbb{R}^3$ be the position and velocity of the target relative to the inertial frame.  We will assume a constant velocity model where
+\begin{align*}
+	\dot{\mathbf{p}}_{t/i}^i &= \mathbf{v}_{t/i}^i \\
+	\dot{\mathbf{v}}_{t/i}^i &= 0.	
+\end{align*}
+The camera measures the normalized line-of-sight vector in camera coordinate
+\[
+\boldsymbol{\ell}_{t/c}^c = \frac{\mathbf{p}_{t/i}^c-\mathbf{p}_{b/i}^c}{\norm{\mathbf{p}_{t/i}-\mathbf{p}_{b/i}}}
+\]
+

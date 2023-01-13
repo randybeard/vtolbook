@@ -1,0 +1,35 @@
+trajectory_generator:
+  kr: 3 # number of derivatives (int)
+  time_scale: 5.0
+
+  # create as many members as you want in a list
+
+  # sinusoidal members need 4 parameters:
+  # {type: 'sin', data: [offset, scale, period, phase_shift]}
+
+  # linear members need 2 parameters
+  # {type: 'lin', data: [initial_value, slope]}
+
+  # pringle
+  member_definitions: [
+    {type: 'sin', data: [0., 5., 60., 0.]},
+    {type: 'sin', data: [0., 5., 30., 0.]},
+    {type: 'sin', data: [-20., 5., 60., rad(pi/2)]},
+    {type: 'sin', data: [0., 0., 0., 0.]},
+    ]
+
+  # circle
+  # members: [
+  #   {type: 'sin', data: [0., 5., 30., 0.]},
+  #   {type: 'sin', data: [0., 5., 30., rad(pi/2)]},
+  #   {type: 'lin', data: [-10., 0.]},
+  #   {type: 'lin', data: [rad(-pi/2), rad(-pi/15)]}
+  #   ]
+
+  # waypoint
+  # members: [
+  #   {type: 'lin', data: [5., 0.]},
+  #   {type: 'lin', data: [5., 0.]},
+  #   {type: 'lin', data: [-5., 0.]},
+  #   {type: 'lin', data: [rad(pi/2), 0.]}
+  #   ]

@@ -1,0 +1,65 @@
+% search notes
+
+Breadth first search (BFS)
+  Used for finding paths, BFS table keeps track of *where we came from*
+  for every location that's visited. Can be used when edges from one
+  node to another have the same cost
+
+
+Dijkstra's algorithm (DA)
+  Used for finding paths when edge costs can vary -- movement costs can
+  depend on the type of movement or terrain in the map. Examples:
+  distance between nodes, fuel or battery cost to travel along edge,
+  threat cost (proximity to threats) along edge.
+  How does Dijkstra's algorithm differ from BFS where costs are uniform?
+  Add a new cost -- cost_so_far -- to keep track of total movement costs
+  from start location. Want to take movement costs into account when
+  evaluating locations (nodes).
+
+Heuristic search (leading to A*)
+  With BFS and DA, frontier expands in all directions. Since we have a
+  goal, we want to search in the direction of the goal. We need to come
+  up with an estimate of the -- cost to go -- how much it will cost to
+  move from the current cell to the goal location. This cost to go
+  estimate will be based on a heuristic -- an approximate calculation.
+
+  Greedy Best-first Search (GBFS)
+  In DA, we used actual distance from the *start* for priority queue
+  ordering. Here for the Greedy Best First Search, we will use the
+  estimated distance to the *goal* for the priority queue ordering. The
+  location closest to the goal will be explored first. We will start the
+  search from the start node and explore the location closest to the
+  goal first based on heuristic estimate of our distance to the goal.
+  Example uses del_x + del_y. We don't know actual distance even in
+  grid world due to potential obstacles, so we have to use a heuristic.
+
+  A* Search
+  DA works well to find the shortest path, but wastes time exploring in
+  directions we are not likely to head (including away from the goal).
+  GBFS explores in promising directions (toward the goal), but may not
+  lead to the shortest path -- especially if a direct path to the goal
+  isn't the optimal direction to head (such as if there are obstacles
+  in the greedy direct-to-goal path). To overcome the deficiencies of
+  DA and GBFS, A* takes into account both the actual distance from
+  the start node to the current node and the estimated distance to the
+  goal from the current node -- it uses the sum of these two distances
+  for priority queue ordering (to determine the order of nodes to put
+  on the frontier of the search).
+
+  A* is the best of both worlds. If the heuristic is admissible (it
+  always underestimates the cost to go), A* will find the optimal
+  path like Dijkstra's algorith, but with less exploration (it's faster
+  than Dijkstra) A* does require a goal node, while DA can produce
+  the best path to any node. For simple unobstructed paths, GBFS can be
+  faster than A* in finding the optimal path.
+
+  MORE STUFF
+  A* not limited to grid worlds.
+  Grids are inefficient -- takes lots of cells to map significant areas/
+  volumes.
+  Octomaps can be used to more efficiently represent obstacles
+  Can also move away from grids/voxels to visibility graphs, which
+  can be searched using A*
+
+  How does this fit in with vision-based sensing?
+  Point cloud -> octomap -> ? visibility graph 

@@ -1,0 +1,64 @@
+
+\documentclass{article}
+
+\usepackage[pdftex]{graphicx}
+	\graphicspath{{../figures/}}
+	\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{algorithmic}
+\usepackage{array}
+\usepackage{subfig}
+\usepackage{cite}
+\usepackage{color}
+\usepackage{fixltx2e}
+\usepackage{url}
+\usepackage{pdfpages} % for includepdf
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\def\proof{\noindent{\it Proof: }}
+\def\QED{\mbox{\rule[0pt]{1.5ex}{1.5ex}}}
+\def\endproof{\hspace*{\fill}~\QED\par\endtrivlist\unskip}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\defeq}{\stackrel{\triangle}{=}}
+\newcommand{\OMIT}[1]{{}} 																
+
+\newcommand{\rwbcomment}[1]{{\color{blue}RWB: #1}}
+
+\begin{document}
+
+\title{Visually Following a Ground Target from a Multi-rotor UAV using Geometric Control}
+\author{Randal~W.~Beard, Mark Peterson,
+        and~others % <-this % stops a space
+\thanks{R. Beard is with the Department of Electrical Engineering, Brigham Young University, Provo, UT, 84602.}%
+	}
+
+\maketitle
+
+\begin{abstract}
+
+This is the abstract.
+\end{abstract}
+
+
+\input{./sections/introduction}
+\input{./sections/models}
+\input{./sections/body_level_frame}
+\input{./sections/following_2d}
+\input{./sections/conclusion}
+
+
+\section*{Acknowledgments}
+Funded by...
+
+\bibliographystyle{IEEEtran}
+\bibliography{../bib/library}
+
+\end{document}
+
+
+1
