@@ -127,3 +127,27 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# LaTeX files
+*.toc
+*.log
+*.aux
+*.bbl
+*.blg
+*.idx
+*.ilg
+*.ind
+*.out
+*.fls
+.texpadtmp/
+*.synctex.gz
+
+# latexmk files
+*.fdb_latexmk
+
+# macos files & directories
+.DS_Store
+__MACOSX/
+
+# LaTeX generated, production files
+vtolbook.pdf
