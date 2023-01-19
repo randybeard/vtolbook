@@ -67,7 +67,7 @@ It is straight forward to show that for any $\abf,\bbf\in\mathbb{R}^3$,
 \[
 \ss{\abf} \bbf = \abf\times\bbf.
 \]
-Therefore $\ss{\abf}$ is a matrix implementation of the cross product operation.
+Therefore $\ss{\abf}$ is a matrix implementation of the cross product operation.  We will also use the ``wedge'' operator to mean the same thing, i.e., $\abf\in\mathbb{R}^3$, $\abf^{\wedge} \defeq \ss{\abf}$.
 The ``vee'' operator goes in the other direction:
 \begin{equation}\label{eq:vee_so_3}
 \begin{pmatrix} 0 & -c & b \\ c & 0 & -a \\ -b & a & 0 \end{pmatrix}^\vee = \begin{pmatrix} a \\ b \\ c \end{pmatrix}
@@ -453,7 +453,7 @@ $\nbf$, $\nbf_2+j\nbf_3$, and $\nbf_2-j\nbf_3$, where $\{\nbf, \nbf_2, \nbf_3\}$
 From the Rodrigues formula we get
 \marginnote{We have used the fact that $\nbf\times\nbf=0$ implies that $\ss{\nbf}\nbf = 0$.}
 \[
-R(\nbf,\theta)\nbf = \nbf + \sin\theta \ss{\nbf}\nbf + (1-\   cos\theta)\ss{\nbf}\ss{\nbf}\nbf
+R(\nbf,\theta)\nbf = \nbf + \sin\theta \ss{\nbf}\nbf + (1-\cos\theta)\ss{\nbf}\ss{\nbf}\nbf
                    = 1\cdot\nbf.
 \]
 Therefore $\lambda=1$ is an eigenvector of $R(\nbf,\theta)$ with eigenvector $\nbf$.  Pick any $\nbf_2$ that is orthogonal to $\nbf$, and let $\nbf_3=\ss{\nbf}\nbf_2$ so that $\{\nbf, \nbf_2, \nbf_3\}$ form a right-handed coordinate system.  Then
@@ -483,7 +483,7 @@ For any $R(\nbf,\theta)\in SO(3)$ we have
 \begin{proof}
 Since $\ss{\nbf}^2 = \nbf \nbf^\top  - I$, we get that
 \begin{align*}
-\trace{R} &= \trace{I} + \sin\theta~\trace{\nbf{\nbf}} + (1-\cos\theta)\trace{\nbf \nbf^\top - I} \\
+\trace{R} &= \trace{I} + \sin\theta~\trace{\ss{\nbf}} + (1-\cos\theta)\trace{\nbf \nbf^\top - I} \\
           &= 3 + \sin\theta \cdot 0 + (1-\cos\theta)(n_1^2+n_2^2+n_3^2 - 3) \\
           &= 1 + 2\cos\theta,
 \end{align*}
@@ -523,8 +523,15 @@ We can also define the $\log$ of a rotation matrix as the inverse operation, whe
 \begin{lemma}\label{lem:matrix_log}
 Given any $R\in SO(3)$, the logarithm of $R$ is given by
 \[
-\log(R) = \left(\frac{\cos^{-1}\left(\frac{\trace{R}-1}{2}\right)}{\sqrt{(3-\trace{R})(1+\trace{R})}}\right)(R-R^\top).
+\log(R) = \frac{1}{2}\frac{R-R^\top}{\sinc{\theta}}
 \]
+where
+\[
+\theta = \cos^{-1}\left(\frac{\trace{R}-1}{2}\right).
+\]
+%\[
+%\log(R) = \left(\frac{\cos^{-1}\left(\frac{\trace{R}-1}{2}\right)}{\sqrt{(3-\trace{R})(1+\trace{R})}}\right)(R-R^\top).
+%\]
 \end{lemma}
 \begin{proof}
 Euler's rotation theorem implies that there exist $\nbf$ and $\theta$ such that $R=\exp(\theta\ss{\nbf})$.  Therefore
@@ -546,11 +553,16 @@ which implies that \sidenote{Note that this formula shows that an equivalent exp
 \[
 \ss{\nbf} = \frac{R-R^\top}{2\sin\theta}.
 \]
-Using the fact that $\sin(\cos^{-1}(x))=\sqrt{1-x^2}$ gives
+Therefore
 \[
-\sin\left(\cos^{-1}\left(\frac{\trace{R}-1}{2}\right)\right) = \frac{\sqrt{(3-\trace{R})(1+\trace{R})}}{2},
+\log{R} = \theta\ss{\nbf} = \theta\frac{R-R^\top}{2\sin\theta} = \frac{1}{2}\frac{R-R^\top}{\sinc{\theta}}.
 \]
-which gives the result.
+%
+%Using the fact that $\sin(\cos^{-1}(x))=\sqrt{1-x^2}$ gives
+%\[
+%\sin\left(\cos^{-1}\left(\frac{\trace{R}-1}{2}\right)\right) = \frac{\sqrt{(3-\trace{R})(1+\trace{R})}}{2},
+%\]
+%which gives the result.
 \end{proof}
 
 
@@ -635,7 +647,7 @@ Therefore we define the set of special orthogonal matrices
 \[
 SO(n) = \{M\in\mathbb{R}^{n\times n} | M\in O(n) \text{~and~} \text{det}(M)=1 \},
 \]
-and note that $R\in SO(3)$ implies that the columns of $R$ fom a right-handed coordinate system.  Therefore, there is a one-to-one relationship between the orientation of right-handed coordinate systems and elements of $SO(3)$.  We say that $R$ is a rotation matrix if $R\in SO(3)$.  Note that the set $SO(3)$ does not form a vector space since $aR_1+bR_2\not\in SO(3)$ when $R_1,R_2\in SO(3)$.  We will see later that elements of $SO(3)$ form a {\em group}, and which is called the {\em special orthgonal group of order 3}.
+and note that $R\in SO(3)$ implies that the columns of $R$ form a right-handed coordinate system.  Therefore, there is a one-to-one relationship between the orientation of right-handed coordinate systems and elements of $SO(3)$.  We say that $R$ is a rotation matrix if $R\in SO(3)$.  Note that the set $SO(3)$ does not form a vector space since $aR_1+bR_2\not\in SO(3)$ when $R_1,R_2\in SO(3)$.  We will see later that elements of $SO(3)$ form a {\em group}, and which is called the {\em special orthgonal group of order 3}.
 
 Therefore, the orientation of a multirotor can be represented by an element of $SO(3)$.  If $\mathcal{F}_b = \{\ibf_b, \jbf_b, \kbf_b\}$ is a right-handed coordinate frame fixed in the multirotor body, then the attitude of $\mathcal{F}_b$ relative to another frame $\mathcal{F}_a = \{\ibf_a, \jbf_a, \kbf_a\}$ is given by
 \[
@@ -648,11 +660,11 @@ To represent the attitude of the gimbal relative to the body, we need to assign 
 R_g^b = \begin{pmatrix} \ibf_g^b & \jbf_g^b & \kbf_g^b \end{pmatrix}.
 \]
 
-To gain further insights into rotation matrices, not that any vector $\pbf$ can be represented in $\mathcal{F}_r$ and $\mathcal{F}_s$ as
+To gain further insights into rotation matrices, note that any vector $\pbf$ can be represented in $\mathcal{F}_r$ and $\mathcal{F}_s$ as
 \[
 \pbf = \alpha_r\ibf_r + \beta_r\jbf_r + \gamma_r\kbf_r = \alpha_s\ibf_s + \beta_s\jbf_s + \gamma_s\kbf_s.
 \]
-Takin the inner product of both sides of this equation with the vectors $\ibf_r$, $\jbf_r$, and $\kbf_r$ gives
+Taking the inner product of both sides of this equation with the vectors $\ibf_r$, $\jbf_r$, and $\kbf_r$ gives
 \begin{align*}
 \alpha_r &= \alpha_s\ibf_r^\top \ibf_s + \beta_s\ibf_r^\top\jbf_s + \gamma_s\ibf_r^\top\kbf_s \\	
 \beta_r &= \alpha_s\jbf_r^\top \ibf_s + \beta_s\jbf_r^\top\jbf_s + \gamma_s\jbf_r^\top\kbf_s \\
@@ -811,8 +823,8 @@ Throughout this book we will denote quaternions as a four vector
 \]
 where $q_0$ is called the scalar part of the quaternion, and $\bar{q} = (q_x, q_y, q_z)^\top$, representing the complex elements, is called the vector part of the quaternion.  In vector notation, the quaternion product in Equation~\eqref{eq:quaternion-product-pre} becomes
 \begin{align}
-\mathbf{p}\otimes\mathbf{q} &= \begin{pmatrix} p_0 & -\bar{p}^\top \\ \bar{p} & p_0I + \bar{p}^\wedge \end{pmatrix}\begin{pmatrix}q_0 \\ \bar{q}\end{pmatrix} \label{eq:quaternion_multiplication_1}\\
-&= \begin{pmatrix} q_0 & -\bar{q}^\top \\ \bar{q} & q_0I-\bar{q}^\wedge \end{pmatrix}\begin{pmatrix}p_0 \\ \bar{p}\end{pmatrix}.
+\mathbf{p}\otimes\mathbf{q} &= \begin{pmatrix} p_0 & -\bar{p}^\top \\ \bar{p} & p_0I + \ss{\bar{p}} \end{pmatrix}\begin{pmatrix}q_0 \\ \bar{q}\end{pmatrix} \label{eq:quaternion_multiplication_1}\\
+&= \begin{pmatrix} q_0 & -\bar{q}^\top \\ \bar{q} & q_0I-\ss{\bar{q}} \end{pmatrix}\begin{pmatrix}p_0 \\ \bar{p}\end{pmatrix}.
 \label{eq:quaternion_multiplication_2}
 \end{align}
 
@@ -1026,7 +1038,7 @@ Given the unit quaternion $\qbf_b^i = (q_0, \bar{q}^\top)^\top = (q_0, q_x, q_y,
 \theta &= \sin^{-1}\left(2(q_0q_y-q_xq_z)\right) \label{eq:quat_to_euler} \\
 \psi &= \tan^{-1}\left(\frac{2(q_xq_y+q_0q_z)}{q_0^2+q_x^2-q_y^2-q_z^2}\right). \notag
 \end{align}
-\rwbcomment{Need to check these equations to make sure they are correct for body to inertial.}
+%\rwbcomment{Need to check these equations to make sure they are correct for body to inertial.}
 \end{lemma}
 \begin{proof}
 From Lemma~\ref{lem:quat_to_rotmat} we have
@@ -1127,9 +1139,36 @@ The result follows by writing $\rbf = \norm{\rbf}\frac{\rbf}{\norm{\rbf}} \doteq
 \end{proof}
 
 \begin{lemma}[Rotation vector to Euler angles] \label{lem:rotvect_to_euler}
-\rwbcomment{need to work this out}
+Given the rotation vector $\rbf=(r_x, r_y, r_z)^\top$, the associated Euler angles are
+\begin{align*}
+	\phi &= \tan^{-1}\left(\frac{r_x\norm{\rbf}\sin(\norm{\rbf})+r_yr_z(1-\cos(\norm{\rbf}))}{(r_x^2+r_y^2)\cos(\norm{\rbf})+r_z^2}\right) \\
+	\theta &= \sin^{-1}\left(\frac{r_y\norm{\rbf}\sin(\norm{\rbf})-r_xr_z(1-\cos(\norm{\rbf}))}{\norm{\rbf}^2}\right) \\
+	\psi &= \tan^{-1}\left(\frac{r_xr_y(1-\cos(\norm{\rbf})) + r_z\norm{\rbf}\sin(\norm{\rbf})}{r_x^2 + (r_y^2+r_z^2)\cos(\norm{\rbf})}\right).
+\end{align*}
 \end{lemma}
 \begin{proof}
+We will derive the result for $\phi$ and leave the derivation of the other angles to the reader.
+From Lemma~\ref{eq:rotvec_to_quat} we have that
+\[
+\qbf^\top = (q_0, q_x, q_y, q_z) = \left(\cos(\norm{\rbf}/2), \frac{r_x}{\norm{\rbf}} \sin(\norm{\rbf}/2), \frac{r_y}{\norm{\rbf}} \sin(\norm{\rbf}/2), \frac{r_z}{\norm{\rbf}} \sin(\norm{\rbf}/2)\right)^\top,
+\]
+and from Lemma~\ref{lem:quat_to_euler} we have that
+\[
+\phi = \tan^{-1}\left(\frac{2(q_y q_z+q_0q_x)}{q_0^2-q_x^2-q_y^2+q_z^2}\right).
+\]
+Therefore
+\begin{align*}
+	2(q_yq_z+q_0q_x) &= 2\left( \frac{r_yr_z}{\norm{\rbf}^2}\sin^2(\norm{\rbf}/2) + \frac{r_x\norm{\rbf}}{\norm{\rbf}^2} \sin(\norm{\rbf}/2)\cos(\norm{\rbf}/2)  \right) \\ 
+	&= \frac{1}{\norm{\rbf}^2}\left[r_yr_z(1-\cos(\norm{\rbf})) + r_x\norm{\rbf} \sin(\norm{\rbf})\right],
+\end{align*}
+where we have used the facts that $\sin(A/2)\cos(A/2) = \frac{1}{2}\sin(A)$ and $\sin^2(A/2)=\frac{1}{2}(1-\cos(A))$.  We also have that
+\begin{align*}
+	q_0^2-q_x^2-q_y^2+q_z^2 &= \cos^2(\norm{\rbf}/2) - \frac{r_x^2}{\norm{\rbf}^2} \sin^2(\norm{\rbf}/2) - \frac{r_y^2}{\norm{\rbf}^2} \sin^2(\norm{\rbf}/2) + \frac{r_z^2}{\norm{\rbf}^2} \sin^2(\norm{\rbf}/2) \\
+	&= \frac{1}{\norm{\rbf}^2}\left[ \norm{\rbf}^2(1-\sin^2(\norm{\rbf}/2)) + \sin^2(\norm{\rbf}/2) \left(-r_x^2-r_y^2+r_z^2\right) \right] \\
+	&= \frac{1}{\norm{\rbf}^2}\left[r_x^2+r_y^2+r_z^2 + \sin^2(\norm{\rbf}/2) \left(-2r_x^2-2r_y^2\right) \right] \\	
+	&= \frac{1}{\norm{\rbf}^2}\left[r_x^2+r_y^2+r_z^2 + (1-\cos(\norm{\rbf})) \left(-2r_x^2-2r_y^2\right) \right] \\	
+	&= \frac{1}{\norm{\rbf}^2}\left[(r_x^2+r_y^2)(1-\cos(\norm{\rbf})) + r_z^2 \right].
+\end{align*}
 \end{proof}
 
 
@@ -1223,7 +1262,7 @@ When vectors are expressed relative to a coordinate frame, then Equation~\eqref{
 
 The Coriolis equation~\eqref{eq:coriolis}
 facilitates the derivation of the rotational kinematics of a rigid body.  Defining coordinate frame $s$ as $\mathcal{F}_s = \{\ibf_s, \jbf_s, \kbf_s\}$,
-and suppose that frame $s$ is rotation relative to frame $r$ by angular velocity $\omegabf_{s/r}$, then the Coriolis formula gives
+and suppose that frame $s$ is rotated relative to frame $r$ by angular velocity $\omegabf_{s/r}$, then the Coriolis formula gives
 \[
 \frac{d\ibf_s}{dt_r} = \frac{d\ibf_s}{dt_s} + \omegabf_{s/r}\times\ibf_s, \qquad 
 \frac{d\jbf_s}{dt_r} = \frac{d\jbf_s}{dt_s} + \omegabf_{s/r}\times\jbf_s, \qquad 
@@ -1354,7 +1393,7 @@ R[k] = R[k-1] \exp\left(T_s \ss{\omegabf[k]} \right).
 \end{equation}
 Similarly, if the angular velocity is piecewise linear between samples, then 
 \begin{equation}\label{eq:rotational_int_linear_omega}
-R[k] = R[k-1] \exp\left(\frac{T_s}{2} \left(ss{\omegabf[k]}+\ss{\omegabf[k-1]}\right)\right).
+R[k] = R[k-1] \exp\left(\frac{T_s}{2} \ss{\omegabf[k]+\omegabf[k-1]}\right).
 \end{equation}
 \end{lemma}
 \begin{proof}
@@ -1418,13 +1457,13 @@ from which we obtain Equation~\eqref{eq:rotational_diff}.
 
 In this section we discuss the use of homogeneous transformations to represent rigid body motion that includes both translation and rotation simultaneously.  We will show that $4\times 4$ matrices can be used to represent rigid body motion.
 %
-Considering Figure~\ref{fig:passive_transform}, 
 \begin{marginfigure}[-2in]
 \includegraphics[width=\linewidth]{chap2_preliminaries/figures/transform_passive}
 \caption{Illustration of a passive transformation}
 \label{fig:passive_transform}
 \end{marginfigure}
-suppose that a robot moves from a pose represented by frame $\mathcal{F}_a$ to a pose represented by frame $\mathcal{F}_b$.  If the robot measures measures the position of point $\pbf$ in frame $a$ and from odometry knows its relative motion represented by the rotation matrix $R_a^b$ and the translation vector $\tbf_{a/b}^b$, then the position of $\pbf$ relative to frame $\mathcal{F}_b$ is given by
+Considering Figure~\ref{fig:passive_transform}, 
+suppose that a robot moves from a pose represented by frame $\mathcal{F}_a$ to a pose represented by frame $\mathcal{F}_b$.  If the robot measures the position of point $\pbf$ in frame $a$ and from odometry knows its relative motion represented by the rotation matrix $R_a^b$ and the translation vector $\tbf_{a/b}^b$, then the position of $\pbf$ relative to frame $\mathcal{F}_b$ is given by
 \begin{equation}\label{eq:homogenenous_1}
 \rbf_{p/b}^b = R_a^b \rbf_{p/a}^a + \tbf_{a/b}^b.
 \end{equation}
@@ -1567,7 +1606,7 @@ and differentiate to get
 \end{align*}
 Define the relative velocity as
 \[
-\vbf_{s/r}]\defeq \dot{\tbf}_{s/r},
+\vbf_{s/r} \defeq \dot{\tbf}_{s/r},
 \]
 and the relative twist as
 \[
@@ -1679,7 +1718,7 @@ From the previous lemma we know that
 \log\begin{pmatrix} \exp(\ss{\omegabf}) & W\vbf \\ 0 & 1 \end{pmatrix} 
 = \begin{pmatrix} \ss{\omegabf} & \vbf \\ 0 & 0 \end{pmatrix}.
 \]
-Equation $R=\exp(\ss{\nubf^\wedge})=R$ and $\tbf = W\vbf$ shows that $\omegabf=\log(R)^\vee$ and $\vbf=W^{-1}\tbf$.
+Equation $R=\exp(\ss{\nubf^\wedge})$ and $\tbf = W\vbf$ shows that $\omegabf=\log(R)^\vee$ and $\vbf=W^{-1}\tbf$.
 	
 \end{proof}
 
