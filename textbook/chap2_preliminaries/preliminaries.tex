@@ -1831,9 +1831,7 @@ Lie Group theory is a very old discipline deeply rooted in mathematics
 and theoretical physics. It was developed to better understand and
 model nature at the most fundamental levels. In fact, much of particle
 physics can be modeled using Lie group theory, including special relativity
-and quantum dynamics. While we don't often need to properly model
-Minkowski space, we can learn a lot about modeling physical systems
-by piggybacking on physics literature.
+and quantum dynamics. 
 
 Robotics requires us to reason about different coordinate frames. We often need to
 reason about how they move, and how they relate to one another. We
@@ -1853,30 +1851,21 @@ linear algebra and reason about things in an efficient manner, then
 map our results back into the group so we can do useful things.
 
 As a further motivating example, consider the case where we might
-want to represent our uncertainty of some estimate of a rotation matrix.
-In general, assuming that our uncertainty of some vector quantity
-$\xbf$ can be represented with a multivariate Gaussian distribution,
-the covariance of this distribution is computed as
-
+want to represent the uncertainty of the estimate of a rotation matrix.
+In general, assuming that the uncertainty of some vector quantity
+$\xbf$ can be represented with a multivariate Gaussian distribution where
+the covariance of the distribution is computed as
 \[
 \Sigma_{\xbf}=E\left[\left(\xbf-\hat{\xbf}\right)\left(\xbf-\hat{\xbf}\right)^{\top}\right],
 \]
-where $\hat{\xbf}$ was our best estimate and $\xbf$ was the true value.
-However, if we consider putting our rotation matrix $R$ into this
-equation, what does $R-\hat{R}$ even mean? Subtraction is not a sensible
-operation when talking about rotation matrices. First off, it would
-no longer be a rotation matrix, as it would not longer have unit determinant,
-and second, it would have nine parameters, when we expect there to
-only be three\footnote{Using Euler angles doesn't get you out of this, either. It's just
-more subtle. Think about what it really means to subtract two ``vectors''
-of euler angles. The intermediate axes defining the Euler angle parameterization
-will not line up, so it's not a sensible operation.}. Lie group theory solves this problem for us, as we will soon find
-out.
+where $\hat{\xbf}$ is the mean of the distribution and $\xbf$ is the true value.
+However, this equation does not work for rotation matrices in part because $R-\hat{R}$ is not meaningful because subtraction is not a sensible
+operation for rotation matrices. In addition, $R$ has nine parameters but only three degrees of freedom, and so we expect the uncertainty covariance to be $3\times 3$.  \marginnote{Euler angles do not solve the problem, because subtracting two ``vectors'' of Euler angles is problematic if the angles are larger than 180 degrees.}. Lie group theory addresses this problem in a very satisfactory way.
 
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \subsection{Group Theory}
 
-Before we launch into Lie groups, let us consider groups generically.
+Before we launch into Lie groups, lets consider groups generically.
 A group is a set of objects $\mathcal{G}$ together with an operation 
 \[
 \circ: \mathcal{G} \times \mathcal{G} \to \mathcal{G},
@@ -1893,57 +1882,37 @@ used groups in robotics are vectors (closed under vector addition),
 rotation matrices (closed under matrix multiplication), and quaternions
 (closed under quaternion multiplication). Some more exotic groups
 could include binary vectors closed under bit-wise-XOR, positive definite
-matrices closed under matrix addition and integers closed under addition.\footnote{In case you need another reason to stop using Euler angles, Euler
+matrices closed under matrix addition and integers closed under addition.
+\marginnote{In case you need another reason to stop using Euler angles, Euler
 angles aren't even a group, unless, of course, the group operator
 is defined as ``convert to rotation matrix, multiply, and then convert
 back to Euler angles''}
 
-A {\em Lie group} is a group that is also a differentiable manifold. What
-this means is that every group element $G$ induces a map from one
-group element \textbf{$B$} to another $C=G\circ B$ and that this
-mapping is differentiable. Of all the groups mentioned above, vectors,
-rotation matrices, quaternions and positive definite matrices are
-also Lie Groups, while binary vectors closed under XOR and integers
-are not, because the mappings are not differentiable.
+A {\em Lie group} is a group that is also a differentiable manifold, meaning that every group element $G$ induces a map from one group element \textbf{$B$} to another $C=G\circ B$ and that this map is differentiable. For example, vectors, rotation matrices, quaternions, and positive definite matrices are Lie Groups, while binary vectors closed under XOR and integers are not, because the mappings are not differentiable.
 
-Each Lie groups has an associated Lie algebra, typically indicated
-by using the fraktur font, (i.e. $\so\left(3\right)).$ A Lie algebra
-is a vector space $\mathfrak{g}$ equipped with a binary operation
-called the \emph{Lie bracket,} $[,]$. For matrix Lie algebras, the
-Lie bracket is given as
-
+Each Lie groups has an associated Lie algebra, typically indicated by using the fraktur font, (i.e. $\so\left(3\right)).$ A Lie algebra is a vector space $\mathfrak{g}$ equipped with a binary operation
+called the \emph{Lie bracket,} $[,]$, that satisfies the following properties:
+\begin{itemize}
+\item Bilinearity: $\left[aX+bY,Z\right]=a\left[X,Z\right]+b\left[Y,Z\right]$,
+\item Anticommutativity: $\left[X,Y\right]=-\left[Y,X\right]\quad\forall X,Y\in\mathfrak{g}$,
+\item The Jacobi Identity: $\left[X,\left[Y,Z\right]\right]+\left[Z,\left[X,Y\right]\right]+\left[Y,\left[Z,X\right]\right]=0\quad\forall X,Y,Z\in\mathfrak{g}$.
+\end{itemize}
+For matrix Lie algebras, the Lie bracket is given by
 \[
 \left[A,B\right]=AB-BA.
 \]
-The Lie bracket abides by the following rules:
-\begin{itemize}
-\item Bilinearity: $\left[aX+bY,Z\right]=a\left[X,Z\right]+b\left[Y,Z\right]$
-\item Anticommutativity: $\left[X,Y\right]=-\left[Y,X\right]\quad\forall X,Y\in\mathfrak{g}$
-\item The Jacobi Identity: $\left[X,\left[Y,Z\right]\right]+\left[Z,\left[X,Y\right]\right]+\left[Y,\left[Z,X\right]\right]=0\quad\forall X,Y,Z\in\mathfrak{g}$
-\end{itemize}
-The Lie Algebra defines something equivalent to the basis of the Lie
-Group, except instead of basis vectors, we have \emph{generators}.
-The generators are the building blocks of the group, and typically
-encode the degrees of freedom in a orthonormal way. Each member of
-any Lie Algebra can be expressed as the exponential of a linear combination
-of the generators.
 
-There is an important theorem that we will use a little later called
-the Baker-Campbell-Hausdorff Theorem (BCH). This theorem states that
-the solution $Z$ to
+Intuitively, the Lie Algebra defines something equivalent to the basis of the Lie Group, except instead of basis vectors, we have \emph{generators}.  The generators are the building blocks of the group, and typically encode the degrees of freedom in a orthonormal way. Each member of any Lie Algebra can be expressed as the exponential of a linear combination of the generators.
 
+There is an important theorem that we will use a little later called the Baker-Campbell-Hausdorff Theorem (BCH). This theorem states that the solution $Z$ to
 \[
-e^{X}e^{Y}=e^{Z},
+	e^{X}e^{Y}=e^{Z},
 \]
-can be expressed as a power series involving commutators $X$ and
-$Y$ in the Lie bracket. The first couple terms of this series is
-given as
-
+can be expressed as a power series involving commutators $X$ and $Y$ in the Lie bracket. The first couple terms of this series is given as
 \[
-Z=X+Y+\frac{1}{2}\left[X,Y\right]+\frac{1}{12}\left[X,\left[X,Y\right]\right]-\frac{1}{12}\left[Y,\left[X,Y\right]\right]+\dots.
+	Z=X+Y+\frac{1}{2}\left[X,Y\right]+\frac{1}{12}\left[X,\left[X,Y\right]\right]-\frac{1}{12}\left[Y,\left[X,Y\right]\right]+\dots.
 \]
-This formula is central to many proofs in the Lie group-Lie algebra
-correspondence.
+This formula is central to many proofs in the Lie group-Lie algebra correspondence.
 
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \subsection{$SO(2)$: A gentile introduction}
@@ -1952,7 +1921,7 @@ Define
 \[
 SO(2) = \left\{ M\in\mathbb{R}^{2\times 2} ~|~ M^\top M = MM^\top = I \text{~and~} \det(M)=1 \right\},
 \]
-and where $\circ$ is defined as matrix multiplication.  
+where the group operation $\circ$ is defined as matrix multiplication.  
 Note that $M\in SO(2)$ implies that
 \[
 M = \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}
@@ -1964,35 +1933,35 @@ for some $\theta\in\mathbb{R}$.  The set $SO(2)$ is closed under multiplication 
 \]
 In addition, the identity matrix $I$ forms the identity element of $SO(2)$, and for any $M\in SO(2)$, $M^\top$ is the inverse of $M$ since $MM^\top = M^\top M = I$.  Therefore $SO(2)$ is a group under matrix multiplication.
 
-We can visualize $R\in SO(2)$ as an element of the unit circle in $\mathbb{R}^2$ as shown in Figure
+We can visualize $R\in SO(2)$ as an element of the unit circle in $\mathbb{R}^2$ as shown in Figure~\ref{fig:so_2}.
 \begin{marginfigure}
   \centering\includegraphics[width=\linewidth]{./chap2_preliminaries/figures/so_2}
   \caption{Visualization of $SO(2)$ as a point on the unit circle in $\mathbb{R}^2$.}
   \label{fig:so_2}  
 \end{marginfigure}
-
 The Lie algebra associated with $SO(2)$ is the set
 \[
 \so(2) = \left\{ M = \begin{pmatrix} 0 & -\theta \\ \theta & 0 \end{pmatrix} ~|~ \theta\in\mathbb{R} \right\},
 \]
 i.e., the set of skew-symmetric matrices in $\mathbb{R}^{2\times 2}$.  Define the ``wedge'' and ``vee'' operators as
-\begin{align*}
-\theta^\wedge &= \begin{pmatrix} 0 & -\theta \\ \theta & 0 \end{pmatrix} \\
-\begin{pmatrix} 0 & -\theta \\ \theta & 0 \end{pmatrix}^\vee &= \theta.
-\end{align*}
-By straightforward manipulation, we can show that 
-\begin{align*}
-\exp(\theta^\wedge) &= I + \theta^\wedge + \frac{1}{2!}(\theta^\wedge)^2 + \frac{1}{3!}(\theta^\wedge)^3 + \dots \\
-&= \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}.
-\end{align*}
+\[
+\theta^\wedge = \begin{pmatrix} 0 & -\theta \\ \theta & 0 \end{pmatrix},
+\qquad \qquad
+\begin{pmatrix} 0 & -\theta \\ \theta & 0 \end{pmatrix}^\vee = \theta.
+\]
+By straightforward manipulation, we see that 
+\[
+\exp(\theta^\wedge) = I + \theta^\wedge + \frac{1}{2!}(\theta^\wedge)^2 + \frac{1}{3!}(\theta^\wedge)^3 + \dots 
+= \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}.
+\]
 Similarly, the $\log$ of an element of $SO(2)$ is given by
 \[
 \log(R) = \cos^{-1}\left(\frac{\trace{R}}{2}\right)^\wedge.
 \]
 It is important to note that 
 \begin{align*}
-\exp: &~ \se(2) \to SO(2) \\	
-\log: &~ SO(2) \to \se(2),
+\exp: &~ \so(2) \to SO(2) \\	
+\log: &~ SO(2) \to \so(2),
 \end{align*}
 therefore it is straightforward to move back and forth between the Lie group $SO(2)$ and its Lie algebra $\so(2)$.  Note that the exponential is a many-to-one map, but that the logarithm maps elements of $SO(2)$ onto only a subset of $\so(2)$ represented by $[0,\pi]$.
 
@@ -2004,7 +1973,7 @@ Note also that $\so(2)$ only has dimension of one, and that its elementary basis
 \[
 J_1 = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}.
 \]
-In Lie group lingo, the basis vector $J_1$ is called the generator of $SO(2)$, because any element of $SO(2)$ can be generated by the exponential of a linear combination of the generators, in our case, for any $M$, there exists a $\theta$ such that
+In Lie group lingo, the basis vector $J_1$ is called the generator of $SO(2)$, because any element of $SO(2)$ can be generated by the exponential of a linear combination of the generators.  In our case, for any $M$, there exists a $\theta$ such that
 \[
 M = \exp(\theta J_1).
 \]
@@ -2019,50 +1988,62 @@ or in other words
 \[
 \dot{R} = R\dot{\theta}^\wedge.
 \]
-If we define $\omega = \dot{\theta}$, then
+Defining $\omega = \dot{\theta}$, gives
 \begin{equation}\label{eq:diff_eq_so_2}
 \dot{R} = R\omega^\wedge,
 \end{equation}
 and the solution (as seen in previous sections) is
 \[
-R(t) = R(t_0)\exp\left(\int_{t_0}^t \omega(\tau)d\tau\right)^\wedge.
+R(t) = R(t_0)\exp\left(\int_{t_0}^t \omega^\wedge(\tau)d\tau\right).
 \]
 
-Considering the differential equation $\dot{R}=R\omega^\wedge$ note that the right hand side of the equation represents a vector in the vector space that is tangent to $SO(2)$ at element $R$.  This can be visualized in Figure~\ref{fig:tangent_space_SO_2}.  Note that the tangent space is just a rotation by $R$ of the tangent space at the identity element $I$.  The tangent space at $I$ is simply $\se(2)$, which is the Lie algebra.
-\begin{marginfigure}[1in]
+Considering the differential equation $\dot{R}=R\omega^\wedge$, note that the right hand side of the equation represents a vector in the vector space that is tangent to $SO(2)$ at element $R$.  This can be visualized in Figure~\ref{fig:tangent_space_SO_2}.  Note that the tangent space is just a rotation by $R$ of the tangent space at the identity element $I$.  The tangent space at $I$ is simply $\se(2)$, which is the Lie algebra.  This is a general property of the Lie algebra of a Lie group, it is the tangent space at the identity element.
+\begin{marginfigure}[0in]
   \centering\includegraphics[width=\linewidth]{./chap2_preliminaries/figures/tangent_space_SO_2}
   \caption{Visualization of $\so(2)$ and the tangent space to $SO(2)$.}
   \label{fig:tangent_space_SO_2}  
 \end{marginfigure}
-This is a general property of the Lie algebra of a Lie group, it is the tangent space at the identity element.
 
 Note also that if Equation~\eqref{eq:diff_eq_so_2} is multiplied on the left by a constant matrix $Q\in SO(2)$, and we let $S=QR$, then
 \begin{align*}
-\dot{S} &= \dot{QR} \\
-        &= Q\dot{R} \\
-        &= QR\omega^\wedge \\
-        &= S\omega^\wedge.
+\dot{S} &= \frac{d}{dt}(QR) 
+        = Q\dot{R} 
+        = QR\omega^\wedge 
+        = S\omega^\wedge.
 \end{align*}
-Therefore $S=QR$ satisfies exactly the same differential equation as $R$.  Dynamics that not affected by a left multiplication of a element of the group are said to be {\em left-invariant}.  Similarly, if $Q=R^\top$, then $Q$ satisfies $\dot{Q} = -\omega^\wedge Q$, which can be multiplied on the right by a constant matrix without affecting the dynamics, and are said to be {\em right-invariant}.
+Therefore $S=QR$ satisfies exactly the same differential equation as $R$.  Dynamics that not affected by a left multiplication of an element of the group are said to be {\em left-invariant} dynamics.
+\marginnote{Definition of left and right invariant dynamics.}  
+Similarly, if $R$ satisfies $\dot{R} = -\omega^\wedge R$, then multiplying on the right by a constant matrix $S$ does not change the dynamics, which are therefore called {\em right-invariant} dynamics.
 
-Note that $SO(2)$ is a one-dimensional group because it can be described by a single parameter $\theta$.  
-We typically think of elements of $SO(2)$ as rotation matrices that rotate vectors.  Therefore, associated with the vector $\wbf\in\mathbb{R}^2$, we can define the {\em group action}
+Note that $SO(2)$ is a one-dimensional group because it can be described by a single parameter $\theta$.  We typically think of elements of $SO(2)$ as rotation matrices that transform coordinates or rotate vectors.  Therefore, associated with the vector $\wbf\in\mathbb{R}^2$, we can define the {\em group action}
 \[
-f_{\wbf}(R) = R\wbf,
+	f_{\wbf}(R) = R\wbf,
 \]
-where the output of $f(R)$ is a vector that represents a rotation of $\wbf$.  However, there is a slightly different perspective here, because we think of $f$ as a function of the group element $R$, with a fixed $\wbf$, instead of as a function of $\wbf$.  It is natural to ask whether we can take the Jacobian of the group action $f$ with respect to the group element $R$.  
+where the output of $f_{\wbf}(R)$ is a vector that represents a transformation of $\wbf$.  However, there is a slightly different perspective here, because we think of $f$ as a function of the group element $R$, with a fixed $\wbf$, instead of as a function of $\wbf$ with a fixed $R$.  It is natural to ask whether we can take the Jacobian of the group action $f_{\wbf}$ with respect to the group element $R$.  
 
+\marginnote{
+Recall that the derivative of a function is defined as
+\[
+\frac{\partial f}{\partial z}=\lim_{\varepsilon\to0}\frac{f\left(z+\varepsilon\right)-f\left(z\right)}{\varepsilon}.
+\]
+In conversational English, this means, ``How does the output of the
+function $f$ change if I bump the input a tiny amount?'' 
+}
 Toward that end, recall that the Jacobian of a function $g: \mathbb{R}^n\to\mathbb{R}^m$ is given by
 \[
-\frac{\partial g}{\partial x} = \lim_{\varepsilon\to 0} \begin{pmatrix} \frac{g(x+\varepsilon\ebf_1)}{\varepsilon} & \dots & \frac{g(x+\varepsilon\ebf_n)}{\varepsilon}\end{pmatrix},
+\frac{\partial g}{\partial \xbf} = \lim_{\varepsilon\to 0} \begin{pmatrix} \frac{g(\xbf+\varepsilon\ebf_1)-g(\xbf)}{\varepsilon} & \dots & \frac{g(\xbf+\varepsilon\ebf_n)-g(\xbf)}{\varepsilon}\end{pmatrix},
 \]
-where the $i^{th}$ row describes how  $g$ changes with incremental changes in $x$ along the basis vector $\ebf_i$.  We can define the $\frac{\partial f}{\partial R}$ similarly, where the $i^{th}$ row of the Jacobian would describe how the group action $f_\wbf(R)$ changes incrementally as $R$ changes incrementally along the basis vector, or generator $J_i$.  In our case, there is only one generator, thus
+where the $i^{th}$ row describes how  $g$ changes with incremental changes in $\xbf$ along the basis vector $\ebf_i$.  
+\marginnote{
+For vector functions $g:\mathbb{R}^n\to\mathbb{R}^m$, the $i^{th}$ column of the Jacobian matrix indicates how $g$ changes with as incremental change in the $i^{th}$ element of $\xbf$.
+}
+We can define the $\frac{\partial f}{\partial R}$ similarly, where the $i^{th}$ row of the Jacobian would describe how the group action $f_\wbf(R)$ changes incrementally as $R$ changes incrementally along the basis vector, or generator $J_i$.  In our case, there is only one generator: 
 \begin{align*}
-\frac{\partial f}{\partial R} &= \frac{\partial R\wbf}{\partial R} \\
-  &= \lim_{\varepsilon\to 0} \frac{R\exp(\varepsilon J_1)\wbf - R\wbf}{\varepsilon} \\
+\frac{\partial f}{\partial R} &= \frac{\partial (R\wbf)}{\partial R} 
+  = \lim_{\varepsilon\to 0} \frac{R\exp(\varepsilon J_1)\wbf - R\wbf}{\varepsilon} \\
   &= \lim_{\varepsilon\to 0} \frac{R\left(I + \varepsilon J_1 + \frac{\varepsilon^2}{2!}J_1^2 + \dots \right)\wbf - R\wbf}{\varepsilon} \\
-  &= \lim_{\varepsilon\to 0} \frac{\varepsilon RJ_1\wbf}{\varepsilon} \\
-  &= R J_1 \wbf.
+  &= \lim_{\varepsilon\to 0} \frac{\varepsilon RJ_1\wbf}{\varepsilon} 
+  = R J_1 \wbf.
 \end{align*}
 Note that $\frac{\partial f}{\partial R}$ is a $2\times 1$ vector that because $f_\wbf(R)$ maps to $\mathbb{R}^2$ (number of rows), and there is only one generator function (number of columns).
 Therefore, knowing the structure (dimension and generators) of the Lie algebra is critical to the process of taking Jacobians of group actions.
@@ -2301,196 +2282,14 @@ This is actually the same as if we redefined the generators of the
 unit quaternion to all be $\frac{1}{2}J_{i}$. This is fine, and totally
 proper, however we just need to be explicit about this choice.
 
-\subsection{The Generators of $\protect SU\left(2\right)/\protect S^{3}$}
-
-We can follow the same procedure that we performed to derive the generators
-of $SO(3)$ to get the generators of $ SU\left(2\right)/ S^{3}$.
-First, let's start with the conditions of $ SU\left(2\right)$
-
-\[
-U^{\dagger}U=UU^{\dagger}=1\qquad\qquad\det\left(U\right)=1.
-\]
-Now, as before, let us write these conditions in terms of the generators,
-and use BCH in tandem with the fact that $\left[U^{\dagger},U\right]=0$
-to get
-
-\begin{align}
-U^{\dagger}U & =1\nonumber \\
-\left(\exp\left(iJ\right)\right)^{\dagger}\exp\left(iJ\right) & =1\nonumber \\
-\exp\left(-iJ^{\dagger}\right)\exp\left(iJ\right) & =1\nonumber \\
-\exp\left(-iJ^{\dagger}+iJ+\frac{1}{2}\text{\ensuremath{\left[J^{\dagger},J\right]}}\right)+\dots & =1 & \textnormal{(BCH)}\nonumber \\
-\exp\left(-iJ^{\dagger}+iJ\right) & =1\nonumber \\
--iJ^{\dagger}+iJ & =0\nonumber \\
-J^{\dagger} & =J.\label{eq:HermetianSU2}
-\end{align}
-Now, if we look at the second condition, (again, leveraging $\det\left(\exp\left(A\right)\right)=\exp\left(\textnormal{tr}\left(A\right)\right)$),
-we can see
-
-\begin{align}
-\det\left(\exp\left(iJ\right)\right) & =1\nonumber \\
-\exp\left(i\textnormal{tr}\left(J\right)\right) & =1\nonumber \\
-\textnormal{tr}\left(J\right) & =0.\label{eq:tracelessSU2}
-\end{align}
-So the generators must be Hermetian (Eq. \ref{eq:HermetianSU2}),
-and traceless (Eq. \ref{eq:tracelessSU2}) complex $2\times2$ matrices.
-The standard basis for this set is
-
-\begin{align*}
-J_{1} & =\begin{pmatrix}0 & 1\\
-1 & 0
-\end{pmatrix} & J_{2} & =\begin{pmatrix}0 & -i\\
-i & 0
-\end{pmatrix} & J_{3} & =\begin{pmatrix}1 & 0\\
-0 & -1
-\end{pmatrix}.
-\end{align*}
-This choice of generators corresponds with infinitesimal rotations
-in $ SU\left(2\right),$ and because of the isomorphism between $ SU\left(2\right)$
-and $ S^{3}$ (unit quaternions), we have also just derived the generators
-for unit quaternions as well:
-
-\begin{align*}
-J_{1} & =i & J_{2} & =j & J_{3} & =k.
-\end{align*}
-This means that the $\left(\cdot\right)^{\wedge}$ operations for
-$ SU\left(2\right)$ and $ S^{3}$ are given as
-
-\[
-\omegabf^{\wedge}=\begin{pmatrix}\omegabf_{z} & \omegabf_{x}-\omegabf_{y}i\\
-\omegabf_{x}+\omegabf_{y}i & \omegabf_{z}
-\end{pmatrix},
-\]
-and
-
-\[
-\omegabf^{\wedge}=\begin{pmatrix}0\\
-\omegabf
-\end{pmatrix},
-\]
-respectively, while the $\left(\cdot\right)^{\vee}$operator is defined
-as the inverse of either operation.
-
-There is a very interesting relationship between $\su\left(2\right)$
-and $\so\left(3\right)$. Both algebras have the following property:
-
-\begin{align*}
-\left[J_{1},J_{2}\right] & =J_{3} & \left[J_{2},J_{1}\right] & =-J_{3}\\
-\left[J_{2},J_{3}\right] & =J_{1} & \left[J_{3},J_{2}\right] & =-J_{1}\\
-\left[J_{3},J_{1}\right] & =J_{2} & \left[J_{1},J_{3}\right] & =-J_{2}.
-\end{align*}
-It turns out, this is indicative of a more fundamental result. One
-can say that $ SU\left(2\right)$ and $SO(3)$ have the
-same Lie algebra, because we define Lie algebras by their Lie bracket.
-Forgive the extended quotation, but this summary from \emph{Physics
-From Symmetry\cite{schwichtenberg_2015}} explains this concept in
-detail, as well as giving a very nice motivation for why we use Lie
-Algebras in the first place.
-\begin{quote}
-There is precisely one simply-connected Lie group corresponding to
-each Lie algebra. This simply-connected group can be thought of as
-the \textquotedbl mother\textquotedbl{} of all those groups having
-the same Lie algebra, because there are maps to all other groups with
-the same Lie algebra from the simply connected group, but not vice
-versa. We could call it the mother group of this particular Lie algebra,
-but mathematicians tend to be less dramatic and call it the covering
-group. All other groups having the same Lie algebra are said to be
-covered by the simply connected one. $SU(2)$ is the double cover
-of $SO(3)$. This means there is a two-to-one map from $SU(2)$ to
-$SO(3)$.
-
-Furthermore, $SU(2)$ is the three sphere, which is a simply connected
-manifold. Therefore, we have found the \textquotedbl most important\textquotedbl{}
-group belonging to the Lie algebra. We can get all other groups belonging
-to this Lie algebra through maps from $SU(2)$.
-
-We can now understand what manifold $SO(3)$ is. The map from $SU(2)$
-to $SO(3)$ identifies with two points of $SU(2)$, one point of $SO(3)$.
-Therefore, we can think of $SO(3)$ as the top half of $ S^{3}$
-
-We can see, from the point of view that Lie groups are manifolds that
-$SU(2)$ is a more complete object than $SO(3)$. $SO(3)$ is just
-\textquotedbl part\textquotedbl{} of the complete object.
-
-...
-
-To describe nature at the most fundamental level, we must use the
-covering group, instead of any of the other groups that one can map
-to from the covering group. We are able to derive the representations
-of the most fundamental group, belonging to a given Lie algebra, by
-deriving representations of the Lie algebra. We can then put the matrices
-representing the Lie algebra elements (the generators) into the exponential
-function to get matrices representing group elements. 
-
-Herein lies the strength of Lie theory. By using pure mathematics
-we are able to reveal something fundamental about nature. The standard
-symmetry group of special relativity hides something from us {[}the
-spin of elementary particles{]}, because it is not the most fundamental
-group belonging to this symmetry. The covering group of the Poincaré
-group is the fundamental group and therefore we will use it to describe
-nature.
-\end{quote}
-What Schwichtenberg is talking about is the fact that the double cover
-of the Lorentz group is able to represent the spin of a particle,
-while the standard Lorentz group cannot. This is analogous to the
-difference between the use of $ S^{3}/ SU\left(2\right)$ versus $SO(3)$.
-In robotics, we are typically unconcerned with the bottom half of
-the $ S^{3}$ unit sphere, so there is no fundamental drawback to
-using $SO(3)$ like there is in particle physics. However,
-there is something about nature and pure mathematics that encodes
-rotations in a double cover, and $SO(3)$ only tells us
-half of the story.
-
-Finally, it's crucial to realize that the Lie groups arise from and
-are defined by the Lie algebra, and therefore by the generators. Not
-the other way around. By starting at the generators we can capture
-at a more fundamental level what is going on in 3D rotations, and
-what the manifold really is. 
-
-
-
-
-
-
+%-----------------------------------------------------------------
 \section{The Adjoint as the Jacobian of Group Action}
 
 \rwbcomment{move this stuff up into the previous sections}
 
 \label{sec:ad_as_jacobian}
 
-Most people's first introduction to calculus typically focuses on
-computing derivatives. For completeness, we're going to start here
-and work our way to computing Jacobians of the Lie Group action. The
-formula for computing the derivative of a scalar function $f$, is
-given as
-%
-\sidenote{Note, to be consistent with the vast majority of literature on this
-topic, I am using $\varepsilon$ to mean a small perturbation. This
-is a separate and distinct concept from $\epsilon,$ the dual number.}
-%
-\[
-\frac{\partial f}{\partial x}=\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\left(f\left(x+\varepsilon\right)-f\left(x\right)\right).
-\]
-In conversational English, this means, ``How does the output of the
-function $f$ change if I bump the input a tiny bit?'' This is very
-naturally adapted for a vector function $g\in\mathbb{R}^{m}\to\mathbb{R}^{n}$
-as
 
-\begin{align*}
-\frac{\partial g}{\partial\xbf} & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\deltabf_{1}\left(\xbf,\varepsilon\right) & \deltabf_{2}\left(\xbf,\varepsilon\right)\cdots\deltabf_{m}\left(\xbf,\varepsilon\right)\end{bmatrix}\in\mathbb{R}^{n\times m}\\
-\deltabf_{i}\left(\xbf,\varepsilon\right) & =g\left(\xbf+\ebf_{i}\varepsilon\right)-g\left(\xbf\right)
-\end{align*}
-Again, in conversational English, we're saying that $g$ is a function
-that takes in $m$-vectors and produces $n$-vectors. We want to know
-what $g$ looks like along each of the input axes, so we're going
-to make a matrix where each column is the derivative along each of
-these directions. This is known as the Jacobian matrix, and can also
-be interpreted as, ``If I change the input in some way, what does
-it do to the output?'' For example, if I go further along the $\ebf_{1}$-axis,
-would I expect the output to go up or down? This would be captured
-in the first column of the Jacobian. This relationship lets us look
-at Jacobians as a sort of mapping from input space to output space,
-and lets us quickly compute how changes in input should affect the
-output of the function $g$.
 
 The concept of differentiation works quite naturally with Lie groups
 as well. For example, consider the case of some function $h\in SE(3)\to\mathbb{R}^{n}.$
