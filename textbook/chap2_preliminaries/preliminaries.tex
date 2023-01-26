@@ -214,7 +214,7 @@ complicated problems quickly and accurately.
 
 It turns out that rotations and transformations do \emph{not} lie
 in a vector space. This means that we end up performing manipulations
-to get our problems into a vector space where we can use powerful
+to get the problems into a vector space where we can use powerful
 linear algebra techniques, and the distinction between vector spaces
 and non-vector spaces will become very important.
 
@@ -1582,11 +1582,6 @@ based on the coordinates of $p$ in frame $a$ projected into frame
 $b$. This is represented by the $p^{\star}$ notation
 in Figure~\ref{fig:active_transform}.
 
-%Transform matrices are an obvious extension of rotation matrices.
-%However, just like rotation matrices, the complex number representation
-%is more efficient. This brings us to our next transform parameterization:
-%dual unit quaternions.
-
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \subsection{Rigid body kinematics}
 As we saw in Section~\ref{sec:rotational_kinematics}, the rotational kinematics are given by
@@ -1773,7 +1768,7 @@ which implies that $W^{-1}(R)$ is well defined as $R\to I$ (i.e., $\omegabf\to 0
 % & =-\ss{(\omegabf_{b/I}^{b})}R_{I}^{b}, & \text{(Eq. \ref{eq:skew_trick_2})}
 %\end{align*}
 %which can also be easily derived as the transpose of Eq \ref{eq:body_rot_dyn}.
-%The desire to express our angular rates in terms of the body frame
+%The desire to express the angular rates in terms of the body frame
 %induces a similar effect in unit quaternion dynamics, except that
 %it is reversed due to the reversed order of concatenation:
 %
@@ -1848,7 +1843,7 @@ manner. Luckily, we have Lie group theory that can bridge this gap.
 We will see in this section how we can use Lie Groups to take non-vector
 group objects, and map them into a vector space where we can perform
 linear algebra and reason about things in an efficient manner, then
-map our results back into the group so we can do useful things.
+map the results back into the group so we can do useful things.
 
 As a further motivating example, consider the case where we might
 want to represent the uncertainty of the estimate of a rotation matrix.
@@ -2099,12 +2094,12 @@ If the group action is defined as $f_\wbf(R) = R\wbf$, then the Jacobian of $f$ 
  	\ebf_2^\wedge\wbf & 
  	\ebf_3^\wedge\wbf 
  \end{pmatrix} \\
- &= R\begin{pmatrix} 
+ &= -R\begin{pmatrix} 
  	\wbf^\wedge\ebf_1 & 
  	\wbf^\wedge\ebf_2 & 
  	\wbf^\wedge\ebf_3 
  \end{pmatrix} 
-  = R\wbf^\wedge \begin{pmatrix} 
+  = -R\wbf^\wedge \begin{pmatrix} 
  	\ebf_1 & 
  	\ebf_2 & 
  	\ebf_3 
@@ -2320,7 +2315,7 @@ be
 \end{align}
 If we make a matrix out of the six $\deltabf_{i}$ for $\se\left(3\right)$,
 take the limit as $\varepsilon\to0$ and attach coordinate frames
-to our transform $T_{a}^{b}$, then we get a $6\times6$ matrix that
+to the transform $T_{a}^{b}$, then we get a $6\times6$ matrix that
 tells us how things change along the generators in the $b$ frame
 if we perturb along the generators the $a$ frame. This has a special
 name--the Adjoint--and it just so happens to be the Jacobian of
@@ -2353,16 +2348,16 @@ of complex expressions involving Lie Groups.
 
 \section{Closed-Form Expressions for the Adjoint}
 
-In this section, I'm going to derive the Adjoint for each of our four
+In this section, I'm going to derive the Adjoint for each of the four
 Lie Groups, but before we do that,\emph{ }let's first talk about a
 concrete example of where the Adjoint is useful. 
 
 Let's consider some kind of nonlinear controller that is computing
 error on the Lie Algebra of $SE(3)$, where we have some
-desired state $\check{T}$ and our current state $T.$ We're going
+desired state $\check{T}$ and the current state $T.$ We're going
 to form some control law around the error between these two states.
-Naturally, we want to use linear algebra as the backbone of our implementation,
-so we'd like to use $\se\left(3\right)^{\vee}$ to represent our error.
+Naturally, we want to use linear algebra as the backbone of the implementation,
+so we'd like to use $\se\left(3\right)^{\vee}$ to represent the error.
 We could compute the error in one of 4 ways:
 
 \begin{align*}
@@ -2377,16 +2372,16 @@ between the transform (i.e. perhaps $a$ refers to the inertial frame),
 and that the $b$ and $\check{b}$ frames are the current and desired
 body frame of a robot. The goal of the controller in this case is
 to make $b=\check{b}.$ In this case, it makes the most sense to define
-our error as one of the following two options (or else the coordinate
+the error as one of the following two options (or else the coordinate
 frames will not match up):
 
 \begin{align*}
 \deltabf_{b}^{\check{b}} & =\log\left(\check{T_{a}^{b}}\cdot\left(T_{a}^{b}\right)^{-1}\right),\\
 \deltabf_{\check{b}}^{b} & =\log\left(T_{a}^{b}\cdot\left(\check{T}_{a}^{b}\right)^{-1}\right).
 \end{align*}
-Driving either of these errors to zero will achieve our control objectives.
+Driving either of these errors to zero will achieve the control objectives.
 However, watch what happens when we want to compute the Jacobian of
-our error with respect to our current state. We can find these Jacobians
+the error with respect to the current state. We can find these Jacobians
 using the chain rule: 
 
 \begin{align*}
@@ -2397,7 +2392,7 @@ using the chain rule:
 The expression for $A$ is in Table \ref{tab:lie_identities_group_vector-se3},
 and it's the same for both parameterizations. However, we are left
 with the two $B$ expressions. In the first case, we have to go through
-our desired state to get to the current state. This isn't too bad,
+the desired state to get to the current state. This isn't too bad,
 we just look at Table \ref{tab:lie_identities_group_operations} to
 get (using the left Jacobian):
 
