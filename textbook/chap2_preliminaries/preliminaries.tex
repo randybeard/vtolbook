@@ -2010,40 +2010,6 @@ Therefore $S=QR$ satisfies exactly the same differential equation as $R$.  Dynam
 \marginnote{Definition of left and right invariant dynamics.}  
 Similarly, if $R$ satisfies $\dot{R} = -\omega^\wedge R$, then multiplying on the right by a constant matrix $S$ does not change the dynamics, which are therefore called {\em right-invariant} dynamics.
 
-Note that $SO(2)$ is a one-dimensional group because it can be described by a single parameter $\theta$.  We typically think of elements of $SO(2)$ as rotation matrices that transform coordinates or rotate vectors.  Therefore, associated with the vector $\wbf\in\mathbb{R}^2$, we can define the {\em group action}
-\[
-	f_{\wbf}(R) = R\wbf,
-\]
-where the output of $f_{\wbf}(R)$ is a vector that represents a transformation of $\wbf$.  However, there is a slightly different perspective here, because we think of $f$ as a function of the group element $R$, with a fixed $\wbf$, instead of as a function of $\wbf$ with a fixed $R$.  It is natural to ask whether we can take the Jacobian of the group action $f_{\wbf}$ with respect to the group element $R$.  
-
-\marginnote{
-Recall that the derivative of a function is defined as
-\[
-\frac{\partial f}{\partial z}=\lim_{\varepsilon\to0}\frac{f\left(z+\varepsilon\right)-f\left(z\right)}{\varepsilon}.
-\]
-In conversational English, this means, ``How does the output of the
-function $f$ change if I bump the input a tiny amount?'' 
-}
-Toward that end, recall that the Jacobian of a function $g: \mathbb{R}^n\to\mathbb{R}^m$ is given by
-\[
-\frac{\partial g}{\partial \xbf} = \lim_{\varepsilon\to 0} \begin{pmatrix} \frac{g(\xbf+\varepsilon\ebf_1)-g(\xbf)}{\varepsilon} & \dots & \frac{g(\xbf+\varepsilon\ebf_n)-g(\xbf)}{\varepsilon}\end{pmatrix},
-\]
-where the $i^{th}$ row describes how  $g$ changes with incremental changes in $\xbf$ along the basis vector $\ebf_i$.  
-\marginnote{
-For vector functions $g:\mathbb{R}^n\to\mathbb{R}^m$, the $i^{th}$ column of the Jacobian matrix indicates how $g$ changes with as incremental change in the $i^{th}$ element of $\xbf$.
-}
-We can define the $\frac{\partial f}{\partial R}$ similarly, where the $i^{th}$ row of the Jacobian would describe how the group action $f_\wbf(R)$ changes incrementally as $R$ changes incrementally along the basis vector, or generator $J_i$.  In our case, there is only one generator: 
-\begin{align*}
-\frac{\partial f}{\partial R} &= \frac{\partial (R\wbf)}{\partial R} 
-  = \lim_{\varepsilon\to 0} \frac{R\exp(\varepsilon J_1)\wbf - R\wbf}{\varepsilon} \\
-  &= \lim_{\varepsilon\to 0} \frac{R\left(I + \varepsilon J_1 + \frac{\varepsilon^2}{2!}J_1^2 + \dots \right)\wbf - R\wbf}{\varepsilon} \\
-  &= \lim_{\varepsilon\to 0} \frac{\varepsilon RJ_1\wbf}{\varepsilon} 
-  = R J_1 \wbf.
-\end{align*}
-Note that $\frac{\partial f}{\partial R}$ is a $2\times 1$ vector that because $f_\wbf(R)$ maps to $\mathbb{R}^2$ (number of rows), and there is only one generator function (number of columns).
-Therefore, knowing the structure (dimension and generators) of the Lie algebra is critical to the process of taking Jacobians of group actions.
-
-\rwbcomment{add discussion on adjoints.}
 
 
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2076,40 +2042,6 @@ and any element $R\in SO(3)$ can be expressed as
 \[
 R = \exp\left( aJ_1 + bJ_2 + cJ_3 \right)
 \]
-
-If the group action is defined as $f_\wbf(R) = R\wbf$, then the Jacobian of $f$ with respect to $R$ can be computed as
-\begin{align*}
-\frac{\partial f}{\partial R} &= \lim_{\varepsilon \to 0} \begin{pmatrix} 
- 	\frac{R\exp(\varepsilon J_1)\wbf - R\wbf}{\varepsilon} & 
- 	\frac{R\exp(\varepsilon J_2)\wbf - R\wbf}{\varepsilon} &
- 	\frac{R\exp(\varepsilon J_3)\wbf - R\wbf}{\varepsilon}
- \end{pmatrix} \\
- &= \lim_{\varepsilon \to 0} \begin{pmatrix} 
- 	\frac{\varepsilon RJ_1\wbf}{\varepsilon} & 
- 	\frac{\varepsilon RJ_2\wbf}{\varepsilon} &
- 	\frac{\varepsilon RJ_3\wbf}{\varepsilon}
- \end{pmatrix}
-  = R\begin{pmatrix} 
- 	\ebf_1^\wedge\wbf & 
- 	\ebf_2^\wedge\wbf & 
- 	\ebf_3^\wedge\wbf 
- \end{pmatrix} \\
- &= -R\begin{pmatrix} 
- 	\wbf^\wedge\ebf_1 & 
- 	\wbf^\wedge\ebf_2 & 
- 	\wbf^\wedge\ebf_3 
- \end{pmatrix} 
-  = -R\wbf^\wedge \begin{pmatrix} 
- 	\ebf_1 & 
- 	\ebf_2 & 
- 	\ebf_3 
- \end{pmatrix}\\
-   &= -R\wbf^\wedge.
-\end{align*}
-
-\rwbcomment{Need to explain other Jacobians in table at end of section.}
-\rwbcomment{Need to explain adjoint.}
-\rwbcomment{Need to explain right Jacobian vs. left Jacobian.}
 
 
 %
@@ -2211,14 +2143,8 @@ operator for $SE(3)$ as
 and $\left(\cdot\right)^{\vee}$ as the inverse operation.
 
 
-
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \subsection{The Lie group $S^3$}
-
-\rwbcomment{rewrite this section}
-
-%++++++++++++++++++++++++++++++++++++++
-\subsection{Closed-Form Exponential for $\protect S^{3}$}
 
 Let's start with the definition of the quaternion exponential
 
@@ -2277,296 +2203,216 @@ This is actually the same as if we redefined the generators of the
 unit quaternion to all be $\frac{1}{2}J_{i}$. This is fine, and totally
 proper, however we just need to be explicit about this choice.
 
+
 %-----------------------------------------------------------------
-\section{The Adjoint as the Jacobian of Group Action}
-
-\rwbcomment{move this stuff up into the previous sections}
-
+\section{Adjoints and Jacobians}
 \label{sec:ad_as_jacobian}
 
-
-
-The concept of differentiation works quite naturally with Lie groups
-as well. For example, consider the case of some function $h\in SE(3)\to\mathbb{R}^{n}.$
-What we want is a matrix that tells us how the output of $h$ behaves
-as we tweak the argument of $h$ along the \emph{generators }of $\se\left(3\right).$
-To compute this, we use the fact that every member of the group can
-be described by the exponential of some linear combination of generators,
-as in
-
-\begin{align*}
-T & =\exp\left(\xbf^{\wedge}\right), & \xbf^{\wedge} & =\log\left(T\right).
-\end{align*}
-When we write it this way, we can see how we might perturb $\xbf$ (and
-therefore, $T$) in the $J_{i}$ direction:
-
-\begin{align*}
-T_{i}^{+} & =\exp\left(\xbf^{\wedge}+J_{i}\varepsilon\right)\\
- & =T\cdot\exp\left(J_{i}\varepsilon\right).
-\end{align*}
-Next, we need to think about how we might compute the difference between
-$T_{i}^{+}$ and the original $T$. Again, looking to the Lie Algebra,
-we should expect the difference $\deltabf_{i}\in\se\left(3\right)$ to
-be
-
-\begin{align}
-\exp\left(\deltabf_{i}\right) & =T\cdot\exp\left(J_{i}\varepsilon\right)\cdot\exp\left(-\xbf^{\wedge}\right)\nonumber \\
-\deltabf_{i} & =\log\left(T\cdot\exp\left(J_{i}\varepsilon\right)\cdot T^{-1}\right)^{\vee}.\label{eq:adjoint_start}
-\end{align}
-If we make a matrix out of the six $\deltabf_{i}$ for $\se\left(3\right)$,
-take the limit as $\varepsilon\to0$ and attach coordinate frames
-to the transform $T_{a}^{b}$, then we get a $6\times6$ matrix that
-tells us how things change along the generators in the $b$ frame
-if we perturb along the generators the $a$ frame. This has a special
-name--the Adjoint--and it just so happens to be the Jacobian of
-the group action by a member of the group.
-
-We can come at the Adjoint in another way: because the Adjoint is
-the Jacobian of the group action of a Lie group, we can use it to
-map vectors from the ``output'' of a group action to the ``input'',
-and vice-versa. In mathematical terms\footnote{for the rest of this section, I'm dropping the $\left(\cdot\right)^{\wedge}$
-so we can focus on the coordinate frame notation. The mapping from
-the vector to algebra should be implied by context.}:
-
+In this section we will discuss differentiating functions with respect to elements of a Lie group.  As a first example, we note that $SO(2)$ is a one-dimensional group because it can be described by a single parameter $\theta$.  We typically think of elements of $SO(2)$ as rotation matrices that transform coordinates or rotate vectors.  Therefore, associated with the vector $\wbf\in\mathbb{R}^2$, we can define the {\em group action}
 \[
-T\cdot\exp\left(\deltabf\right)=\exp\left(\Ad_{T}\cdot\deltabf\right)\cdot T.
+	f_{\wbf}(R) = R\wbf,
 \]
-See how we have ``moved'' $\deltabf$ from the ``input'' of $T$ (the
-right side) to the ``output'' (the left side)? If we attach coordinate
-frames to $T$ this becomes even more clear: 
+where the output of $f_{\wbf}(R)$ is a vector that represents a transformation of $\wbf$. In this section, we think of $f$ as a function of the group element $R$, with a fixed $\wbf$, instead of as a function of $\wbf$ with a fixed $R$.  It is natural to ask whether we can take the Jacobian of the group action $f_{\wbf}$ with respect to the group element $R$.  
 
-\begin{align}
-T_{a}^{b}\cdot\exp\left(\deltabf^{a}\right) & =\exp\left(\Ad\left(T_{a}^{b}\right)\cdot\deltabf^{a}\right)\cdot T_{a}^{b}.\nonumber \\
- & =\exp\left(\deltabf^{b}\right)\cdot T_{a}^{b}.\label{eq:adjoint_show}
-\end{align}
-The Adjoint transforms $\deltabf$ from $a$ to $b.$
+\marginnote{
+	Recall that the derivative of a function is defined as
+	\[
+	\frac{\partial f}{\partial z}=\lim_{\varepsilon\to0}\frac{f\left(z+\varepsilon\right)-f\left(z\right)}{\varepsilon}.
+	\]
+	In conversational English, this means, ``How does the output of the
+	function $f$ change if the input x is changed by a small amount?'' 
+}
 
-Remember all that talk about left-invariance and right-invariance?
-This property of the Adjoint of the Lie Group lets us swap back and
-forth however we need to. This is really helpful when computing Jacobians
-of complex expressions involving Lie Groups.
-
-\section{Closed-Form Expressions for the Adjoint}
-
-In this section, I'm going to derive the Adjoint for each of the four
-Lie Groups, but before we do that,\emph{ }let's first talk about a
-concrete example of where the Adjoint is useful. 
-
-Let's consider some kind of nonlinear controller that is computing
-error on the Lie Algebra of $SE(3)$, where we have some
-desired state $\check{T}$ and the current state $T.$ We're going
-to form some control law around the error between these two states.
-Naturally, we want to use linear algebra as the backbone of the implementation,
-so we'd like to use $\se\left(3\right)^{\vee}$ to represent the error.
-We could compute the error in one of 4 ways:
-
-\begin{align*}
-\deltabf_{a}^{\check{a}} & =\log\left(\check{\left(T_{a}^{b}\right)}^{-1}\cdot T_{a}^{b}\right)\\
-\deltabf_{b}^{\check{b}} & =\log\left(\check{T_{a}^{b}}\cdot\left(T_{a}^{b}\right)^{-1}\right)\\
-\deltabf_{\check{a}}^{a} & =\log\left(\left(T_{a}^{b}\right)^{-1}\cdot\check{T_{a}^{b}}\right)\\
-\deltabf_{\check{b}}^{b} & =\log\left(\left(T_{a}^{b}\right)\cdot\left(\check{T}_{a}^{b}\right)^{-1}\right).
-\end{align*}
-The choice of error depends largely on which frames are moving, and
-which are not. Let's assume that in this case the $a$ frame is shared
-between the transform (i.e. perhaps $a$ refers to the inertial frame),
-and that the $b$ and $\check{b}$ frames are the current and desired
-body frame of a robot. The goal of the controller in this case is
-to make $b=\check{b}.$ In this case, it makes the most sense to define
-the error as one of the following two options (or else the coordinate
-frames will not match up):
-
-\begin{align*}
-\deltabf_{b}^{\check{b}} & =\log\left(\check{T_{a}^{b}}\cdot\left(T_{a}^{b}\right)^{-1}\right),\\
-\deltabf_{\check{b}}^{b} & =\log\left(T_{a}^{b}\cdot\left(\check{T}_{a}^{b}\right)^{-1}\right).
-\end{align*}
-Driving either of these errors to zero will achieve the control objectives.
-However, watch what happens when we want to compute the Jacobian of
-the error with respect to the current state. We can find these Jacobians
-using the chain rule: 
-
-\begin{align*}
-\frac{\partial}{\partial T_{a}^{b}}\deltabf_{b}^{\check{b}} & =\left.\frac{\partial\log\left(\xbf\right)}{\partial\xbf}\right|_{\xbf=\left(T_{a}^{b}\cdot\left(T_{a}^{\check{b}}\right)\right)}\cdot\frac{\partial}{\partial T_{a}^{b}}\left(\check{T_{a}^{b}}\cdot\left(T_{a}^{b}\right)^{-1}\right) & =A\cdot B^{\check{b}}\\
-\frac{\partial}{\partial T_{a}^{b}}\deltabf_{\check{b}}^{b} & =\left.\frac{\partial\log\left(\xbf\right)}{\partial\xbf}\right|_{\xbf=\left(T_{a}^{b}\cdot\left(T_{a}^{\check{b}}\right)\right)}\cdot\frac{\partial}{\partial T_{a}^{b}}\left(T_{a}^{b}\cdot\left(\check{T_{a}^{b}}\right)^{-1}\right) & =A\cdot B^{b}
-\end{align*}
-
-The expression for $A$ is in Table \ref{tab:lie_identities_group_vector-se3},
-and it's the same for both parameterizations. However, we are left
-with the two $B$ expressions. In the first case, we have to go through
-the desired state to get to the current state. This isn't too bad,
-we just look at Table \ref{tab:lie_identities_group_operations} to
-get (using the left Jacobian):
-
-\begin{align*}
-B^{\check{b}} & =\frac{\partial}{\partial T_{a}^{b}}\left(\check{T_{a}^{b}}\cdot\left(T_{a}^{b}\right)^{-1}\right)\\
- & =-\Ad\left(\check{T_{a}^{b}}\cdot\left(T_{a}^{b}\right)^{-1}\right)
-\end{align*}
-for the first cast, and
-
-\begin{align*}
-B^{b} & =\frac{\partial}{\partial T_{a}^{b}}\left(T_{a}^{b}\cdot\left(\check{T_{a}^{b}}\right)^{-1}\right)\\
- & =I\in\mathbb{R}^{6\times6}.
-\end{align*}
-for the second. Having a closed form expression for the Adjoint makes
-computing these kinds of expressions very straight-forward. 
-
-Most modern forms of control and estimation rely heavily on quickly-computed
-Jacobians. With a table of Jacobians for exp, log, Ad and a few other
-Lie group expressions, plus the Matrix Cookbook \cite{Petersen2012},
-it's pretty easy to chain-rule out even the hairiest Jacobians pretty
-quickly to get analytical expressions. Appendix \ref{sec:Tables}
-contains most of these Jacobians for easy reference.
-
-\subsection{Adjoint for $SO(3)$}
-
-For all four Lie groups, we can derive the Adjoint by finding the
-closed-form expression of Eq. \ref{eq:adjoint_start}. $SO(3)$
-is quite easy:
-
-\begin{align*}
-\Ad\left(R\right) & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}R\cdot\exp\left(J_{1}\varepsilon\right)\cdot R^{-1} & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}R\cdot\left(I+\ss{\ebf_{1}\epsilon}+\cdots\right)\cdot R^{-1} & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}R\cdot R^{-1}+R\cdot\ss{\ebf_{1}\epsilon}\cdot R^{-1} & \cdots\end{bmatrix}\\
- & =\begin{bmatrix}R\cdot\ss{\ebf_{1}}\cdot R^{-1} & \cdots\end{bmatrix} & R\cdot R^{-1}=I\\
- & =\begin{bmatrix}\ss{R\ebf_{1}} & \ss{R\ebf_{2}} & \ss{R\ebf_{3}}\end{bmatrix} & \textnormal{(Eq. \ref{eq:skew_trick_2})}\\
- & =R
-\end{align*}
-We see here that $SO(3)$ is \emph{self-adjoint}, and
-it makes sense why. Consider an $SO(3)$ version of Eq.
-\ref{eq:adjoint_show}. Rotating the vector is the natural way to
-transform $\deltabf$ from the $a$ frame to the $b$ frame.
-
+Toward that end, recall that the Jacobian of a function $g: \mathbb{R}^n\to\mathbb{R}^m$ is given by
 \[
-\boxed{\Ad\left(R\right)=R}
+\frac{\partial g}{\partial \xbf} = \lim_{\varepsilon\to 0} \begin{pmatrix} \frac{g(\xbf+\varepsilon\ebf_1)-g(\xbf)}{\varepsilon} & \dots & \frac{g(\xbf+\varepsilon\ebf_n)-g(\xbf)}{\varepsilon}\end{pmatrix},
+\]
+where the $i^{th}$ row describes how  $g$ changes with incremental changes in $\xbf$ along the basis vector $\ebf_i$.  
+\marginnote{
+For vector functions $g:\mathbb{R}^n\to\mathbb{R}^m$, the $i^{th}$ column of the Jacobian matrix indicates how $g$ changes with as incremental change in the $i^{th}$ element of $\xbf$.
+}
+We can define the $\frac{\partial f}{\partial R}$ similarly, where the $i^{th}$ row of the Jacobian would describe how the group action $f_\wbf(R)$ changes incrementally as $R$ changes incrementally along the basis vector, or generator $J_i$.
+Since we cannot add elements in $SO(2)$ we need to perturb $R$ using Lie Group operations.  Accordingly, we can perturb $R$ on the right using 
+$R\exp(\varepsilon J_1)$ or we could perturb $R$ on the left using $\exp(\varepsilon J_1)R$.  The Jacobian that we obtain will be different in both cases.  If we perturb on the right, we will obtain the {\em right Jacobian}.  Alternatively, if we perturb on the left we get the {\em left Jacobian}.  
+
+In our case, the right Jacobian is computed as
+\begin{align*}
+J_r^{f_\wbf}(R) = \frac{\partial f}{\partial R} &= \frac{\partial (R\wbf)}{\partial R} 
+  = \lim_{\varepsilon\to 0} \frac{R\exp(\varepsilon J_1)\wbf - R\wbf}{\varepsilon} \\
+  &= \lim_{\varepsilon\to 0} \frac{R\left(I + \varepsilon J_1 + \frac{\varepsilon^2}{2!}J_1^2 + \dots \right)\wbf - R\wbf}{\varepsilon} \\
+  &= \lim_{\varepsilon\to 0} \frac{\varepsilon RJ_1\wbf}{\varepsilon} 
+  = R J_1 \wbf.
+\end{align*}
+Alternatively, the left Jacobian is computed as
+\begin{align*}
+J_\ell^{f_\wbf}(R) = \frac{\partial f}{\partial R} &= \frac{\partial (R\wbf)}{\partial R} 
+  = \lim_{\varepsilon\to 0} \frac{\exp(\varepsilon J_1)R\wbf - R\wbf}{\varepsilon} \\
+  &= \lim_{\varepsilon\to 0} \frac{\left(I + \varepsilon J_1 + \frac{\varepsilon^2}{2!}J_1^2 + \dots \right)R\wbf - R\wbf}{\varepsilon} \\
+  &= J_1 R \wbf.
+\end{align*}
+Note that $\frac{\partial f}{\partial R}$ is a $2\times 1$ vector that because $f_\wbf(R)$ maps to $\mathbb{R}^2$ (number of rows), and there is only one generator function (number of columns).
+Therefore, knowing the structure (dimension and generators) of the Lie algebra is critical to the process of taking Jacobians of group actions.
+
+Similarly, for $SO(3)$, if the group action is defined as $f_\wbf(R) = R\wbf$, then the right Jacobian of $f$ with respect to $R$ can be computed as
+\begin{align*}
+J_r^{f_\wbf}(R) = \frac{\partial f_\wbf}{\partial R} &= \lim_{\varepsilon \to 0} \begin{pmatrix} 
+ 	\frac{R\exp(\varepsilon J_1)\wbf - R\wbf}{\varepsilon} & 
+ 	\frac{R\exp(\varepsilon J_2)\wbf - R\wbf}{\varepsilon} &
+ 	\frac{R\exp(\varepsilon J_3)\wbf - R\wbf}{\varepsilon}
+ \end{pmatrix} \\
+ &= \lim_{\varepsilon \to 0} \begin{pmatrix} 
+ 	\frac{\varepsilon RJ_1\wbf}{\varepsilon} & 
+ 	\frac{\varepsilon RJ_2\wbf}{\varepsilon} &
+ 	\frac{\varepsilon RJ_3\wbf}{\varepsilon}
+ \end{pmatrix}
+  = R\begin{pmatrix} 
+ 	\ebf_1^\wedge\wbf & 
+ 	\ebf_2^\wedge\wbf & 
+ 	\ebf_3^\wedge\wbf 
+ \end{pmatrix} \\
+ &= -R\begin{pmatrix} 
+ 	\wbf^\wedge\ebf_1 & 
+ 	\wbf^\wedge\ebf_2 & 
+ 	\wbf^\wedge\ebf_3 
+ \end{pmatrix} 
+  = -R\wbf^\wedge \begin{pmatrix} 
+ 	\ebf_1 & 
+ 	\ebf_2 & 
+ 	\ebf_3 
+ \end{pmatrix}\\
+   &= -R\wbf^\wedge,
+\end{align*}
+and the left Jacobian is computed as
+\begin{align*}
+J_\ell^{f_\wbf}(R) = \frac{\partial f_\wbf}{\partial R} &= \lim_{\varepsilon \to 0} \begin{pmatrix} 
+ 	\frac{\exp(\varepsilon J_1)R\wbf - R\wbf}{\varepsilon} & 
+ 	\frac{\exp(\varepsilon J_2)R\wbf - R\wbf}{\varepsilon} &
+ 	\frac{\exp(\varepsilon J_3)R\wbf - R\wbf}{\varepsilon}
+ \end{pmatrix} \\
+ &= \lim_{\varepsilon \to 0} \begin{pmatrix} 
+ 	\frac{\varepsilon J_1R\wbf}{\varepsilon} & 
+ 	\frac{\varepsilon J_2R\wbf}{\varepsilon} &
+ 	\frac{\varepsilon J_3R\wbf}{\varepsilon}
+ \end{pmatrix}
+  = \begin{pmatrix} 
+ 	\ebf_1^\wedge R\wbf & 
+ 	\ebf_2^\wedge R\wbf & 
+ 	\ebf_3^\wedge R\wbf 
+ \end{pmatrix} \\
+ &= -\begin{pmatrix} 
+ 	(R\wbf)^\wedge\ebf_1 & 
+ 	(R\wbf)^\wedge\ebf_2 & 
+ 	(R\wbf)^\wedge\ebf_3 
+ \end{pmatrix} \\
+   &= -(R\wbf)^\wedge.
+\end{align*}
+
+%----------------------------------------------------
+\subsection{The Adjoint Operator and Adjoint Matrix}
+For a Lie group $G$, we can think of $g\in G$ as mapping the identity element $e$ to the element $g$.  It is natural to wonder about how small increments in the Lie algebra, i.e., small increments along the generators of the tangent space at $e$ map to small increments along the generators of the tangent space at $g$. Let $TG_g$ be the tangent space of manifold $G$ at element $g$, and let $\taubf_e^\wedge\in TG_e$ be a small increment in the lie algebra, and $\taubf_g^\wedge\in TG_g$ be a small increment in the tangent space at $g$, then we have that
+\[
+g \exp(\taubf_e^\wedge) = \exp(\taubf_g^\wedge)g.
+\]
+\rwbcomment{Add picture here}
+Therefore, we have that
+\[
+\exp(\taubf_g^\wedge) = g \exp(\taubf_e^\wedge) g^{-1}
+\]
+For matrix Lie groups we have that
+\begin{align*}
+\exp(g \taubf^\wedge g^{-1}) 
+	&= I + 	g \taubf^\wedge g^{-1} + \frac{1}{2!} (g \taubf^\wedge g^{-1})^2 + \dots \\
+	&= g(I + 	\taubf^\wedge  + \frac{1}{2!} (\taubf^\wedge )^2 + \dots ) g^{-1} \\
+	&= g exp(\taubf^\wedge) g^{-1},
+\end{align*}
+which implies that
+\begin{align*}
+& \exp(\taubf_g^\wedge) = \exp(g \taubf_e^\wedge g^{-1}) \\
+\implies & \taubf_g^\wedge = g \taubf_e^\wedge g^{-1}.
+\end{align*}
+We denote the {\em adjoint operator} $\text{Ad}_g:\mathfrak{g}\to \mathfrak{g}$ as
+\[
+Ad_g(\taubf^\wedge) \defeq g \taubf^\wedge g^{-1},
+\] 
+and note that the physical meaning of $Ad_g(\cdot)$ is that it transforms elements in the tangent space of the input to $g$ to an element in the tangent space at the output of $g$.  For example, if $T_b^i\in SE(3)$ represents the pose in the inertial frame relative to the body frame, then $Ad_{T_b^i}(\cdot)$ transforms small deviations of the twist in the body frame to small deviations of the twist in the inertial frame, and therefore represents the Jacobian of $T_b^i$.
+
+Notice that the adjoint is a linear operator since
+\begin{align*}
+Ad_g(\alpha \taubf_1^\wedge + \beta\taubf_2^\wedge) 
+	&= g (\alpha \taubf_1^\wedge + \beta\taubf_2^\wedge)g^{-1} \\
+	&= \alpha g\taubf_1^\wedge g^{-1} + \beta g\taubf_2^\wedge g^{-1} \\
+	&= \alpha Ad_g(\taubf_1^\wedge) + \beta Ad_g(\taubf_1^\wedge)
+\end{align*}
+and therefore, there exists a matrix, which in a severe abuse of notation is also denoted as $Ad_g:\mathbb{R}^{\text{dim}(\mathfrak{g})} \to \mathbb{R}^{\text{dim}(\mathfrak{g})}$, where
+\[
+\taubf_g = Ad_g \taubf_e. 
 \]
 
-
-\subsection{Adjoint for Unit Quaternions}
-
-Remember, the Adjoint action is given by 
-
-\[
-\Ad=\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\qbf\cdot\exp\left(J_{1}\varepsilon\right)\cdot\qbf^{-1}\right) & \cdots\end{bmatrix}.
-\]
-In the case of unit quaternions, we can see that they too, are self-adjoint.
-To compute the adjoint of a quaternion, all we need to do is pre-
-and post-multiply a pure quaternion of the lie algebra member by the
-quaternion. 
-
-\[
-\Ad\left(\qbf\right)=\qbf\cdot\deltabf\cdot\qbf^{-1}.
-\]
-However, sometimes we might want the matrix form of the adjoint. This
-can be computed as follows:
-
+As a first example, consider $R\in SO(2)$.  The adjoint operator is defined as
 \begin{align*}
- & =\lim_{\varepsilon\to 0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\qbf\cdot\begin{pmatrix}0\\
-\ebf_{1}\sin\left(\frac{\varepsilon}{2}\right)
-\end{pmatrix}\cdot\qbf^{-1}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to 0}\frac{1}{\varepsilon}\begin{bmatrix}\log\begin{pmatrix}0\\
-\frac{R^{\top}\ebf_{1}\varepsilon}{2}
-\end{pmatrix} & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to 0}\frac{1}{\varepsilon}\begin{bmatrix}R^{\top}\ebf_{1}\varepsilon & R^{\top}\ebf_{2}\varepsilon & R^{\top}\ebf_{3}\varepsilon\end{bmatrix}\\
- & =R^{\top}.
+Ad_R(\omega^\wedge) 
+	&= R\omega^\wedge R^\top \\
+	&= \begin{pmatrix}\cos\theta -\sin\theta \\ \sin\theta \cos\theta \end{pmatrix} \begin{pmatrix} 0 & -\omega \\ \omega & 0 \end{pmatrix} \begin{pmatrix} \cos\theta & \sin\theta \\ -\sin\theta & \cos\theta \end{pmatrix} \\
+	&= \begin{pmatrix} 0 & -\omega \\ \omega & 0 \end{pmatrix}.
 \end{align*}
-You could probably come up with this only just from intuition as well.
-If you remember that quaternions and rotation matrices share a Lie
-Algebra, and that the order of concatenation is backwards, then $R^{\top}$
-is the logical choice.
-
+The adjoint matrix is computed by
 \[
-\boxed{\Ad\left(\qbf\right)=R^{\top}\left(\qbf\right)}
+(Ad_R) \omega = \begin{pmatrix} 0 & -\omega \\ \omega & 0 \end{pmatrix}^\vee = \omega = (1) \cdot \omega,
+\]
+implying that $Ad_R = 1$ for $R\in SO(2)$.
+
+As another example, consider $R_a^b\in SO(3)$.  The adjoint operator is defined as
+\[
+{\omegabf^b}^\wedge = Ad_{R_a^b}({\omegabf^a}^\wedge) = R_a^b {\omegabf^a}^\wedge {R_a^b}^\top.
+\]
+However, noting that $R_a^b {\omegabf^a}^\wedge {R_a^b}^\top = (R_a^b\omegabf^a)^\wedge$ we have that 
+$\omegabf^b = R_a^b \omegabf^a$.  Therefore, for $SO(3)$, the adjoint matrix is
+\[
+Ad_{R_a^b}=R_a^b.
+\]
+Since the adjoint of $R$ is simply $R$, the Lie Group $SO(3)$ is self adjoint.  Unfortunately, not all Lie Groups are self-adjoint.  
+
+Consider now 
+\[
+T_a^b = \begin{pmatrix} R & \tbf \\ 0 1 \end{pmatrix} \in SO(2), \qquad \nubf^\wedge = \begin{pmatrix} \vbf \\ \omega \end{pmatrix}^\wedge = \begin{pmatrix} \omega^\wedge & \vbf \\ 0 1 \end{pmatrix}
+\]
+where $R\in SO(2)$, $\tbf, \vbf \in \mathbb{R}^2$, and $\omega\in\mathbb{R}$.
+The adjoint operator is defined as
+The adjoint operator is defined as
+\begin{align*}
+{\nubf^b}^\wedge = Ad_{T_a^b}({\nubf^a}^\wedge) &= T_a^b {\nubf^a}^\wedge {T_a^b}^\top 
+	&= \begin{pmatrix} \omega^\wedge & -\omegabf^\wedge \tbf + R\vbf \\ 0 & 0 \end{pmatrix}.
+\end{align*}
+Noting that 
+\begin{align*}
+\begin{pmatrix} \omega^\wedge & -\omega^\wedge \tbf + R\vbf \\ 0 & 0 \end{pmatrix}^\vee 
+	&= \begin{pmatrix} 	-\omega^\wedge \tbf + R\vbf \\ \omega \end{pmatrix} 
+	= \begin{pmatrix} R & -1^\wedge\tbf \\ 0 & 1 \end{pmatrix}\begin{pmatrix} \vbf \\ \omega \end{pmatrix},
+\end{align*}
+where $1^\wedge = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$, we conclude that for $SE(2)$
+\[
+Ad_T = \begin{pmatrix} R & -1^\wedge\tbf \\ 0 & 1 \end{pmatrix}.
 \]
 
-
-\subsection{Adjoint for $SE(3)$}
-
-Computing this adjoint is more complicated than pure rotation. Unfortunately,
-$SE(3)$ isn't self-adjoint,\footnote{This should be pretty obvious, seeing as $\se\left(3\right)$ is 6-dimensional
-while $SE(3)$ is a group of $4\times4$ matrices.} so the limit gets a little more hairy. We have two main blocks: the
-first three generators are the rotation generators, while the last
-three are the translation generators. Let's consider these separately.
-First, the rotation blocks
-
-\begin{align*}
-\Ad_{1-3} & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(T\cdot\exp\left(J_{1}\varepsilon\right)\cdot T^{-1}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(T\cdot\begin{bmatrix}\ss{\ebf_{1}\varepsilon} & 0\\
-0 & 0
-\end{bmatrix}\cdot T^{-1}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}R & \tbf\\
-0 & 1
-\end{bmatrix}\cdot\begin{bmatrix}\ss{\ebf_{1}\varepsilon} & 0\\
-0 & 0
-\end{bmatrix}\cdot\begin{bmatrix}R^{\top} & -R^{\top}\tbf\\
-0 & 1
-\end{bmatrix}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}R\ss{\ebf_{1}\varepsilon} & 0\\
-0 & 0
-\end{bmatrix}\cdot\begin{bmatrix}R^{\top} & -R^{\top}\tbf\\
-0 & 1
-\end{bmatrix}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}R\ss{\ebf_{1}\varepsilon}R^{\top} & -R\ss{\ebf_{1}\varepsilon}R^{\top}\tbf\\
-0 & 0
-\end{bmatrix}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\ss{R\ebf_{1}\varepsilon} & -\ss{R\ebf_{1}\varepsilon}\tbf\\
-0 & 0
-\end{bmatrix}\right) & \cdots\end{bmatrix} & \textnormal{(Eq. \ref{eq:skew_trick_2})}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\ss{R\ebf_{1}\varepsilon} & \ss{\tbf}R\ebf_{1}\varepsilon\\
-0 & 0
-\end{bmatrix}\right) & \cdots\end{bmatrix} & \textnormal{(Eq. \ref{eq:skew_trick_1})}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}R\varepsilon\\
-\ss{\tbf}R\varepsilon
-\end{bmatrix}\\
- & =\begin{bmatrix}R\\
-\ss{\tbf}R
-\end{bmatrix}.
-\end{align*}
-Now for the translation blocks
-
-\begin{align*}
-\Ad_{4-6} & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(T\cdot\exp\left(J_{4}\varepsilon\right)\cdot T^{-1}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}R & \tbf\\
-0 & 1
-\end{bmatrix}\cdot\begin{bmatrix}0 & \ebf_{1}\varepsilon\\
-0 & 0
-\end{bmatrix}\cdot\begin{bmatrix}R^{\top} & -R^{\top}\tbf\\
-0 & 1
-\end{bmatrix}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}0 & R\ebf_{1}\varepsilon\\
-0 & 0
-\end{bmatrix}\cdot\begin{bmatrix}R^{\top} & -R^{\top}\tbf\\
-0 & 1
-\end{bmatrix}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}0 & R\ebf_{1}\varepsilon\\
-0 & 0
-\end{bmatrix}\right) & \cdots\end{bmatrix}\\
- & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}0 & 0 & 0\\
-R\ebf_{1}\varepsilon & R\ebf_{2}\varepsilon & R\ebf_{3}\varepsilon
-\end{bmatrix}\\
- & =\begin{bmatrix}0\\
-R
-\end{bmatrix}.
-\end{align*}
-We now concatenate these blocks to get the final Adjoint matrix:
-
+For our final example, let 
 \[
-\boxed{\Ad\left(T\right)=\begin{pmatrix}R & 0\\
-\ss{\tbf}R & R
-\end{pmatrix}.}
+T_a^b = \begin{pmatrix} R & \tbf \\ 0 & 1\end{pmatrix} \in SE(3),  \qquad \nubf^\wedge = \begin{pmatrix} \vbf \\ \omegabf\end{pmatrix}^\wedge = \begin{pmatrix} \ss{\omegabf} & \vbf \\ 0 & 0 \end{pmatrix}.  
 \]
-Note that some literature\cite{Drummond2014,Ethan2019} derives this
-block-transposed. All that means is that they define generators 1-3
-as the translation generators and 4-6 as the rotation generators.
-
-Before moving on, let's take a second to develop a little bit of intuition
-regarding the adjoint when it comes to rigid transforms. Consider
-a rod rotating about a fixed origin, as shown in Figure \ref{fig:rotating_adjoint}.
-Let us say we have the linear and angular velocity of coordinate frame
-$a$, but we want the velocity of coordinate frame $b$. Because the
-coordinate frames are fixed by some rigid transform, any angular rate
-value of $a$ is the same for $b$, only rotated. However, to compute
-the linear velocity of coordinate frame $b$, we must account for
-the ``lever arm'' and the angular rate. This is what is going on
-in the bottom-left corner of the Adjoint in $SE(3).$ 
+The adjoint operator is defined as
+\begin{align*}
+{\nubf^b}^\wedge = Ad_{T_a^b}({\nubf^a}^\wedge) &= T_a^b {\nubf^a}^\wedge {T_a^b}^\top 
+	&= \begin{pmatrix} R\ss{\omegabf}R^\top & -R\ss{\omegabf}R^\top \tbf + R\vbf \\ 0 & 0 \end{pmatrix}.
+\end{align*}
+Noting that
+\begin{align*}
+	\begin{pmatrix} R\ss{\omegabf}R^\top & -R\ss{\omegabf}R^\top \tbf + R\vbf \\ 0 & 0 \end{pmatrix}^\wedge
+	&= \begin{pmatrix} \ss{\tbf}R\omegabf + R\vbf \\ R\omegabf \end{pmatrix} \\
+	&= \begin{pmatrix} R & \ss{\tbf} R \\ 0 & R \end{pmatrix}\begin{pmatrix}\vbf \\ \omegabf \end{pmatrix}, 
+\end{align*}
+we have that the associated adjoint matrix for $SE(3)$ is
+\[
+Ad_{T_a^b} \defeq \begin{pmatrix} R & \ss{\tbf} R \\ 0 & R \end{pmatrix}.
+\]
 
 \begin{marginfigure}
 \includegraphics[width=\linewidth]{chap2_preliminaries/figures/rotating_bar}
@@ -2577,145 +2423,177 @@ change in translation. }
 \label{fig:rotating_adjoint}
 \end{marginfigure}
 
-%++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-%\subsection{Adjoint of Dual Quaternions}
+Again, the physical meaning of the adjoint matrix $Ad_g$ where $g\in G$, is that it maps small deviations in the Euclidean space isomorphic to the tangent space of the manifold $G$ at the input of $g$, to small deviations in the Euclidean space isomorphic to the tangent space of the manifold G at the output of $g$.
+For example, Consider a rod rotating about a fixed origin, as shown in Figure~\ref{fig:rotating_adjoint}.
+Suppose we know the linear velocity $\vbf^a$ and angular velocity $\omegabf^a$ in coordinate frame
+$a$, and want to know these quantities in coordinate frame $b$.  The adjoint matrix in $SE(3)$ provides the transformation.  
+Since $\omegabf^b$ is only a rotation of $\omegabf^a$, the bottom row of $Ad_T$ only contains a rotation. However, to compute
+the linear velocity in frame $b$, we must account for the ``lever arm'' and the angular rate, which is what is going on in the two row of $Ad_T$. 
+
+
+\rwbcomment{Add a picture here.}
+ 
+For any Lie group $G$ with associated Lie algebra $\mathfrak{g}$, the adjoint matrix has the following properties, where $g, h\in G$ and $\tau\in\mathfrak{g}$:
+\begin{align*}
+g \exp(\tau) &= Ad_g(\tau) g, \qquad \text{$Ad_g(\cdot)$ as an operator}\\
+Ad_{g^{-1}} &= (Ad_g)^{-1}, \qquad \text{$Ad_g$ as a matrix} \\
+Ad_{gh} &= Ad_g Ad_h, \qquad \text{$Ad_\ast$ as a matrix}.
+\end{align*}
+
+
+\begin{table}[hhhht]
+\caption{Adjoint matrix summary}
+\label{tab:adjoint_matrix}
+\bgroup
+\def\arraystretch{1.0}
+\begin{tabular}{clll}
+	\toprule
+	$G$ & $g\in G$ & $\nu^\wedge \in \mathfrak{g}$ & $Ad_g: \mathbb{R}^{\text{dim}(\mathfrak{g})} \to \mathbb{R}^{\text{dim}(\mathfrak{g})}$ \\
+	\midrule
+	$SO(2)$, & $g=R(\theta)$, & $\nu = \omega\in\mathbb{R}$, & $Ad_g = 1$ \\
+	$SE(2)$, & $g=\begin{pmatrix} R & \tbf \\ 0 & 1 \end{pmatrix}$, & $\nu = \begin{pmatrix}\vbf \\ \omega \end{pmatrix} \in \mathbb{R}^3$, & $Ad_g = \begin{pmatrix} R & -1^\wedge\tbf \\ 0 & 1 \end{pmatrix}$ \\
+	$SO(3)$, & $g=R$, & $\nu = \omegabf \in \mathbb{R}^3$, & $Ad_g = R$ \\
+	$SE(3)$, & $g=\begin{pmatrix} R & \tbf \\ 0 & 1\end{pmatrix}$, & $\nu = \begin{pmatrix}\vbf \\ \omegabf \end{pmatrix} \in \mathbb{R}^6$, & $Ad_g = \begin{pmatrix} R & \ss{\tbf} R \\ 0 & R \end{pmatrix}$ \\
+	\bottomrule
+\end{tabular}
+\egroup
+\end{table}
+
+%++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{Right and Left Jacobian of the Exponential}
+
+We have seen that the exponential and logarithmic operator plays especially important roles in Lie group theory.  In particular, the exponential operator maps elements of the Lie algebra to elements of the Lie group, and the logarithm performs the inverse operation.  Therefore, it should come as no surprise that the Jacobian of the exponential and logarithm operators also plays an important role in working with Lie groups.
+
+
+
+\section{Adjoint and Jacobian stuff from some of our papers}
+
+Let $g \in SE(3)$ and $v \in \mathbb{R}^6$. The group matrix adjoint representation $\mathbf{Ad}_{g}:\mathbb{R}^6 \to \mathbb{R}^6$ and the Lie algebra matrix adjoint representation $\mathbf{ad}_{v}:\mathbb{R}^{6}\to\mathbb{R}^{6}$ are given by 
+\begin{align*}
+\mathbf{Ad}_{g}&=\begin{bmatrix}\mathcal{R} & \ss{t}\mathcal{R}\\
+0_{3\times3} & \mathcal{R}
+\end{bmatrix}, \text{ and } \mathbf{ad}_{v}=\begin{bmatrix}\ss{\omega} & \ss{\rho}\\
+0_{3\times3} & \ss{\omega}
+\end{bmatrix}.
+\end{align*}
+
+The right Jacobian and left Jacobian of the matrix exponential (
+$J_{r}:\mathbb{R}^{6}\to\mathbb{R}^{6}$, $J_{l}:\mathbb{R}^{6}\to\mathbb{R}^{6}$ respectively) are given
+in matrix notation at the point $v \in{\mathbb{R}^6}$ as 
+\begin{align} \label{eq:exponential_jacobians}
+J_{r}\left(v\right) & =\sum_{n=0}^{\infty}\frac{\left(-\mathbf{ad}_{v}\right)^{n}}{\left(n+1\right)!}, & J_{l}\left(v\right) & =\sum_{n=0}^{\infty}\frac{\left(\mathbf{ad}_{v}\right)^{n}}{\left(n+1\right)!}
+\end{align}
+and have the properties that for any $v\in\mathbb{R}^6$ and any small $\tilde{v}\in\mathbb{R}^6$, 
+\begin{subequations}\label{eq:Jacobian_property}
+\begin{align}
+\Exp(v)\Exp(\tilde{v}) & \approx\Exp\left(v+J_{r}^{-1}(v)\tilde{v}\right) \\
+\Exp(\tilde{v})\Exp(v) & \approx\Exp\left(v+J_{l}^{-1}(v)\tilde{v}\right) 
+\end{align}
+\end{subequations}
+
+
+For closed form expressions of the exponential, logarithm and Jacobian maps see \cite{Sola2018}.
+
+\subsection{}
+he matrix adjoint of $g\in G$ is a representation of $g$ that acts on $\mathbf{R}_G$ and is generically defined as 
+\[
+\text{Ad}^G_{g}:\mathbf{R}_G\to\mathbf{R}_G;\quad\left(v\right)\mapsto \text{Ad}^{G}_{g}(v),
+\]
+and represents, for example, a change of coordinates from one location on the manifold to another.
+A useful property of the adjoint is 
+\begin{equation}\label{eq:lie_groups_review_adjoint_relation}
+g\Exp_I^{G}(v)=\Exp_I^{G}\left(\text{Ad}^G_g v\right)g.    
+\end{equation}
 %
-%As with unit quaternions, dual unit quaternions are also self-adjoint:
+For $SE(2)$, the matrix adjoint of $g \in SE(2)$ is
 %
-%\[
-%\Ad\left(\Gamma\right)=\Gamma\cdot\exp\left(\dbf\right)\cdot\Gamma^{-1}.
-%\]
-%We have no problem dealing with six-vectors here (the problem with
-%$SE(3),$which led us to compute that hairy limit). However,
-%just like unit quaternions, we can compute the matrix form of the
-%Adjoint using the limit expression. Again, let's split up the generators
-%into two groups to help keep things a little more concise
+\begin{equation}
+    \text{Ad}^{SE(2)}_g = \begin{bmatrix}
+    R & -\ss{1} p\\
+    0_{1\times 2} &1
+    \end{bmatrix}.
+\end{equation}
+
+The matrix adjoint of $v_1 \in \mathbf{R}_G$ is a representation of $\mathbf{R}_G$ that acts on $v_2 \in \mathbf{R}_G$ generically defined as 
+\begin{equation*}
+\text{ad}^G_{v_1}:\mathbf{R}_G\to \mathbf{R}_G; \quad \left( v_2\right)\mapsto \text{ad}^G_{v_1}v_2.
+\end{equation*}
 %
-%{\small{}
-%\begin{align*}
-%\Ad_{1-3} & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\Gamma\cdot\exp\left(J_{1}\varepsilon\right)\cdot\Gamma^{-1}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}\cdot\begin{bmatrix}\begin{pmatrix}0\\
-%\ebf_{1}\sin\left(\frac{\varepsilon}{2}\right)
-%\end{pmatrix}\\
-%0\epsilon
-%\end{bmatrix}\cdot\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}^{-1}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}\cdot\begin{bmatrix}\ebf_{1}\varepsilon\\
-%0\epsilon
-%\end{bmatrix}\cdot\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}^{-1}\right) & \cdots\end{bmatrix} & \sin\varepsilon\to\varepsilon\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\\
-%\epsilon\left(\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{d}\right)
-%\end{bmatrix}\cdot\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}^{-1}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\\
-%\epsilon\left(\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{d}^{-1}+\qbf_{r}^{-1}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{d}\right)
-%\end{bmatrix}\right) & \cdots\end{bmatrix} & \ebf_{1}^{\wedge}=\begin{pmatrix}0\\
-%\ebf_{1}
-%\end{pmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\\
-%\epsilon\left(\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\begin{pmatrix}\frac{1}{2}\t^{\wedge}\cdot\qbf_{r}\end{pmatrix}^{-1}+\qbf_{r}^{-1}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\frac{1}{2}\t^{\wedge}\cdot\qbf_{r}\right)
-%\end{bmatrix}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\\
-%\frac{1}{2}\epsilon\left(\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\cdot\left(-\t^{\wedge}\right)+\qbf_{r}^{-1}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\t^{\wedge}\cdot\qbf_{r}\right)
-%\end{bmatrix}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\\
-%\frac{1}{2}\epsilon\left(-\ss{R^{\top}\ebf_{1}\varepsilon}\tbf+R\ss{\ebf_{1}\varepsilon}\tbf\right)
-%\end{bmatrix}\right) & \cdots\end{bmatrix} & \textnormal{(Eq. \ref{eq:quat_mult_matrix})}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\\
-%\frac{1}{2}\epsilon\left(-R^{\top}\ss{\ebf_{1}\varepsilon}R\tbf+R\ss{\ebf_{1}\varepsilon}\tbf\right)
-%\end{bmatrix}\right) & \cdots\end{bmatrix} & \textnormal{(Eq. \ref{eq:skew_trick_2})}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\\
-%\frac{1}{2}\epsilon\left(R^{\top}\ss{R\t}\ebf_{1}\varepsilon-R\ss{\tbf}\ebf_{1}\varepsilon\right)
-%\end{bmatrix}\right) & \cdots\end{bmatrix} & \textnormal{(Eq. \ref{eq:skew_trick_1})}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\cdot\ebf_{1}^{\wedge}\varepsilon\cdot\qbf_{r}^{-1}\\
-%\frac{1}{2}\epsilon\left(\ss{\tbf}R^{\top}\ebf_{1}\varepsilon-R\ss{\tbf}\ebf_{1}\varepsilon\right)
-%\end{bmatrix}\right) & \cdots\end{bmatrix} & \textnormal{(Eq. \ref{eq:skew_trick_1})}\\
-% & =\begin{bmatrix}R^{\top}\\
-%\ss{\tbf}R^{\top}
-%\end{bmatrix}.
-%\end{align*}
-%Whew! Luckily, the translation generators are much easier:}{\small\par}
+For $SE(2)$, the matrix representation of the adjoint is
+\begin{equation*}
+\text{ad}^{SE(2)}_{v} = \begin{bmatrix}
+\ss{w} & -\ss{1}\rho \\
+0_{1\times 2} & 0
+\end{bmatrix}.
+\end{equation*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobian of the Matrix Exponential}
+
+When working with Lie groups, we need the differential of the exponential
+and logarithm functions. These differentials are commonly called
+the right and left Jacobians. The right and left Jacobians and their inverses are defined to map elements of $\mathbf{R}_G$ to the general linear group (set of invertible matrices) that acts on $\mathbf{R}_G$. For matrix Lie groups, they are defined as
+
+\begin{align*}
+J_r^G(v) & =\sum_{n=0}^{\infty}\frac{\left(-\text{ad}^{G}(v)\right)^{n}}{\left(n+1\right)!}, \hspace{0.5em}  J_\ell^{G}(v)=\sum_{n=0}^{\infty}\frac{\left(\text{ad}^G(v)\right)^{n}}{\left(n+1\right)!},
+\end{align*}
+
+\begin{align*}
+{J_r^{G}}^{-1}(v) & =\sum_{n=0}^{\infty}\frac{B_{n}\mathopen{}\left(-\text{ad}^G(v)\right)^{n}\mathclose{}}{n!},  \hspace{0.5em} {J_\ell^{G}}^{-1}(v)=\sum_{n=0}^{\infty}\frac{B_{n}\mathopen{}\left(\text{ag}^G(v)\right)^{n}\mathclose{}}{n!},
+\end{align*}
+where $B_{n}$ are the Bernoulli numbers, the subscripts $r/l$ indicate the right and left Jacobian, and the superscript indicates the corresponding Lie group. The derivation of the left
+and right Jacobians stems from the Baker-Campbell-Hausdorff formula~\cite{Hall2003,Barfoot2019}. The
+right Jacobian has the properties that for any $v\in\mathbf{R}_G$ and any small $\tilde{v}\in\mathbf{R}_G$, 
+\begin{subequations}\label{eq:Jr_property}
+\begin{align}
+\Exp_I^{G}(v + \tilde{v}) & \approx\Exp_I^{G}(v)\Exp_I^{G}\left(J_r^G(v)\tilde{v}\right)\\
+\Exp_I^{G}(v)\Exp_I^{G}\left(\tilde{v}\right) & \approx\Exp_I^{G}\left(v+{J_r^{G}}^{-1}(v)\tilde{v}\right).
+\end{align}
+\end{subequations}
 %
-%\begin{align*}
-%\Ad_{4-6} & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\Gamma\cdot\exp\left(J_{1}\varepsilon\right)\cdot\Gamma^{-1}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}\cdot\begin{bmatrix}0\\
-%\ebf_{1}\epsilon
-%\end{bmatrix}\cdot\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}^{-1}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\left(\begin{bmatrix}0\\
-%\epsilon\left(\qbf_{r}\cdot\ebf_{q}\varepsilon\right)
-%\end{bmatrix}\cdot\begin{bmatrix}\qbf_{r}\\
-%\epsilon\qbf_{d}
-%\end{bmatrix}^{-1}\right) & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\begin{bmatrix}0\\
-%\epsilon\left(\qbf_{r}\cdot\ebf_{q}\varepsilon\cdot\qbf_{r}^{-1}\right)
-%\end{bmatrix} & \cdots\end{bmatrix}\\
-% & =\lim_{\varepsilon\to0}\frac{1}{\varepsilon}\begin{bmatrix}\log\begin{bmatrix}0\\
-%\epsilon\left(R^{\top}\ebf_{1}\varepsilon\right)
-%\end{bmatrix} & \cdots\end{bmatrix}\\
-% & =R^{\top}.
-%\end{align*}
-%Finally, we can write the full Adjoint for dual quaternions as
-%
-%\[
-%\boxed{\Ad\left(\Gamma\right)=\begin{pmatrix}R^{\top} & 0\\
-%\ss{\tbf}R^{\top} & R^{\top}
-%\end{pmatrix}},
-%\]
-%which, unsurprisingly, is the same as the Adjoint of $SE(3)$,
-%except with all the rotations transposed (due to the reverse order
-%of quaternions rotation with respect to $SO(3).$) Note
-%that this is also the matrix inverse of the Adjoint of $SE(3)$. 
-%
-%Now that we have each of the Adjoints, we can use the tables in Appendix
-%\ref{sec:Tables} to find Jacobians for almost any arbitrary expression
-%involving Lie groups!
-%
-%\section{Left vs Right Jacobians}
-%
-%For now, just read \cite{Sola2019}. They have a great discussion
-%on this topic. 
-%
-%TL;DR: Most of the time, I end up using the left Jacobian. Depending
-%on how you define error, however, you may want to use the right Jacobian.
-%If things are still hazy after reading Sola, write unit tests of your
-%implementations and make sure everything is self-consistent.
+Similarly for the left Jacobian,
+\begin{align*}
+\Exp_I^{G}(v+\tilde{v}) & \approx\Exp_I^{G}\left(J_\ell^{G}(v)\tilde{v}\right)\Exp_I^{G}(v)\\
+\Exp_I^{G}(\tilde{v})\Exp_I^{G}(v) & \approx\Exp_I^{G}\left(v+{J_\ell^G}^{-1}(v)\tilde{v}\right).
+\end{align*}
+
+For $SE(2)$, the Jacobians have closed form solutions, and
+the right Jacobian for $SE(2)$ is 
+\begin{equation}
+    J_r^{SE(2)}(v) = \begin{bmatrix}
+    W_r \left(\omega\right) & D_r \left(\omega\right)\rho \\
+    0_{1\times 2} & 1
+    \end{bmatrix}
+\end{equation}
+where 
+% \begin{align*}
+%     W_r \left(\omega\right) & =\begin{cases}
+%     I - \frac{\left[\omega\right]_\times}{2} & \text{if } \omega \approx 0\\
+%     \frac{\cos{\omega}-1}{\omega}\left[ 1 \right]_\times + \frac{\sin{\omega}}{\omega}I & \text{else}
+%     \end{cases} \\
+%     D_r \left(\omega\right) & =\begin{cases}
+%     \frac{I}{2}  & \text{if } \omega \approx 0\\
+%     \frac{1-\cos{\omega}}{\omega^2}\left[ 1 \right]_\times + \frac{\omega - \sin{\omega}}{\omega^2}I & \text{else}
+%     \end{cases}.
+% \end{align*}
+\begin{align*}
+    W_r \left(\omega\right) &=
+    \frac{\cos{\omega}-1}{\omega}\left[ 1 \right]_\times + \frac{\sin{\omega}}{\omega}I  \\
+    D_r \left(\omega\right) &=
+    \frac{1-\cos{\omega}}{\omega^2}\left[ 1 \right]_\times + \frac{\omega - \sin{\omega}}{\omega^2}I,
+\end{align*}
+and where we again note that $W_r(0)$ and $D_r(0)$ are well defined and that for small $\omega$, 
+$W_r(\omega)\approx I - \frac{1}{2}[\omega]_\times$ and $D_r(\omega)\approx \frac{1}{2}[1]_\times$.
+
+
+
+
 
 %++++++++++++++++++++++++++++++++++++++++++++++++++
 \section{Useful Tables}
 
 \label{sec:Tables}
 
-\begin{table}[ht]
-\caption{Common dual number formulae}
-\label{tab:dual_trig_functions}
-\bgroup
-\def\arraystretch{1.5}
-\begin{tabular}{cc}
-	\toprule
-	Expression & Dual number expansion \\
-	\midrule
-	$f\left(r+d\epsilon\right)$ & $f\left(r\right)+\epsilon d\left(f^{\prime}\left(r\right)\right)$ \\
-	$\cos\left(r+d\epsilon\right)$ & $\cos r-\epsilon d\sin r$ \\
-	$\sin\left(r+d\epsilon\right)$ & $\sin r+\epsilon d\cos r$ \\
-	$\arctan\left(r+d\epsilon\right)$ & $\arctan r+\epsilon\frac{d}{r^{2}+1}$ \\
-	$\left(r+d\epsilon\right)^{2}$ & $r^{2}+\epsilon 2 r d$ \\
-	$\sqrt{r+d\epsilon}$ & $\sqrt{r}+\epsilon\frac{d}{2\sqrt{r}}$ \\
-	\bottomrule
-\end{tabular}
-\egroup
-\end{table}
 
 \begin{table}[ht]
 \caption{Taylor series expansions}
@@ -2817,62 +2695,29 @@ change in translation. }
 \egroup
 \end{table}
 
-\begin{table}[ht]
-\caption{Useful Jacobians for $S^{3}$. \newline
-		$\qbf\in S^{3}$, $\vbf,\omegabf\in\mathfrak{s}^{3}$ \newline
-		$\deltabf=\log\left(\qbf\right)$, $\theta=\norm{\deltabf}$ \newline
-	    $a=\frac{\sin\theta}{\theta}$, $b=\frac{1-\cos\left(\theta\right)}{\theta^{2}}$ \newline
-	    $c=\frac{1-a}{\theta^{2}}$, $e=\frac{b-2c}{2a}$
-	    }
-\label{tab:lie_identities_s3}
-\bgroup
-\def\arraystretch{2.0}
-\begin{tabular}{ccc}
-	\toprule
-	Expression & Left Jacobian & Right Jacobian\\
-	\midrule
-	$\frac{\partial}{\partial\xbf}\qbf^{-1}\cdot\vbf^{\wedge}\cdot\qbf$ & $R\left(\qbf\right)^{\top}\cdot\ss{\vbf}$ & $\ss{(R\left(\qbf\right)^{\top}\cdot\vbf)}$\\
-	$\frac{\partial}{\partial\xbf}\qbf\cdot\vbf^{\wedge}\cdot\qbf^{-1}$ & $-\ss{(R\left(\qbf\right))}\cdot\vbf$ & $-R\left(\qbf\right)\cdot\ss{\vbf}$\\
-	$\frac{\partial}{\partial\omegabf}\exp\left(\omegabf^{\wedge}\right)$ & $aI+b\ss{\omegabf}+c\omegabf\omegabf^{\top}$ & $aI-b\ss{\omegabf}+c\omegabf\omegabf^{\top}$\\
-	$\frac{\partial}{\partial\qbf}\log\left(\qbf\right)$ & $I-\frac{1}{2}\ss{\deltabf}+e\ss{\deltabf}^{2}$ & $I+\frac{1}{2}\ss{\deltabf}+e\ss{\deltabf}^{2}$\\
-	\bottomrule
-\end{tabular}
-\egroup
-\end{table}
+%\begin{table}[ht]
+%\caption{Useful Jacobians for $S^{3}$. \newline
+%		$\qbf\in S^{3}$, $\vbf,\omegabf\in\mathfrak{s}^{3}$ \newline
+%		$\deltabf=\log\left(\qbf\right)$, $\theta=\norm{\deltabf}$ \newline
+%	    $a=\frac{\sin\theta}{\theta}$, $b=\frac{1-\cos\left(\theta\right)}{\theta^{2}}$ \newline
+%	    $c=\frac{1-a}{\theta^{2}}$, $e=\frac{b-2c}{2a}$
+%	    }
+%\label{tab:lie_identities_s3}
+%\bgroup
+%\def\arraystretch{2.0}
+%\begin{tabular}{ccc}
+%	\toprule
+%	Expression & Left Jacobian & Right Jacobian\\
+%	\midrule
+%	$\frac{\partial}{\partial\xbf}\qbf^{-1}\cdot\vbf^{\wedge}\cdot\qbf$ & $R\left(\qbf\right)^{\top}\cdot\ss{\vbf}$ & $\ss{(R\left(\qbf\right)^{\top}\cdot\vbf)}$\\
+%	$\frac{\partial}{\partial\xbf}\qbf\cdot\vbf^{\wedge}\cdot\qbf^{-1}$ & $-\ss{(R\left(\qbf\right))}\cdot\vbf$ & $-R\left(\qbf\right)\cdot\ss{\vbf}$\\
+%	$\frac{\partial}{\partial\omegabf}\exp\left(\omegabf^{\wedge}\right)$ & $aI+b\ss{\omegabf}+c\omegabf\omegabf^{\top}$ & $aI-b\ss{\omegabf}+c\omegabf\omegabf^{\top}$\\
+%	$\frac{\partial}{\partial\qbf}\log\left(\qbf\right)$ & $I-\frac{1}{2}\ss{\deltabf}+e\ss{\deltabf}^{2}$ & $I+\frac{1}{2}\ss{\deltabf}+e\ss{\deltabf}^{2}$\\
+%	\bottomrule
+%\end{tabular}
+%\egroup
+%\end{table}
 
-\begin{table}[ht]
-\caption{Useful Jacobians for $\mathbb{D} S^{3}$. \newline
-	$\Gamma\in\mathbb{D} S^{3}$, $\boldsymbol{\xi}=(\omegabf^\top \vbf^\top)^{\top}\in\mathfrak{ds}^{3}$ \newline
-	$a=\frac{\sin\theta}{\theta}$, $b=\frac{1-\cos\theta}{\theta^{2}}$, $c=\frac{1-a}{\theta^{2}}$, \newline 
-	$d=\omegabf^{\top}\vbf$,  $A=\frac{\partial}{\partial\omegabf}\exp\left(\ss{\omegabf}\right)$ \newline
-	$B=\omegabf\vbf^{\top}+\vbf\omegabf^{\top}$, \newline
-	$C=\left(c-b\right)I+\left(\frac{a-2b}{\theta^{2}}\right)\ss{\omegabf}+\left(\frac{b-3c}{\theta^{2}}\right)\omegabf\omegabf^{\top}$ \newline
-	$D=b\ss{\vbf}+cB+dC$, \newline
-	$E=\frac{\partial}{\partial R}\log\left(R\right)$
-    }
-\label{tab:lie_identities_ds3}
-\bgroup
-\def\arraystretch{2.0}
-\begin{tabular}{ccc}
-	\toprule
-		Expression & Left Jacobian & Right Jacobian\\
-	\midrule 
-	$\frac{\partial}{\partial\xbf}\Gamma^{-1}\cdot\vbf^{\wedge}\cdot\Gamma$ & $\begin{pmatrix}R\left(\qbf_{r}\right)\ss{\vbf} & R\left(\qbf\right)\end{pmatrix}$ & $\begin{pmatrix}\ss{(R\left(\qbf_{r}\right)\left(\vbf-\tbf\right))} & -I\end{pmatrix}$\tabularnewline[0.15cm]
-	$\frac{\partial}{\partial\xbf}\Gamma\cdot\vbf^{\wedge}\cdot\Gamma^{-1}$ & $\begin{pmatrix}-\ss{(R\left(\qbf_{r}\right)^{\top})}\vbf+\tbf & I\end{pmatrix}$ & $\begin{pmatrix}R\left(\qbf_{r}\right)^{\top}\ss{-\vbf} & R\left(\qbf_{r}\right)^{\top}\end{pmatrix}$\tabularnewline[0.15cm]
-	$\frac{\partial}{\partial\boldsymbol{\xi}}\exp\left(\boldsymbol{\xi^{\wedge}}\right)$ & $\begin{pmatrix}A & 0\\
-	D & A
-	\end{pmatrix}$ & $\begin{pmatrix}A^{\top} & 0\\
-	D^{\top} & A^{\top}
-	\end{pmatrix}$\tabularnewline[0.15cm]
-	$\frac{\partial}{\partial T}\log\left(\Gamma\right)$ & $\begin{pmatrix}E & 0\\
-	-E\cdot D\cdot E & E
-	\end{pmatrix}$ & $\begin{pmatrix}E^{\top} & 0\\
-	\left(-E\cdot D\cdot E\right)^{\top} & E^{\top}
-	\end{pmatrix}$\tabularnewline[0.15cm]
-	\bottomrule
-\end{tabular}
-\egroup
-\end{table}
 
 \clearpage
 
