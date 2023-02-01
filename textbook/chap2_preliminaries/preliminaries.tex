@@ -406,7 +406,7 @@ Let
 R(\nbf,\theta)=\nbf \nbf^\top + \cos\theta (I-\nbf\nbf^\top) + \sin\theta \ss{\nbf},
 \]
 and note that using Equation~\eqref{eq:skew_matrix_5} we can write
-\marginnote{Equation~\eqref{eq:skew_matrix_5} is $(\ss{\nbf})^2 = \nbf\nbf^\top-I$.}
+\marginnote{Equation~\eqref{eq:skew_matrix_5} is \[(\ss{\nbf})^2 = \nbf\nbf^\top-I.\]}
 \begin{equation}\label{eq:rodrigues_1}
 R(\nbf,\theta)=I + \sin\theta \ss{\nbf} + (1-\cos\theta)\ss{\nbf}^2,
 \end{equation}
@@ -865,7 +865,8 @@ To rotate a vector using a unit quaternion, a non-unit quaternion is formed with
 Alternatively, Equation~\eqref{eq:quaternion_multiplication_1} can be used to obtain the following condensed expression
 \begin{align*}
 \rbf^{r} & =\text{rot} \left(\qbf_{s}^{r},\rbf^{s}\right)\\
- & =\rbf^s + 2q_0\ss{\rbf^s}\bar{\qbf}_s^r+2\ss{\ss{\rbf^s}\bar{\qbf}_s^r}\bar{\qbf}_s^r.
+ &=\rbf^s + 2q_0\ss{\rbf^s}\bar{\qbf}_s^r+2\ss{\ss{\rbf^s}\bar{\qbf}_s^r}\bar{\qbf}_s^r\\
+ &= \left[ (q_0^2-\norm{\bar{\qbf}_s^r}^2)I + 2 \bar{\qbf}_s^r \bar{\qbf}_s^{r\top} + 2 q_0 \ss{\bar{\qbf}_s^r}\right] \rbf^s  
 \end{align*}
 If implemented efficiently, this method can be just as efficient as
 the matrix-vector multiplication used when rotating a vector with
@@ -2341,7 +2342,7 @@ Notice that the adjoint is a linear operator since
 Ad_g(\alpha \taubf_1^\wedge + \beta\taubf_2^\wedge) 
 	&= g (\alpha \taubf_1^\wedge + \beta\taubf_2^\wedge)g^{-1} \\
 	&= \alpha g\taubf_1^\wedge g^{-1} + \beta g\taubf_2^\wedge g^{-1} \\
-	&= \alpha Ad_g(\taubf_1^\wedge) + \beta Ad_g(\taubf_1^\wedge)
+	&= \alpha Ad_g(\taubf_1^\wedge) + \beta Ad_g(\taubf_2^\wedge)
 \end{align*}
 and therefore, there exists a matrix, which in a severe abuse of notation is also denoted as $Ad_g:\mathbb{R}^{\text{dim}(\mathfrak{g})} \to \mathbb{R}^{\text{dim}(\mathfrak{g})}$, where
 \[
@@ -2374,7 +2375,7 @@ Since the adjoint of $R$ is simply $R$, the Lie Group $SO(3)$ is self adjoint.  
 
 Consider now 
 \[
-T_a^b = \begin{pmatrix} R & \tbf \\ 0 1 \end{pmatrix} \in SO(2), \qquad \nubf^\wedge = \begin{pmatrix} \vbf \\ \omega \end{pmatrix}^\wedge = \begin{pmatrix} \omega^\wedge & \vbf \\ 0 1 \end{pmatrix}
+T_a^b = \begin{pmatrix} R & \tbf \\ 0 & 1 \end{pmatrix} \in SO(2), \qquad \nubf^\wedge = \begin{pmatrix} \vbf \\ \omega \end{pmatrix}^\wedge = \begin{pmatrix} \omega^\wedge & \vbf \\ 0 & 1 \end{pmatrix}
 \]
 where $R\in SO(2)$, $\tbf, \vbf \in \mathbb{R}^2$, and $\omega\in\mathbb{R}$.
 The adjoint operator is defined as
@@ -2405,7 +2406,7 @@ The adjoint operator is defined as
 \end{align*}
 Noting that
 \begin{align*}
-	\begin{pmatrix} R\ss{\omegabf}R^\top & -R\ss{\omegabf}R^\top \tbf + R\vbf \\ 0 & 0 \end{pmatrix}^\wedge
+	\begin{pmatrix} R\ss{\omegabf}R^\top & -R\ss{\omegabf}R^\top \tbf + R\vbf \\ 0 & 0 \end{pmatrix}^\vee
 	&= \begin{pmatrix} \ss{\tbf}R\omegabf + R\vbf \\ R\omegabf \end{pmatrix} \\
 	&= \begin{pmatrix} R & \ss{\tbf} R \\ 0 & R \end{pmatrix}\begin{pmatrix}\vbf \\ \omegabf \end{pmatrix}, 
 \end{align*}
@@ -2467,7 +2468,7 @@ is a matrix Lie group.  Therefore, the matrix Lie group $Ad(SE(3))$ has a Lie al
 
 The relationship between the big adjoint and the little adjoint is given by
 \[
-Ad(\exp(\nubf^\wedge)) = \exp(ad(\nubf^\wedge)).
+Ad_{\Exp(\boldsymbol{\xi})}(\exp(\nubf^\wedge)) = \exp(ad_{\boldsymbol{\xi}}(\nubf^\wedge)).
 \]
 
 \begin{table}[hhhht]
@@ -2516,7 +2517,7 @@ J_{\ell}\left(\nubf\right) & =\sum_{n=0}^{\infty}\frac{\left(\mathbf{ad}_{\nubf}
 The right and left Jacobians are related to each other as
 \begin{align*}
 J_\ell(\nubf) &= \Exp(\nubf) J_r(\nubf) \\
-J_\ell(\nubf) &= J_r(\nubf).
+J_\ell(\nubf) &= J_r(-\nubf).
 \end{align*}
 Right and left Jacobians are extremely useful in robotic applications because of the following property, where $\nubf, \delta\nubf\in\mathfrak{g}$ and $\norm{\delta\nubf}$ is small:
 \begin{subequations}\label{eq:Jacobian_property}
@@ -2579,7 +2580,9 @@ J_r^G(v) & =\sum_{n=0}^{\infty}\frac{\left(-\text{ad}^{G}(v)\right)^{n}}{\left(n
 {J_r^{G}}^{-1}(v) & =\sum_{n=0}^{\infty}\frac{B_{n}\mathopen{}\left(-\text{ad}^G(v)\right)^{n}\mathclose{}}{n!},  \hspace{0.5em} {J_\ell^{G}}^{-1}(v)=\sum_{n=0}^{\infty}\frac{B_{n}\mathopen{}\left(\text{ag}^G(v)\right)^{n}\mathclose{}}{n!},
 \end{align*}
 where $B_{n}$ are the Bernoulli numbers, the subscripts $r/l$ indicate the right and left Jacobian, and the superscript indicates the corresponding Lie group. The derivation of the left
-and right Jacobians stems from the Baker-Campbell-Hausdorff formula~\cite{Hall2003,Barfoot2019}. The
+and right Jacobians stems from the Baker-Campbell-Hausdorff formula~\cite{Hall2003,Barfoot2019}. 
+\rwbcomment{Add BCH theorem or more explanation.}
+The
 right Jacobian has the properties that for any $v\in\mathbf{R}_G$ and any small $\tilde{v}\in\mathbf{R}_G$, 
 \begin{subequations}\label{eq:Jr_property}
 \begin{align}
