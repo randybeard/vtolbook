@@ -2459,40 +2459,77 @@ Ad_{gh} &= Ad_g Ad_h, \qquad \text{$Ad_\ast$ as a matrix}.
 \egroup
 \end{table}
 
+It turns out that the set of adjoint matrices is itself a matrix Lie group.  For example, for $SE(3)$, the set of $6\times 6$ matrices
+\[
+Ad(SE(3)) = \left\{ \begin{pmatrix} R & \ss{\tbf} R \\ 0 & R \end{pmatrix} \mid R\in SO(3), \tbf\in\mathbf{R}^3 \right\}
+\]
+is a matrix Lie group.  Therefore, the matrix Lie group $Ad(SE(3))$ has a Lie algebra, which we will denote as (little ad) $ad(\mathfrak{se}(3))$.  The little adjoint for common matrix groups is given in Table~\ref{tab:little_adjoint_matrix}.
+
+The relationship between the big adjoint and the little adjoint is given by
+\[
+Ad(\exp(\nubf^\wedge)) = \exp(ad(\nubf^\wedge)).
+\]
+
+\begin{table}[hhhht]
+\caption{Little adjoint matrix summary}
+\label{tab:little_adjoint_matrix}
+\bgroup
+\def\arraystretch{1.0}
+\begin{tabular}{clll}
+	\toprule
+	$\mathfrak{g}$ & $\nu^\wedge \in \mathfrak{g}$ & $ad_{\nubf}: \mathbb{R}^{\text{dim}(\mathfrak{g})} \to \mathbb{R}^{\text{dim}(\mathfrak{g})}$ \\
+	\midrule
+	$\mathfrak{so}(2)$, 
+		& $\nubf = \omega\in\mathbb{R}$, 
+		& $ad_{\nubf} = 0$ \\
+	$\mathfrak{se}(2)$, 
+		&  $\nubf = \begin{pmatrix}\vbf \\ \omega \end{pmatrix} \in \mathbb{R}^3$, 
+		& $ad_{\nubf} = \begin{pmatrix} \omegabf^\wedge & -1^\wedge\vbf \\ 0 & 0 \end{pmatrix}$  \\
+	$\mathfrak{so}(3)$, 
+		&  $\nubf = \omegabf \in \mathbb{R}^3$, 
+		& $ad_{\nubf} = \ss{\omegabf}$ \\
+	$\mathfrak{se}(3)$, 
+		&  $\nubf = \begin{pmatrix}\vbf \\ \omegabf \end{pmatrix} \in \mathbb{R}^6$, 
+		& $ad_{\nubf} = \begin{pmatrix} \ss{\omegabf} & \ss{\vbf} \\ 0 & \ss{\omegabf} \end{pmatrix}$ \\
+	\bottomrule
+\end{tabular}
+\egroup
+\end{table}
+
+
+
+
+
 %++++++++++++++++++++++++++++++++++++++++++++++++++
 \section{Right and Left Jacobian of the Exponential}
 
 We have seen that the exponential and logarithmic operator plays especially important roles in Lie group theory.  In particular, the exponential operator maps elements of the Lie algebra to elements of the Lie group, and the logarithm performs the inverse operation.  Therefore, it should come as no surprise that the Jacobian of the exponential and logarithm operators also plays an important role in working with Lie groups.
 
-
-
-\section{Adjoint and Jacobian stuff from some of our papers}
-
-Let $g \in SE(3)$ and $v \in \mathbb{R}^6$. The group matrix adjoint representation $\mathbf{Ad}_{g}:\mathbb{R}^6 \to \mathbb{R}^6$ and the Lie algebra matrix adjoint representation $\mathbf{ad}_{v}:\mathbb{R}^{6}\to\mathbb{R}^{6}$ are given by 
-\begin{align*}
-\mathbf{Ad}_{g}&=\begin{bmatrix}\mathcal{R} & \ss{t}\mathcal{R}\\
-0_{3\times3} & \mathcal{R}
-\end{bmatrix}, \text{ and } \mathbf{ad}_{v}=\begin{bmatrix}\ss{\omega} & \ss{\rho}\\
-0_{3\times3} & \ss{\omega}
-\end{bmatrix}.
-\end{align*}
-
-The right Jacobian and left Jacobian of the matrix exponential (
-$J_{r}:\mathbb{R}^{6}\to\mathbb{R}^{6}$, $J_{l}:\mathbb{R}^{6}\to\mathbb{R}^{6}$ respectively) are given
-in matrix notation at the point $v \in{\mathbb{R}^6}$ as 
-\begin{align} \label{eq:exponential_jacobians}
-J_{r}\left(v\right) & =\sum_{n=0}^{\infty}\frac{\left(-\mathbf{ad}_{v}\right)^{n}}{\left(n+1\right)!}, & J_{l}\left(v\right) & =\sum_{n=0}^{\infty}\frac{\left(\mathbf{ad}_{v}\right)^{n}}{\left(n+1\right)!}
+For a matrix Lie group $G$ with Lie algebra $\mathfrak{g}$, it is shown in~\cite{Barfoot2019} that the right and left Jacobians of the exponential map $g=\exp(\nubf)$, where $\nubf \in \mathfrak{g}$, are given by 
+\begin{align} 
+J_{r}(\nubf) & =\sum_{n=0}^{\infty}\frac{\left(-\mathbf{ad}_{\nubf}\right)^{n}}{\left(n+1\right)!}, 
+\label{eq:exponential_right_jacobians}
+\\
+J_{\ell}\left(\nubf\right) & =\sum_{n=0}^{\infty}\frac{\left(\mathbf{ad}_{\nubf}\right)^{n}}{\left(n+1\right)!}.
+\label{eq:exponential_left_jacobians}
 \end{align}
-and have the properties that for any $v\in\mathbb{R}^6$ and any small $\tilde{v}\in\mathbb{R}^6$, 
+The right and left Jacobians are related to each other as
+\begin{align*}
+J_\ell(\nubf) &= \Exp(\nubf) J_r(\nubf) \\
+J_\ell(\nubf) &= J_r(\nubf).
+\end{align*}
+Right and left Jacobians are extremely useful in robotic applications because of the following property, where $\nubf, \delta\nubf\in\mathfrak{g}$ and $\norm{\delta\nubf}$ is small:
 \begin{subequations}\label{eq:Jacobian_property}
 \begin{align}
-\Exp(v)\Exp(\tilde{v}) & \approx\Exp\left(v+J_{r}^{-1}(v)\tilde{v}\right) \\
-\Exp(\tilde{v})\Exp(v) & \approx\Exp\left(v+J_{l}^{-1}(v)\tilde{v}\right) 
+\Exp(\nubf + \delta\nubf) &\approx \Exp(\nubf)\Exp(J_r(\nubf)\delta\nubf) \\
+\Exp(\nubf + \delta\nubf) &\approx \Exp(J_\ell(\nubf)\delta\nubf)\Exp(\nubf) \\
+\Exp(\nubf)\Exp(\delta\nubf) & \approx\Exp\left(\nubf+J_{r}^{-1}(\nubf)\delta\nubf\right) \\
+\Exp(\delta\nubf)\Exp(\nubf) & \approx\Exp\left(\nubf+J_{\ell}^{-1}(\nubf)\delta\nubf\right).
 \end{align}
 \end{subequations}
 
 
-For closed form expressions of the exponential, logarithm and Jacobian maps see \cite{Sola2018}.
+\rwbcomment{Add closed form expressions of the exponential, logarithm and Jacobian maps see \cite{Sola2018}.}
 
 \subsection{}
 he matrix adjoint of $g\in G$ is a representation of $g$ that acts on $\mathbf{R}_G$ and is generically defined as 
