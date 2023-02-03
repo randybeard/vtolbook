@@ -6,7 +6,7 @@ In this chapter we discuss trajectory following algorithms for aircraft.  In par
 \[
 \Taubf(t) = \{\pbf_{d/i}^i(t), R_d^i(t)\}
 \]
-where $\mathcal{F}_d$ is the ``desired'' frame, and where $\mathbb{R}^3$ $\pbf_{d/i}^i(t)\in\mathbb{R}^3$ is the desired trajectory of the center of the frame, and $R_d^i(t)\in SO(3)$ is the desired attitude.  The goal is to select the throttle $T$, and the torque $\taubf^b$ so that the multirotor follows the desired trajectory, i.e., 
+where $\mathcal{F}_d$ is the ``desired'' frame, and where $\pbf_{d/i}^i(t)\in\mathbb{R}^3$ is the desired trajectory of the center of the frame, and $R_d^i(t)\in SO(3)$ is the desired attitude.  The goal is to select the throttle $T$, and the torque $\taubf^b$ so that the multirotor follows the desired trajectory, i.e., 
 \begin{align*}
 \norm{\pbf_{b/i}^i(t) - \pbf_{d/i}^i} &\to 0, \\
 R_d^{i\top} R_b^i \to I.
@@ -28,7 +28,7 @@ suppose that the control strategy is given by $u=k(x)$, then the system can be w
 \]
 We say that $x_e$ is an equilibrium of the system if $f(x_e)=0$.
 
-Let $\mathcal{X}$ be the state space, and let $\Omega\subset\mathcal{X}$.  If $x_e\in\Omega$, a function $V:\Omega\to\mathbb{R}$ is said to be {\em positive definite} on $\Omega$ if $V(x)>0$ for all $x\in\Omega\setminus\{x_e\}$ and $V(x_e)=0$.  The function $V$ is said too be {\em positive semi-definite} on $\Omega$ if $V(x)\geq 0$ for all $x\in\Omega$.  Define the level set
+Let $\mathcal{X}$ be the state space, and let $\Omega\subset\mathcal{X}$.  If $x_e\in\Omega$, a function $V:\Omega\to\mathbb{R}$ is said to be {\em positive definite} on $\Omega$ if $V(x)>0$ for all $x\in\Omega\setminus\{x_e\}$ and $V(x_e)=0$.  The function $V$ is said to be {\em positive semi-definite} on $\Omega$ if $V(x)\geq 0$ for all $x\in\Omega$.  Define the level set
 \[
 \Omega_c = \left\{ x\in\mathcal{X} ~|~ V(x) \leq 0 \right\}.
 \]
