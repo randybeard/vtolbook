@@ -51,7 +51,7 @@ u = \ddot{y}_d + k_p(y_d-y) + k_d(\dot{y}_d-\dot{y}).
 \]
 It is well known that this control law ensures that $y(t)\to y_d(t)$.  Suppose that we would like to demonstrate this fact using Theorem~\ref{thm:lyapunov_theorem}.  Let $\tilde{y} = y-y_d$, and note that
 \begin{equation}\label{eq:double_integrator_lasalle}
-\dot{\tilde{y}} = \ddot{y}-\ddot{y}_d = u - \ddot{y}_d = -k_p\tilde{y} - k_d\dot{\tilde{y}}.
+\ddot{\tilde{y}} = \ddot{y}-\ddot{y}_d = u - \ddot{y}_d = -k_p\tilde{y} - k_d\dot{\tilde{y}}.
 \end{equation}
 Pick the Lyapunov function candidate
 \[
@@ -141,7 +141,7 @@ In near hover conditions, the attitude is adequately represented using the Euler
 	\dot{\Theta} &= S(\Theta)\omegabf_{b/i}^b \\	
 	J\dot{\omegabf}_{b/i}^b &= -\omegabf_{b/i}^b \times (J\omegabf_{b/i}^b) + \taubf^b,
 \end{align*}
-where
+where \rwbcomment{Need to add the derivation of the top equation to the previous chapter.}
 \[
 S(\Theta)= \begin{pmatrix} 1, & \sin\phi\tan\theta, & \cos\phi\tan\theta \\
  0, & \cos\phi, & -\sin\phi \\
@@ -152,7 +152,6 @@ is well defined and invertible for small $\Theta$.  When the roll angle $\phi$ a
 \[
 J\ddot{\Theta} = \taubf^b.
 \]
-\rwbcomment{Need to add the the derivation of the top equation to the previous chapter.}
 Given the desired attitude as $\dot{\Theta}_d(t)$, the objective is design $\taubf^b$ so that $\Theta(t)\to \Theta_d(t)$.
 
 \begin{theorem}\label{thm:euler_attitude_stabilization}
@@ -160,7 +159,7 @@ Given the desired attitude as $\dot{\Theta}_d(t)$, the objective is design $\tau
 	\begin{equation}\label{eq:torque_euler_attitude_regulation}
 	\taubf^b = J\ddot{\Theta}^d - K_p (\Theta-\Theta^d) - K_v (\dot{\Theta}-\dot{\Theta}^d),
 	\end{equation}
-	where $K_p=K_p^\top >0$ and $K_v=K_v^\top$, then $\Theta(t)\to\Theta^d(t)$ and $\dot{\Theta}(t)\to\dot{\Theta}^d(t)$.
+	where $K_p=K_p^\top >0$ and $K_v=K_v^\top > 0$, then $\Theta(t)\to\Theta^d(t)$ and $\dot{\Theta}(t)\to\dot{\Theta}^d(t)$.
 \end{theorem}
 \begin{proof}
 Define
@@ -169,22 +168,22 @@ Define
 \]
 and define the Lyapunov function
 \[
-V(\Theta, \dot{\Theta}) = \frac{1}{2}\tilde{\Theta}^\top K_p \tilde{\Theta} + \frac{1}{2}\dot{\tilde{\Theta}}^\top J \dot{\tilde{\Theta}}.
+V(\tilde{\Theta}, \dot{\tilde{\Theta}}) = \frac{1}{2}\tilde{\Theta}^\top K_p \tilde{\Theta} + \frac{1}{2}\dot{\tilde{\Theta}}^\top J \dot{\tilde{\Theta}}.
 \]
 Differentiating $V$ gives
 \begin{align*}
-\dot{V} &= \dot{\tilde{\Theta}}^\top K_p	 \tilde{\Theta} + \tilde{\Theta}^\top \left( J\ddot{\Theta} - J\ddot{\Theta}^d\right) \\
+\dot{V} &= \dot{\tilde{\Theta}}^\top K_p	 \tilde{\Theta} + \dot{\tilde{\Theta}}^\top \left( J\ddot{\Theta} - J\ddot{\Theta}^d\right) \\
 	&= \dot{\tilde{\Theta}}^\top \left( K_p	 \tilde{\Theta} + \taubf^b - J\ddot{\Theta}^d) \right).
 \end{align*}
 Using Equation~\eqref{eq:torque_euler_attitude_regulation} gives
 \[
 \dot{V} = -\dot{\tilde{\Theta}}^\top K_v \dot{\tilde{\Theta}}.
 \]
-Define the set $\Omega_c = \{ (\tilde{\Theta},\dot{\tilde{\Theta}}) ~|~ V(\Theta,\dot{\Theta}) < c\}$ and note that if the dynamics are satisfied, then all trajectories that start in $\Omega_c$ remain in $\Omega_c$.  Define
+Define the set $\Omega_c = \{ (\tilde{\Theta},\dot{\tilde{\Theta}}) ~|~ V(\tilde{\Theta},\dot{\tilde{\Theta}}) < c\}$ and note that if the dynamics are satisfied, then all trajectories that start in $\Omega_c$ remain in $\Omega_c$.  Define
 \[
 E = \Omega_c \cap \{ (\tilde{\Theta}, \dot{\tilde{\Theta}}) ~|~ \dot{V}(\Theta, \dot{\Theta}) = 0 \},
 \]
-and let $M$ be the largest invariant set in $E$.  Then for all trajectories in $M$ we must have that $\dot{\Theta}\equiv 0$, which is true if and only if $\ddot{\Theta}\equiv 0$.  Therefore $J\ddot{\tilde{\Theta}} = \taubf^b - J\ddot{\Theta}^d \equiv 0$.  From Equation~\eqref{eq:torque_euler_attitude_regulation} we get that $K_p\tilde{\Theta}\equiv 0$, and therefore that $M = \{(\tilde{\Theta}, \dot{\tilde{\Theta}}) ~|~ \tilde{\Theta} = 0, \dot{\tilde{\Theta}}=0 \}.$, and Theorem~\ref{thm:lasalle_invariance_theorem} implies that all trajectories that start in $\Omega_c$ converge to $M$.
+and let $M$ be the largest invariant set in $E$.  Then for all trajectories in $M$ we must have that $\dot{\tilde{\Theta}}\equiv 0$, which is true if and only if $\ddot{\tilde{\Theta}}\equiv 0$.  Therefore $J\ddot{\tilde{\Theta}} = \taubf^b - J\ddot{\Theta}^d \equiv 0$.  From Equation~\eqref{eq:torque_euler_attitude_regulation} we get that $K_p\tilde{\Theta}\equiv 0$, and therefore that $M = \{(\tilde{\Theta}, \dot{\tilde{\Theta}}) ~|~ \tilde{\Theta} = 0, \dot{\tilde{\Theta}}=0 \}.$, and Theorem~\ref{thm:lasalle_invariance_theorem} implies that all trajectories that start in $\Omega_c$ converge to $M$.
 \end{proof}
 
 Note that Equation~\eqref{eq:torque_euler_attitude_regulation} is a standard feedforward plus proportional-derivative feedback control law.  
@@ -208,7 +207,7 @@ Define
 \]
 and define the Lyapunov function
 \[
-V = \frac{1}{2}\tilde{\Theta}^\top K_p \tilde{\Theta}.
+V = \frac{1}{2}\tilde{\Theta}^\top \tilde{\Theta}.
 \]
 Differentiating $V$ gives
 \begin{align*}
@@ -219,7 +218,7 @@ Using Equation~\eqref{eq:euler_attitude_regulation_simple} gives
 \[
 \dot{V} = -\tilde{\Theta}^\top K_p \tilde{\Theta}.
 \]
-From Theorem~\ref{thm:lyapunov} we have that $\norm{\tilde{\Theta}}\to 0$.
+From Theorem~\ref{thm:lyapunov_theorem} we have that $\norm{\tilde{\Theta}}\to 0$.
 \end{proof}
 
 Note that Equation~\eqref{eq:euler_attitude_regulation_simple} is a standard feedforward plus proportional feedback control strategy.
@@ -237,9 +236,9 @@ Recall from the Rodrigues formula~\eqref{eq:rodrigues_1} that given a unit vecto
 \[
 \exp(\theta\mathbf{n}) = R(\theta\mathbf{n}) \doteq I + \sin\theta \ss{\mathbf{n}} + (1-\cos\theta)\ss{\mathbf{n}}^2.
 \]
-When $\theta = \pi$ we have
+When $\theta = \pi$ we have \marginnote{Recall that $\ss{\nbf}^2 = I-\nbf\nbf^\top$.}
 \begin{align*}
-\exp(\pi\mathbf{n}) &= I + \sin\pi \ss{\mathbf{n}} + (1-\cos\pi)\ss{\mathbf{n}}^2 \\
+\exp(\pi\mathbf{n}) &= I + \sin\pi \ss{\mathbf{n}} + (1-\cos\pi)\ss{\mathbf{n}}^2 \\x
   &= I + 2(\nbf\nbf^\top - I) \\
   &= 2\nbf\nbf^\top - I.
 \end{align*}
@@ -253,15 +252,15 @@ If $R\in SO(3)$, then $\mathbb{P}_a(R)=0$ if and only if $R\in U$.
 \sidenote{Recall that $\mathbb{P}_a(R) = \frac{1}{2}(R-R^\top)$.}
 \end{lemma}
 \begin{proof}
-Using the Rodrigues formula, for rotation matrix $R$ can be expressed as 
+Using the Rodrigues formula, the rotation matrix $R$ can be expressed as 
 \begin{equation}\label{eq:rodrigues-inner-loop}
 R = \exp(\theta \mathbf{n}) = I + \sin\theta \ss{\nbf} + (1-\cos\theta)\ss{\nbf}^2,
 \end{equation}
 for some $\theta$ and unit vector $\mathbf{n}$.  Therefore 
 \begin{align*}
 \mathbb{P}_a(R) &= \frac{1}{2}(R-R^\top) \\
-                &= \frac{1}{2}\big( I + \sin\theta \ss{\nbf} + (1-\cos\theta) \ss{\nbf}\ss{\nbf} \\
-                &\qquad - I - \sin\theta \ss{\nbf}^\top - (1-\cos\theta) (\ss{\nbf}\ss{\nbf})^\top\big) \\
+                &= \frac{1}{2}\big( I + \sin\theta \ss{\nbf} + (1-\cos\theta) \ss{\nbf}^2 \\
+                &\qquad - I - \sin\theta \ss{\nbf}^\top - (1-\cos\theta) (\ss{\nbf}^2)^\top\big) \\
                 &= 2 \sin\theta \ss{\nbf} 
 \end{align*}
 where we have used the fact that $\ss{\nbf}^\top=-\ss{\nbf}$.  If $R\in U$, then $\theta=\pi$ and $\mathbb{P}_a(R)=0$.  Alternatively, if $\mathbb{P}_a(R)=0$ then $\sin\theta=0$ implying that $\theta = m\pi$, where $m=0, \pm 1, \pm 2, \dots$.  Therefore from Equation~\eqref{eq:rodrigues-inner-loop} we have that
@@ -330,18 +329,20 @@ Differentiating $V$ we get
         &= -\frac{k_p}{2} \trace{-\ss{\omegabf_{b/i}^b} R_d^b + \ss{R_d^b \omegabf_{d/i}^d} R_d^b } + \tilde{\omegabf}^\top ( -\omegabf_{b/i}^b \times J\omegabf_{b/i}^b + \taubf^b - J\dot{\omegabf}_{d/i}^b) \\
         &= -\frac{k_p}{2} \trace{-\ss{\tilde{\omegabf}} R_d^b } + \tilde{\omegabf}^\top ( -\omegabf_{b/i}^b \times J\omegabf_{b/i}^b + \taubf^b - J\dot{\omegabf}_{d/i}^b),
 \end{align*}
-where we note that
+where we note that 
 \begin{align*}
 \dot{\omegabf}_{d/i}^b &= \frac{d}{dt}\left(R_b^{i\top}R_d^i\omegabf_{d/i}^d\right) \\
 	&=	\dot{R}_b^{i\top}R_d^i\omegabf_{d/i}^d + R_b^{i\top}\dot{R}_d^i\omegabf_{d/i}^d + R_b^{i\top}R_d^i\dot{\omegabf}_{d/i}^d \\
 	&=	-\ss{\omegabf_{b/i}^b} R_b^{i\top} R_d^i\omegabf_{d/i}^d + R_b^{i\top}R_d^i\ss{\omegabf_{d/i}^d}\omegabf_{d/i}^d + R_b^{i\top}R_d^i\dot{\omegabf}_{d/i}^d \\
-	&=	-\ss{\omegabf_{b/i}^b} R_b^{i\top} R_d^i\omegabf_{d/i}^d  + R_b^{i\top}R_d^i\dot{\omegabf}_{d/i}^d.
+	&= -\ss{\omegabf_{b/i}^b} R_b^{i\top} R_d^i\omegabf_{d/i}^d  + R_b^{i\top}R_d^i\dot{\omegabf}_{d/i}^d. 
 \end{align*}
-\marginnote{We have used the fact that $\ss{\omegabf}\omegabf = \omegabf \times \omegabf = 0$.}
+\marginnote{Recall that: \\ $\ss{\omegabf}\omegabf = \omegabf \times \omegabf = 0$ \\ $A=A^\top, B=-B^\top \implies\trace{AB}=0$ \\
+$\trace{\ss{\mathbf{a}}\ss{\mathbf{b}}}=-2\mathbf{a}^\top \mathbf{b}$ }
 
 Using the fact that $R_d^b=\mathbb{P}_s(R_d^b)+\mathbb{P}_a(R_d^b)$ we get
 \begin{align*}
-\dot{V} &= -\frac{k_p}{2} \trace{-\ss{\tilde{\omegabf}} (\mathbb{P}_s(R_d^b)+\mathbb{P}_a(R_d^b) } + \tilde{\omegabf}^\top ( -\omegabf_{b/i}^b \times J\omegabf_{b/i}^b + \taubf^b - J\dot{\omegabf}_{d/i}^b) \\
+\dot{V} &= -\frac{k_p}{2} \trace{-\ss{\tilde{\omegabf}} (\mathbb{P}_s(R_d^b)+\mathbb{P}_a(R_d^b) } \\
+		&\quad + \tilde{\omegabf}^\top ( -\omegabf_{b/i}^b \times J\omegabf_{b/i}^b + \taubf^b - J\dot{\omegabf}_{d/i}^b) \\
 \dot{V} &= -\frac{k_p}{2} \trace{-\ss{\tilde{\omegabf}} \mathbb{P}_a(R_d^b) } + \tilde{\omegabf}^\top ( -\omegabf_{b/i}^b \times J\omegabf_{b/i}^b + \taubf^b - J\dot{\omegabf}_{d/i}^b) \\
 \dot{V} &= -\tilde{\omegabf}^\top k_p\mathbb{P}_a(R_d^b)^\vee + \tilde{\omegabf}^\top ( -\omegabf_{b/i}^b \times J\omegabf_{b/i}^b + \taubf^b - J\dot{\omegabf}_{d/i}^b) \\
 \dot{V} &= \tilde{\omegabf}^\top ( -\omegabf_{b/i}^b \times J \omegabf_{b/i}^b + \taubf^b - J\dot{\omegabf}_{d/i}^b - k_p\mathbb{P}_a(R_d^b)^\vee ),
@@ -353,10 +354,10 @@ Using the torque in Equation~\eqref{eq:inner-loop-rotation-torque} gives
 \]
 which is negative semi-definite.  Define the sets
 \begin{align*}	
-E &= \Omega_c \cap \{(R_d^b,\tilde{\omegabf})| \tilde{\omegabf}^\top K \tilde{\omegabf}=0\}
+E &= \Omega_c \cap \{(R_d^b,\tilde{\omegabf})~|~ \tilde{\omegabf}^\top K \tilde{\omegabf}=0\}
 \end{align*}
 and let $M$ be the largest invariant set in $E$.  Since the system starts in $\Omega_c$, and $\dot{V}\leq 0$ in $\Omega_c$, all system trajectories remain in $\Omega_c$.  
-Define $M$ to be the largest invariant set in $E$.  For trajectories in $M$, we must have that $\tilde{\omegabf}\equiv 0$ which implies that $J\dot{\tilde{\omegabf}}\equiv 0$,
+For trajectories in $M$, we must have that $\tilde{\omegabf}\equiv 0$ which implies that $J\dot{\tilde{\omegabf}}\equiv 0$,
 which implies that
 \begin{align*}
 J(\dot{\omegabf}_{b/i}^b-\dot{\omegabf}_{d/i}^b) &= -\omegabf_{b/i}^b \times J\omegabf_{b/i}^b + \taubf - J\dot{\omegabf}_{d/i}^b \\
@@ -386,7 +387,7 @@ leading to the following simplified strategy for attitude control.
 	\begin{equation}\label{eq:attitude_stabilization_rotation_simple}
 		\omegabf_c^b = R_b^{i\top}R_d^i \omegabf_{d/i}^d + K_p \mathbb{P}_a(R_b^{i\top}R_d^i)^\vee
 	\end{equation}
-	where $K=K^\top >0$, then $R_b^i(t) \to R_d^i(t)$ asymptotically.
+	where $K_p=K_p^\top >0$, then $R_b^i(t) \to R_d^i(t)$ asymptotically.
 \end{theorem}
 \begin{proof}
 Define the Lyapunov function
@@ -413,7 +414,7 @@ which implies that $\mathbb{P}_a(R_d^b) \to 0$.  The initial conditions and Lemm
 $R_b^{i\top}R_d^i \to I$.
 \end{proof}
 
-Note that if $R_d^i(t)$ is given and $\dot{R}_d^i(t)$ is ether given or computed numerically, then $\omega_{d/i}^d$ can be computed as
+Note that if $R_d^i(t)$ is given and $\dot{R}_d^i(t)$ is either given or computed numerically, then $\omega_{d/i}^d$ can be computed as
 \[
 \omega_{d/i}^d(t) = \left( R_d^{i\top}(t) \dot{R}_d^i(t) \right)^\vee.
 \]
