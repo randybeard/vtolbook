@@ -1341,21 +1341,21 @@ The curvature of $p(\sigma)$ is defined by the formula
 
 Add a discussion similar to this paper.
 
-This paper uses a delaney trangulation to parameterize the free space, and then moves control points within the delayney triangles to satisfy constraints.
-
-\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/ManyamCasbeerWeintraub21.pdf}
-
-This paper gets a quick and dirty path using the fast marching method, and then creates boxes around the desired trajectory produces a safe path corridor.  The b-spline paths are then optimized to stay within the corridor.
-\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/GaoWuLin18.pdf}
+cite{ManyamCasbeerWeintraub21}:  This paper uses a delaney trangulation to parameterize the free space, and then moves control points within the delayney triangles to satisfy constraints.
 
 
-This paper shows how to get quick and dirty paths using the Fast Marching Method (FMM).
+%\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/ManyamCasbeerWeintraub21.pdf}
+
+\cite{GaoWuLin18}:  This paper gets a quick and dirty path using the fast marching method, and then creates boxes around the desired trajectory produces a safe path corridor.  The b-spline paths are then optimized to stay within the corridor.
+%\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/GaoWuLin18.pdf}
 
 
-\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/PetresPailhasPatron.pdf}
+\cite{PetresPailhasPatron}:  This paper shows how to get quick and dirty paths using the Fast Marching Method (FMM).
+
+%\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/PetresPailhasPatron.pdf}
 
 
-Collision avoidance constraints, as describe in~\cite{LutzMeurer21}.
+\cite{LutzMeurer21}:  Collision avoidance constraints, as describe in~\cite{LutzMeurer21}.
 If the obstacles are ellipsoids:  Suppose that the world is modeled by a set of ellipsoidal obstacles
 \[
 \mathcal{O}_i = \{x\in\mathbf{R}^3: x^\top P_i x \leq 1}
@@ -1367,7 +1367,7 @@ and the total set of obstacles in the world is
 In this case, we want to ensure that none of the control points is in an obstacle, i.e., that
 
 This paper shows how to formulate the obstacle avoidance problem as a convex problem using dual variables.
-\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/LutzMeurer21.pdf}
+%\includepdf[pages=-,scale=.8,pagecommand={}]{chap5_trajectory_planning/papers/LutzMeurer21.pdf}
 
 
 
