@@ -298,12 +298,13 @@ b_1^1(t; \mathbf{t}) &= \begin{cases} 1 & \text{~if~} \tau_1 \leq t \leq \tau_2 
  			\end{cases}
 \end{align*}
 where $b_0^1(t)$ and $b_1^0=1(t)$ are shown in Figure~\ref{fig:spline_basis_0}.
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.5\textwidth]{./chap5_trajectory_planning/figures/spline_basis_0}
+\begin{marginfigure}[0in]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_0}
   \caption{First order spline basis}
   \label{fig:spline_basis_0}  
-\end{figure}
+\end{marginfigure}
 Note that $b_1^1(t; \mathbf{t}) = b_0^1(t-1; \mathbf{t})$, or in other words, all first order basis functions are shifted versions of the central first order basis function $b_0^1(t; \mathbf{t})$.  Additional first order basis function can be defined by expanding the knot vector to $\mathbf{t}=[0, \dots, M]$, where $b_m^1(t; \mathbf{t})= b_0^1(t-m; \mathbf{t})$ for $m\leq M$.
+
 
 \clearpage
 
@@ -334,13 +335,16 @@ b_2^2(t; \mathbf{t}) &= \frac{t-\tau_2}{\tau_3-\tau_2} b_2^1(t;\mathbf{t}) + \fr
  	  \end{cases}
 \end{align*}
 where $b_0^2(t; \mathbf{t})$, $b_1^2(t; \mathbf{t})$, and $b_2^2(t; \mathbf{t})$ are shown on the left in Figure~\ref{fig:spline_basis_1}.
-\begin{figure}[hbt]
-  \centering
-  	\includegraphics[width=0.45\textwidth]{./chap5_trajectory_planning/figures/spline_basis_1}
-  	\includegraphics[width=0.45\textwidth]{./chap5_trajectory_planning/figures/spline_basis_1_extra_knot}
+\begin{marginfigure}[-2in]
+  	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_1}
   \caption{Second order spline basis}
   \label{fig:spline_basis_1}  
-\end{figure}
+\end{marginfigure}
+\begin{marginfigure}[0in]
+  	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_1_extra_knot}
+  \caption{Second order spline basis}
+  \label{fig:spline_basis_1_extra_knot}  
+\end{marginfigure}
 If the knot vector is expanded by one time unit to
 \[
 \mathbf{t}' = [\tau_0, \tau_1, \tau_2, \tau_3, \tau_4, \tau_5] \defeq [0, 0, 1, 2, 3, 3],
@@ -390,13 +394,16 @@ b_4^3(t; \mathbf{t}) &= \frac{t-\tau_2}{\tau_4-\tau_2} b_2^2(t;\mathbf{t}) + \fr
  	  \end{cases}.	   	  
 \end{align*}
 The the unique third order basis function are shown on the left in Figure~\ref{fig:spline_basis_2}.
-\begin{figure}[hbt]
-  \centering
-  	\includegraphics[width=0.45\textwidth]{./chap5_trajectory_planning/figures/spline_basis_2}
-  	\includegraphics[width=0.45\textwidth]{./chap5_trajectory_planning/figures/spline_basis_2_extra_knot}
-  \caption{Third order spline basis}
+\begin{marginfigure}[-8in]
+  	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_2}
+  \caption{Third order spline basis.}
   \label{fig:spline_basis_2}  
-\end{figure}
+\end{marginfigure}
+\begin{marginfigure}[-2.5in]
+  	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_2_extra_knot}
+  \caption{Third order spline basis with extra knot}
+  \label{fig:spline_basis_2}  
+\end{marginfigure}
 Expanding the knot vector by one time unit to 
 \[
 \mathbf{t}' = [\tau_0, \tau_1, \tau_2, \tau_3, \tau_4, \tau_5] \defeq [0, 0, 0, 1, 2, 3, 4, 4, 4],
@@ -405,14 +412,14 @@ still results in $2k-1$ unique basis vectors, but $b_3^3(t; \mathbf{t}')$ is a r
 
 Similarly, the unique fourth order and ninth order basis functions are shown in Figures~\ref{fig:spline_basis_3} and~\ref{fig:spline_basis_8} respectively.
 
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.99\textwidth]{./chap5_trajectory_planning/figures/spline_basis_3}
+\begin{marginfigure}[0in]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_3}
   \caption{Fourth order spline basis}
   \label{fig:spline_basis_3}  
-\end{figure}
+\end{marginfigure}
 
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.99\textwidth]{./chap5_trajectory_planning/figures/spline_basis_8}
+\begin{figure}[ht]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_8}
   \caption{Ninth order spline basis}
   \label{fig:spline_basis_8}  
 \end{figure}
@@ -605,11 +612,11 @@ Therefore, the lemma holds by induction.
 \end{proof}
 
 A graphical depiction of the region of support for the set of basis functions $\{b_m^k(t;\mathbf{t}_M^k)\}_{m=0}^{M+k-2}$ is shown in Figure~\ref{fig:region_of_support} for $k=4$ and $M=8$.
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.99\textwidth]{./chap5_trajectory_planning/figures/region_of_support}
+\begin{marginfigure}[0in]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/region_of_support}
   \caption{Region of support for the B-spline basis functions of order $k=4$ with knot vector $\mathbf{t}_8^4$.}
   \label{fig:region_of_support}  
-\end{figure}
+\end{marginfigure}
 
 \begin{lemma} \label{lem:basis_vectors_sum_to_1}
 	Let $\mathbf{t}_M^k$ be a uniform clamped knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M\geq k$. For any instant of time $t\in[0,M]$, the basis vectors at that time sum to unity, i.e., for $t\in[0, M]$,
@@ -752,22 +759,22 @@ def plot_spline(spl):
 \end{lstlisting}
 
 The resulting spline is shown in Figure~\ref{fig:example_spline_curve}.
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.5\textwidth]{./chap5_trajectory_planning/figures/example_spline_curve}
+\begin{marginfigure}[0in]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/example_spline_curve}
   \caption{Example spline curve}
   \label{fig:example_spline_curve}  
-\end{figure}
+\end{marginfigure}
 
 %+++++++++++++++++++++++++++++++
 \subsection{Derivatives of B-splines}
 
 We begin this section by noting that the basis functions and the knot vector do not have to be of the same order.  In fact, if the knot vector has higher order than the basis functions, then the first several basis functions will simply be zero.  
 For example, let $\mathbf{t}_3^3 = [0, 0\vdots, 0, 1, 2, 3, \vdots 3, 3]$, then from Equation~\eqref{eq:spline_basis_definition_0} $b_0^1(t; \mathbf{t}_3^3)$, $b_1^1(t; \mathbf{t}_3^3)$, $b_5^1(t; \mathbf{t}_3^3)$, $b_1^1(t; \mathbf{t}_3^3)$, and $b_5^2(t; \mathbf{t}_3^3)$ are equal to zero since the knot intervals in the denominator for those functions are zero.  The remaining basis functions are shown in Figure~\ref{fig:shifting_property}.
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.99\textwidth]{./chap5_trajectory_planning/figures/shifting_property}
+\begin{marginfigure}[0in]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/shifting_property}
   \caption{Shifting property of uniform clamped B-spline basis functions.}
   \label{fig:shifting_property}  
-\end{figure}
+\end{marginfigure}
 If on the other hand, the knot vector has one order lower, i.e., $\mathbf{t}_3^2 = [0\vdots, 0, 1, 2, 3, \vdots 3]$, then the basis vectors are also shown to the right in Figure~\ref{fig:shifting_property}.  It is clear that reducing the order of the knot vector by one, shifts the index of the basis vectors by one.  We can formalize these observations in the following lemma.
 \begin{lemma} \label{lem:shifting_property}
 For uniform or clamped uniform knot vectors $\mathbf{t}_M^k \in \mathbb{R}^{M+2k-1}$ and $\mathbf{t}_M^{k-1}\in\mathbb{R}^{M+2k-1}$ we have
@@ -986,11 +993,11 @@ Suppose that instead of defining the surface over the set $[0, M]\times[0, N]$ w
 S(\sbf) = \bbf^k_M\left(\frac{M(s_1-\underline{X})}{\overline{X}-\underline{X}}\right)^\top \Cbf \bbf^k_N\left(\frac{N(s_2-\underline{Y})}{\overline{Y}-\underline{Y}}\right), \quad \sbf\in[\underline{X}, \overline{X}]\times[\underline{Y}, \overline{Y}].
 \end{equation}
 
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.9\textwidth]{./chap5_trajectory_planning/figures/spline_surface_basis}
+\begin{marginfigure}[0in]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_surface_basis}
   \caption{A single second order spline bases function $b_3^2(s_1)b_3^2(s_2)$.}
   \label{fig:spline_surface_bases}  
-\end{figure}
+\end{marginfigure}
 
 
 %
@@ -1072,11 +1079,11 @@ def draw_random_surface(order=2, M=10, N=10,
     plt.show()
 \end{lstlisting}
 The result of running this code is shown in Figure~\ref{fig:random_spline_surface}
-\begin{figure}[hbt]
-  \centering\includegraphics[width=0.9\textwidth]{./chap5_trajectory_planning/figures/random_spline_surface}
+\begin{marginfigure}[0in]
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/random_spline_surface}
   \caption{Spline surface with randomly generated control points.}
   \label{fig:random_spline_surface}  
-\end{figure}
+\end{marginfigure}
 
 
 
@@ -1358,7 +1365,7 @@ cite{ManyamCasbeerWeintraub21}:  This paper uses a delaney trangulation to param
 \cite{LutzMeurer21}:  Collision avoidance constraints, as describe in~\cite{LutzMeurer21}.
 If the obstacles are ellipsoids:  Suppose that the world is modeled by a set of ellipsoidal obstacles
 \[
-\mathcal{O}_i = \{x\in\mathbf{R}^3: x^\top P_i x \leq 1}
+\mathcal{O}_i = \{x\in\mathbf{R}^3: x^\top P_i x \leq 1\}
 \]
 and the total set of obstacles in the world is 
 \[

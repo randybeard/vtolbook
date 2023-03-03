@@ -19,19 +19,19 @@ The intensity of a grayscale image at pixel $(m_x, m_y)$ will be denoted $I(M_x,
 
 The geometry of camera is shown in Figure~\ref{fig:pin_hole_camera}.
 The camera frame is represented as $\mathcal{F}_c = \{\ibf_c, \jbf_c, \kbf_c\}$, where $\ibf_c$ is aligned with the $m_x$-direction in the image plane, i.e., to the right when looking at the image, $\ibf_y$ is aligned with $m_y$-direction in the image plane, i.e., down when looking at the image, and $\kbf_c$ is aligned along the optical axis, or in the pointing direction of the camera, and so that a scaled version of $\kbf_c$ would intersect the image plane at the center of the image.  The image plane is located at a distance $Sf$ from the center of the camera frame, where $f$ is the focal length in units of pixels, and $S$ is a scale factor that converts pixels to meters.  
-\begin{figure}
+\begin{figure}[htb]
+  \label{fig:pin_hole_camera}
   \centering
   \includegraphics[width=\linewidth]{chap6_camera_features/figures/pin_hole_camera}
   \caption{Pin hole camera model}
-  \label{fig:pin_hole_camera}
 \end{figure}
 
-Let $\pbf_{f/c}^c = (p_x, p_y, p_z)^\top$ be the 3D Euclidian position of a feature point in the environment relative to the camera frame, expressed in the camera frame, as shown in Figure~\ref{fig:pin_hole_camera}.  Suppose that the projection of the point $\pbf_{f/c}^c$ on to the camera frame is at  the pixel $(m_x, m_y)$.  The vector that represents the project of $\pbf_{f/c}^c$ on the image plane is given by
+Let $\pbf_{f/c}^c = (p_x, p_y, p_z)^\top$ be the 3D Euclidian position of a feature point in the environment relative to the camera frame, expressed in the camera frame, as shown in Figure~\ref{fig:pin_hole_camera}.  Suppose that the projection of the point $\pbf_{f/c}^c$ on to the camera frame is at  the pixel $(m_x, m_y)$.  The vector that represents the projection of $\pbf_{f/c}^c$ on the image plane is given by
 \[
 \begin{pmatrix} S(m_x-c_x) \\ S(m_y-c_y) \\ Sf \end{pmatrix}.
 \]
 
-From Figure\ref{fig:pin_hole_camera} and using similar triangles, we get that
+From Figure~\ref{fig:pin_hole_camera} and using similar triangles, we get that
 \begin{align*}
 \frac{S(m_x-c_x)}{Sf} &= \frac{p_x}{p_z} \\	
 \frac{S(m_y-c_y)}{Sf} &= \frac{p_y}{p_z},
@@ -48,7 +48,7 @@ In order to write the pixel location as vector, we introduce {\em normalized hom
 	&= \frac{1}{p_z}\begin{pmatrix} f & 0 & c_x \\ 0 & f & c_y \\ 0 & 0 & 1 \end{pmatrix}\begin{pmatrix}p_x \\ p_y \\ p_z \end{pmatrix}.
 	\label{eq:intrinsic_parameters_1}
 \end{align}
-
+%
 For real-world cameras, the focal length can be different in the $x$ and $y$ directions.  Consider Figure~\ref{fig:focal_length_calculation}.
 \begin{marginfigure}
   \includegraphics[width=\linewidth]{chap6_camera_features/figures/focal_length_calc}
@@ -79,7 +79,7 @@ to be the intrinsic parameters of the camera, we have shown that
 \begin{equation}\label{eq:pin_hole_pixel}
 \lambda_f \begin{pmatrix} m_x \\ m_y \\ 1 \end{pmatrix} = K_c \pbf_{f/c}^c,
 \end{equation}
-where $\lambda_f = p_z$ is the distance to the feature along the camera $z$-axis.  
+where $\lambda_f = p_z$ is the (unknown) distance to the feature along the camera $z$-axis.  
 \marginnote{In \texttt{ROSflight-Holodeck}, the horizontal field-of-view of the camera is $90$ degrees from which $f_x$ can be computed.  Assume that $f_y=f_x$ and $f_\theta=0$.  The optical center can be computed as $c_\ast = M_\ast/2$.}
 
 The intrinsic parameters $K_c$ (in addition to radial distortion parameters) can be found through a process known as camera calibration.  If the camera has been calibrated, then $K_c$ is known.  When $K_c$ is known, then pixel coordinated returned via $\texttt{openCV}$ can be converted to calibrated pixel coordinates as 
@@ -271,20 +271,20 @@ The image based control and estimation schemes that we will consider in this boo
 	
 The Harris corner detector attempts to find positions in the image that have strong gradients in both the $x$ and $y$ directions. Consider the function
 \[
-E'(u,v) = \abs{I(m_x + u, m_y+v) - I(m_x, m_y)}^2
+E_{\mathbf{m}}'(u,v) = \abs{I(m_x + u, m_y+v) - I(m_x, m_y)}^2
 \]
-which is a function of pixel deviations $(u,v)$.  For example, if $E'(1,0)$ is large, then the image intensity undergoes a large change for one pixel deviation along the $x$-direction in the image.  
+which is a function of pixel deviations $(u,v)$.  For example, if $E_{\mathbf{m}}'(1,0)$ is large, then the image intensity undergoes a large change for one pixel deviation along the $x$-direction in the image.  
 It is desireable to find features that are well-defined over a window $W$ of pixels.  For example, noise may cause strong gradients at one pixel in the image, but the gradient in each direction does not persist for more than a few pixels.  Define the window $W(\mbf)$ to be an $(N+1)\times(N+1)$ box around the pixel $\mbf$.  Consider the cost function
 \[
-E(u,v) = \sum_{(x,y)\in W(\mbf)} \abs{ I(x+u, y+v)-I(x,y) }^2,
+E_{\mathbf{m}}(u,v) = \sum_{(x,y)\in W(\mbf)} \abs{ I(x+u, y+v)-I(x,y) }^2,
 \]
-then good features will those pixels $\mbf$ where $E$ is large.
+then good features will be those pixels $\mbf$ where $E$ is large.
 Using the Taylor series approximation of image intensity $I(x,y)$ we get
 \begin{equation}\label{eq:image_gradient_1}
 I(x+u, y+v) = I(x,y) + \frac{\partial I}{\partial x}(x,y)u + \frac{\partial I}{\partial y}(x,u) v + H.O.T.
 \end{equation}
 
-Given an image $I(m_x, m_y)$, the gradient image along the $x$-direction can be found by convolving the image with the so-called Sobel edge detector
+Given an image $I(x, y)$, the gradient image along the $x$-direction can be found by convolving the image with the so-called Sobel edge detector
 \[
 G_x = \left[ \begin{array}{c|c|c}
 -1 & 0 & 1 \\\hline -2 & 0 & 2 \\\hline -1 & 0 & 1
@@ -297,23 +297,23 @@ G_y = \left[\begin{array}{c|c|c}
 -1 & -2 & -1  \\\hline 0 & 0 & 0  \\\hline 1 & 2 & 1
 \end{array} \right].
 \]
-Equivalently, the gradient $\frac{\partial I}{\partial \mbf}$ of an image at pixel $\mbf=(m_x, m_y)$ is given by
+Equivalently, the gradient $\frac{\partial I}{\partial \mbf}$ of an image at pixel $\mbf^0=(m_x^0, m_y^0)^\top$ is given by
 \begin{equation}\label{eq:image_gradient}
-\frac{\partial I}{\partial \mbf}(m_x, m_y) \defeq
+\frac{\partial I}{\partial \mbf}(\mbf^0) \defeq
 \begin{pmatrix} I_x \\ I_y \end{pmatrix}
 = \left(\begin{array}{c}
-[I(m_x+1, m_y-1)-I(m_x-1,m_y-1)] \\
-+ 2[I(m_x+1, m_y)-I(m_x-1,m_y)] \\
-+ [I(m_x+1, m_y+1)-I(m_x-1,m_y+1)] \\\hline
- [I(m_x-1, m_y+1)-I(m_x-1,m_y-1)] \\
-+ 2[I(m_x, m_y+1)-I(m_x,m_y-1)] \\
-+ [I(m_x+1, m_y+1)-I(m_x+1,m_y-1)]
+[I(m_x^0+1, m_y^0-1)-I(m_x^0-1,m_y^0-1)] \\
++ 2[I(m_x^0+1, m_y^0)-I(m_x^0-1,m_y^0)] \\
++ [I(m_x^0+1, m_y^0+1)-I(m_x^0-1,m_y^0+1)] \\\hline
+ [I(m_x^0-1, m_y^0+1)-I(m_x^0-1,m_y^0-1)] \\
++ 2[I(m_x^0, m_y^0+1)-I(m_x^0,m_y^0-1)] \\
++ [I(m_x^0+1, m_y^0+1)-I(m_x^0+1,m_y^0-1)]
 \end{array}\right).
 \end{equation}
 
 Therefore, dropping all be the constant and linear terms in Equation~\eqref{eq:image_gradient_1} gives
 \begin{align*}
-E(u,v) &\approx \sum_{(x,y)\in W(\mbf)} \abs{I_x(x,y)u +I_y(x,y) v }^2,\\
+E_{\mathbf{m}}(u,v) &\approx \sum_{(x,y)\in W(\mbf)} \abs{I_x(x,y)u +I_y(x,y) v }^2,\\
 &= \sum_{(x,y)\in W(\mbf)} \begin{pmatrix} u & v \end{pmatrix}\begin{pmatrix}\left(I_x(x,y)\right)^2 & I_x(x,y) I_y(x,y) \\
 I_x(x,y)I_y(x,y) & (I_y(x,y))^2 \end{pmatrix}\begin{pmatrix}u \\ v\end{pmatrix} \\
 &= \begin{pmatrix} u & v \end{pmatrix} G(\mbf) \begin{pmatrix}u \\ v\end{pmatrix},
@@ -330,9 +330,9 @@ G = U\begin{pmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{pmatrix} U^\top,
 where $U$ is orthogonal.  Therefore $\xbf^\top G(\mbf) \xbf$ is large for all $\xbf$ when both of the eigenvalues of $G(\mbf)$ are large.  
 
 \subsection{Harris Corner Detector}
-The so-called Harris corner detector, originally proposed by (Harris \& Stephens)\cite{HarrisStephen88} proposed to use the metric
+The so-called Harris corner detector, originally proposed by (Harris \& Stephens)\cite{HarrisStephen88} uses the metric
 \[
-R_h = \det{G} - k\trace{G}
+R_h = \det{G} - k~\trace{G}
 \]
 to distinguish good features.  
 Since for any matrix
@@ -347,7 +347,7 @@ R(G) = \lambda_1\lambda_2 - k(\lambda_1+\lambda_2),
 where $k$ is typically small.  Therefore $R$ will be large when both $\lambda_1$ and $\lambda_2$ are relatively large and close to the same size.
 
 \subsection{Shi-Tomasi Corner Detector}
-The Shi-Tomasi corner detector, originally proposed in (Shi \& Tomasi)~\cite{ShiTomasi94} proposes instead to use the metric
+The Shi-Tomasi corner detector, originally proposed in (Shi \& Tomasi)~\cite{ShiTomasi94} instead uses the metric
 \[
 R_{st}(G) = \min\{\lambda_1, \lambda_2\}
 \]
