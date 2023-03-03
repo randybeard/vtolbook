@@ -55,17 +55,17 @@ where $\lambda_\ell$ is selected at each iteration to ensure that the residual $
 \section{Optical Flow}
 \label{sec:optical_flow}
 
-Suppose that a camera attached to a multirotor collect image $I_k$ at time $k$ and image $I_{k+1}$ at time $I_{k+1}$, and suppose that $\mbf_0 = (m_x, m_y)^\top$ is a pixel of interest in image $I_k$.  The objective is to find the corresponding pixel in image $I_{k+1}$ using only image data.  We assume that lighting qualities in the scene do not change between images $I_k$ and $I_{k+1}$.  
+Suppose that a camera attached to a multirotor collects image $I_k$ at time $k$ and image $I_{k+1}$ at time $I_{k+1}$, and suppose that $\mbf_0 = (m_x, m_y)^\top$ is a pixel of interest in image $I_k$.  The objective is to find the corresponding pixel in image $I_{k+1}$ using only image data.  We assume that lighting qualities in the scene do not change between images $I_k$ and $I_{k+1}$.  
 
 Let $\deltabf = (\delta_x, \delta_y)^\top$ be a small change in pixel locations, then the objective is to find $\deltabf$ to minimize the residual
 \begin{equation}\label{eq:optical_flow_1}
 r(I_k, I_{k+1}, \mbf_0, \deltabf) = I_{k+1}(\mbf_0+\deltabf) - I_k(\mbf_0),
 \end{equation}
-where $\mbf_0+\deltabf$ is the pixel location in the new image of the feature located at $\mbf_0$ in the old image.  It turns out that finding the optical flow at a single pixel under-determined and susceptable to noise  Therefre, the residual function is modified to minimize the intensity values over a window surrounding $\mbf_0$ as
+where $\mbf_0+\deltabf$ is the pixel location in the new image of the feature located at $\mbf_0$ in the old image.  It turns out that finding the optical flow at a single pixel is under-determined and susceptible to noise  Therefore, the residual function is modified to minimize the intensity values over a window surrounding $\mbf_0$ as
 \begin{equation}\label{eq:optical_flow_1}
 r(I_k, I_{k+1}, \mbf_0, \deltabf) = \begin{pmatrix} \left(I_{k+1}(\xbf_1+\deltabf) - I_k(\xbf_1)\right) \\
 \vdots \\
-\left(I_{k+1}(\xbf_n+\deltabf) - I_k(\xbf_,)\right)
+\left(I_{k+1}(\xbf_n+\deltabf) - I_k(\xbf_n)\right)
 \end{pmatrix}
 \end{equation}
 where $\xbf_1, \dots, \xbf_n$ are the pixels in the window $W(\mbf_0)$ around the pixel $\mbf_0$.  
@@ -96,21 +96,20 @@ The optical flow problem can now be stated as the problem of finding the optical
 Letting $S = r^\top r$ we get 
 \begin{align*}
 S(I_k, I_{k+1}, \mbf_0, \deltabf) &= \sum_{\xbf\in M(\mbf_0)} \left(\frac{\partial I_k}{\partial t}(\xbf) + \frac{\partial I_k^\top}{\partial \mbf}(\xbf)\deltabf\right)^\top \left(\frac{\partial I_k}{\partial t}(\xbf) + \frac{\partial I_k^\top}{\partial \mbf}(\xbf)\deltabf\right) \\
-&= \deltabf^\top \left(\sum_{\xbf\in M(\mbf_0)}\frac{\partial I_k}{\partial \mbf}(\xbf)\frac{\partial I_k^\top}{\partial \mbf}(\xbf)\right) 
+&= \deltabf^\top \left(\sum_{\xbf\in M(\mbf_0)}\frac{\partial I_k}{\partial \mbf}(\xbf)\frac{\partial I_k^\top}{\partial \mbf}(\xbf)\right) \deltabf
 	+ 2\left(\sum_{\xbf\in M(\mbf_0)}\frac{\partial I_k}{\partial t}(\xbf)\frac{\partial I_k}{\partial \mbf}(\xbf)\right)^\top \deltabf 
 	+ \left(\sum_{\xbf\in M(\mbf_0)}\frac{\partial I_k^2}{\partial t}(\xbf) \right) \\
 &= 	\deltabf^\top G(\mbf_0) \deltabf + 2b^\top(\mbf_0) \deltabf + c,
 \end{align*}
-where $G(\mbf_0)$ is given in Equation~\eqref{eq:G_mbf}m, and 
-Define 
+where $G(\mbf_0)$ is given in Equation~\eqref{eq:G_mbf}, and where 
 \begin{align*}
 b(\mbf_0) &\defeq \left(\sum_{\xbf\in W(\mbf_0)} \frac{\partial I}{\partial\mbf}(\xbf) \frac{\partial I}{\partial t}\right), \\
 c(\mbf_0) &\defeq \sum_{\xbf\in M(\mbf_0)}\frac{\partial I_k^2}{\partial t}(\xbf).
 \end{align*}
 Taking the partial of $S$ with respect to $\deltabf$ and setting equal to zero gives
-\[
+\begin{equation}\label{eq:optical_flow_4}
 \delta = G^{-1}(\mbf_0) b(\mbf_0).
-\] 
+\end{equation} 
 %
 %
 %
@@ -158,7 +157,7 @@ As described in the previous section, the Gauss-Newton iteration gives
 
 The method described above assumes that the intensity at pixel $\mbf_0$ moves a small distance that is at least contained in the window $W(\mbf_0)$, and the method can fail for large motions.  
 \rwbcomment{Need to describe image pyramids}.
-One method for compensating for this problem is to compute the a set of image pyramids and to compute the optical flow vector on a lower resolution image in the pyramid, where small optical flow vector now correspond to larger motions in the image.  The optical flow algorithm is then computer at higher resolutions using the seed from the lower resolution image.  
+One method for compensating for this problem is to compute the a set of image pyramids and to compute the optical flow vector on a lower resolution image in the pyramid, where small optical flow vector now correspond to larger motions in the image.  The optical flow algorithm is then computed at higher resolutions using the seed from the lower resolution image.  
 
 The \texttt{openCV} function \texttt{calcOpticalFlowPyrLK()} computes the optical flow at a set of points passed into the function.
 \sidenote{\href{https://docs.opencv.org/3.4/d4/dee/tutorial_optical_flow.html}{\texttt{openCV code example}}.}
@@ -173,9 +172,10 @@ In calibrated normalized pixel coordinated we have
 \]
 Therefore, the optic flow vector in calibrated normalized pixel coordinates is given by
 \begin{align*}
-\dot{\bar{\epsilonbf}} &= \begin{pmatrix} \dot{\epsilon}_x \\ \dot{\epsilon}_y \\ 0 \end{pmatrix} \\ 
-&= K_c^{-1} \begin{pmatrix} \dot{m}_x \\ \dot{m}_y \\ 0 \end{pmatrix} \\ 
-&= K_c^{-1} \dot{\bar{\mbf}},
+	\dot{\bar{\epsilonbf}} 
+		&= \begin{pmatrix} \dot{\epsilon}_x \\ \dot{\epsilon}_y \\ 0 \end{pmatrix}  
+		= K_c^{-1} \begin{pmatrix} \dot{m}_x \\ \dot{m}_y \\ 0 \end{pmatrix} 
+		= K_c^{-1} \dot{\bar{\mbf}},
 \end{align*}
 and the units of $\dot{\bar{\epsilonbf}}$ are $\text{seconds}^{-1}$.
 
