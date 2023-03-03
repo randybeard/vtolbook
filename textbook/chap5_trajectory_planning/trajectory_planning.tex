@@ -1129,7 +1129,7 @@ The normed integral square of the fourth derivative of $\mathbf{p}(t)$ is given 
 \end{align*}
 Define
 \[
-W_M^{k,j} \defeq S_M^{k,j} \int_0^M 	\mathbf{b}_M^{k-j}(t) {\mathbf{b}_M^{k-j}(t)}^\top \, dt~~ {S_M^{k,3}}^\top,
+W_M^{k,j} \defeq S_M^{k,j} \int_0^M 	\mathbf{b}_M^{k-j}(t) {\mathbf{b}_M^{k-j}(t)}^\top \, dt~~ {S_M^{k,j}}^\top,
 \]
 and note that $W_M^{k,j}$ are constant matrices that can be pre-computed and stored in memory,
 then 
@@ -1152,7 +1152,7 @@ which can be written in matrix form as
 	\underbrace{\begin{pmatrix}\mathbf{c}_0 & \dots \mathbf{c}_{M+k-2} \end{pmatrix}}_{\mathbf{C}_p}
 	\underbrace{\begin{pmatrix} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 & \mathbf{e}_{M+k-3} & \mathbf{e}_{M+k-2} & \mathbf{e}_{M+k-1} \end{pmatrix}}_{U_1}
 	\\ = 
-	\underbrace{\begin{pmatrix}\mathbf{p}_0 & \mathbf{v}_0 & \mathbf{a}_0 & \mathbf{p}_f & \mathbf{v}_f & \mathbf{a}_f \end{pmatrix}}_{A_p}
+	\underbrace{\begin{pmatrix}\mathbf{p}_0 & \mathbf{v}_0 & \mathbf{a}_0 & \mathbf{a}_f & \mathbf{v}_f & \mathbf{p}_f \end{pmatrix}}_{A_p}
 	\underbrace{\begin{pmatrix} 1 & 1 & 1 & 0 & 0 & 0 \\ 0 & \frac{1}{k-1} & \frac{3}{k-1} & 0 & 0 & 0 \\ 0 & 0 & \frac{2}{(k-1)(k-2)} & 0 & 0 & 0 \\ 0 & 0 & 0 & \frac{2}{(k-1)(k-2)} & 0 & 0 \\ 0 & 0 & 0 & \frac{-3}{k-1} & \frac{-1}{k-1} & 0 \\ 0 & 0 & 0 & 1 & 1 & 1 \end{pmatrix}}_{B^{k,4}}.
 \end{multline*}
 
@@ -1205,7 +1205,7 @@ Without obstacles, the minimum-snap problem has an analytic solution as derived 
 	\]
 	and recalling that for matrix equations
 	\begin{align*}
-		\frac{\partial}{\partial X}\trace{MX} &= M^\top \\	
+		\frac{\partial}{\partial X}\trace{XM} &= M^\top \\	
 		\frac{\partial}{\partial X}\trace{XMX^\top} &= X(M+M^\top),
 	\end{align*}
 	we get that
@@ -1226,11 +1226,11 @@ Without obstacles, the minimum-snap problem has an analytic solution as derived 
 \endproof
 This is a very nice result in the sense that the matrix
 \[
-S_M^{k,4} = B^{k,4} U_1^\top \left(I-W_M^{k,4}U_2(U_2^\top W_M^{k,4} U_2)^{-1}U_2^\top\right)
+Q_M^{k,4} = B^{k,4} U_1^\top \left(I-W_M^{k,4}U_2(U_2^\top W_M^{k,4} U_2)^{-1}U_2^\top\right)
 \]
 is a constant, problem independent matrix that can be pre-computed and stored in memory, and the optimal control points can be computed simply from the initial and final conditions as 
 \[
-\mathbf{C}_p^\ast = A_p S_M^{k,4}.
+\mathbf{C}_p^\ast = A_p Q_M^{k,4}.
 \]
 
 For the heading spline, we assume constraints on the initial and final heading as
@@ -1259,11 +1259,11 @@ Using the same logic as above, we have the following theorem for the heading spl
 	\end{equation}
 	is given by
 	\begin{equation}
-		\mathbf{C}_\psi^\star  = A_\psi S_M^{k,2} ,
+		\mathbf{C}_\psi^\star  = A_\psi Q_M^{k,2} ,
 	\end{equation}
 	where
 	\begin{align*}
-	S_M^{k,2} &= U_{1,\psi}^\top \left(I-W_M^{k,2}U_{2,\psi}(U_{2,\psi}^\top W_M^{k,2} U_{2,\psi})^{-1}U_{2,\psi}^\top\right) \\
+	Q_M^{k,2} &= U_{1,\psi}^\top \left(I-W_M^{k,2}U_{2,\psi}(U_{2,\psi}^\top W_M^{k,2} U_{2,\psi})^{-1}U_{2,\psi}^\top\right) \\
 	U_{2,\psi} &= \begin{pmatrix} \mathbf{e}_2, \dots, \mathbf{e}_{M+k-2} \end{pmatrix}.
 	\end{align*}
 \end{theorem}
