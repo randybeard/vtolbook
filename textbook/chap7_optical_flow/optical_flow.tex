@@ -275,7 +275,7 @@ Features on the wall will move in the camera $x$-direction.
 %	\dot{\epsilon}_x = \frac{v}{\norm{\Pi_{\ebf_3}\pbf_{f/c}^c}}\frac{\epsilon_x}{\norm{\Pi_{\ebf_3}\epsilonbf_f}},
 	\dot{\epsilon}_x = \frac{v}{D}\frac{\epsilon_x}{\sqrt{\epsilon_x^2 + 1}},
 	\end{equation}
-	where $D$ is the distance to the feature projected on to the camera $x-z$ plane.
+	where $D$ is the distance to the feature projected onto the camera $x-z$ plane.
 \end{theorem}
 \begin{proof}
   The distance from the camera frame to the world feature in the horizontal plane is $D$ and the distance from the camera frame to the projection of the feature on the image plane in the horizontal plane is $d=\sqrt{\epsilon_x^2+1}$.
@@ -295,7 +295,7 @@ Features on the wall will move in the camera $x$-direction.
 
 %
 Consider the picture shown in Figure~\ref{fig:optical_flow_forward_looking_ground}, where the multirotor is moving parallel to the ground that contains features, with a forward-looking camera.  
-\begin{marginfigure}
+\begin{marginfigure}[-2in]
 	\includegraphics[width=\linewidth]{chap7_optical_flow/figures/optical_flow_forward_looking_ground}
 	\caption{Optical flow of a feature on the ground for forward looking camera.}
 	\label{fig:optical_flow_forward_looking_ground}
@@ -352,7 +352,7 @@ Consider the picture shown in Figure~\ref{fig:optical_flow_time_to_collision}, w
 
 If instead of tracking feature points, the computer vision algorithm tracks the area of an object, then time to collision with the plane containing the object can also be computed as shown in the next theorem.
 
-\begin{marginfigure}
+\begin{marginfigure}[2in]
 	\includegraphics[width=\linewidth]{chap7_optical_flow/figures/optical_flow_time_to_collision_area}
 	\caption{Time-to-collision calculation for an object with area $A$}
 	\label{fig:optical_flow_time_to_collision_area}

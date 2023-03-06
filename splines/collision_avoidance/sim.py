@@ -6,12 +6,10 @@ from animation import Animation
 import numpy as np
 from intruderDynamics import IntruderDynamics
 from ownshipDynamics import OwnshipDynamics
+#from ctrlPID import CtrlPID
 
 #from dataPlotter import dataPlotter
-#from ctrlStateFeedback import ctrlStateFeedback
 
-# instantiate pendulum, controller, and reference classes
-#pendulum = pendulumDynamics()
 #controller = ctrlStateFeedback()
 #reference = signalGenerator(amplitude=0.5, frequency=0.04)
 #disturbance = signalGenerator(amplitude=0.1)
@@ -37,7 +35,6 @@ while t < P.t_end:  # main simulation loop
         #n = 0.0  #noise.random(t)  # simulate sensor noise
         #x = pendulum.state
         #u = controller.update(r, x)  # update controller
-        #y = pendulum.update(u + d)  # propagate system
         u = 0.0
         ownship.update(u)
         intruder.update()        
