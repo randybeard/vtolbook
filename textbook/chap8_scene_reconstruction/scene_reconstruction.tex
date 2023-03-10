@@ -36,7 +36,6 @@ We will assume in this section that the IMU is rigidly attached to the camera an
 angular velocity $\omegabf_{c/i}^c$ and the specific acceleration $\abf_{c/i}^c$, 
 where $\mathbf{F}_c$ is the camera frame and $\mathcal{F}_i$ is the inertial frame. 
 We will assume that the camera moves according to 
-The equations of motion are given by
 \begin{align}
 \dot{\pbf}_{c/i}^i &= \vbf_{c/i}^i  \label{eq:camera_motion_p} \\
 \dot{\vbf}_{c/i}^i &= g \ebf_3 + R_c^i\abf_{c/i}^c, \label{eq:camera_motion_v} \\
@@ -44,7 +43,7 @@ The equations of motion are given by
 \end{align}
 We begin by developing a sampled-data version of the equations of motion.
 \begin{lemma}
-	Suppose that the camera evolves according to \eqref{eq:camera_motion} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution equations are given by
+	Suppose that the camera evolves according to \eqref{eq:camera_motion_p}--\eqref{eq:cam_motion_R} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution equations are given by
 	\begin{align}
 	R_{\ell+1}^i &= R_{\ell}^i \exp\left(\ss{\omegabf_{\ell/i}^{\ell}} T_s \right)
 	\label{eq:R_imu_int_1} \\
@@ -70,7 +69,7 @@ We begin by developing a sampled-data version of the equations of motion.
 \end{proof}
 Since the relative pose does not include the inertial frame, we would like to remove references to the inertial frame in Equations~\eqref{eq:p_imu_int_1}--\eqref{eq:R_imu_int_1}.  The next lemma does so.
 \begin{lemma}
-	Suppose that the camera evolves according to \eqref{eq:camera_motion} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution from IMU sample $\ell$ to IMU sample $\ell+1$ is given by
+	Suppose that the camera evolves according to \eqref{eq:camera_motion_p}--\eqref{eq:cam_motion_R} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution from IMU sample $\ell$ to IMU sample $\ell+1$ is given by
 	\begin{align}
 	R_{\ell}^{\ell+1} &= \exp\left(-\ss{\omegabf_{\ell/i}^{\ell}} T_s \right)
 		\label{eq:R_imu_int_2} \\
@@ -136,16 +135,16 @@ When $\ell=m$, then $t_m=t_k$ and the algorithm has determined the relative pose
 %------------------------------------------------
 \section{Essential Matrix}
 \label{sec:essential_matrix}
-Author: Jake Johnson
-
-Recall from Equations~\eqref{eq:pin_hole_pixel} and \eqref{eq:pin_hole_calibrated}, that the relationship between the 3D-position of a feature $\pbf_{f/c}^c = (p_x, p_y, p_z)^\top$, the homogeneous pixel coordinates $\bar{\mbf}_f = (m_x, m_y, 1)^\top$, and the homogeneous normalized (calibrated) coordinates $\epsilonbf_f = (\epsilon_x, \epsilon_y, 1)$ is given by
-\[
-\lambda_f K_c^{-1} \mbf_f = \lambda_f \epsilonbf_f = \pbf_{f/c}^c, 
-\]
-where $\lambda_f=p_z$ is the distance to the feature along the optical axis $\kbf_c$.
+%Author: Jake Johnson
+%
+%Recall from Equations~\eqref{eq:pin_hole_pixel} and \eqref{eq:pin_hole_calibrated}, that the relationship between the 3D-position of a feature $\pbf_{f/c}^c = (p_x, p_y, p_z)^\top$, the homogeneous pixel coordinates $\bar{\mbf}_f = (m_x, m_y, 1)^\top$, and the homogeneous normalized (calibrated) coordinates $\epsilonbf_f = (\epsilon_x, \epsilon_y, 1)$ is given by
+%\[
+%\lambda_f K_c^{-1} \mbf_f = \lambda_f \epsilonbf_f = \pbf_{f/c}^c, 
+%\]
+%where $\lambda_f=p_z$ is the distance to the feature along the optical axis $\kbf_c$.
 
 Figure~\ref{fig:epipolar_geometry} shows the essence of epipolar geometry.  
-Let $\pbf_f$ be the 3D position of a feature point in the world, and let $\pbf_{f/a}^a$ be the position vector of the feature point relative to frame $\mathcal{F}_a$ expressed in frame $\mathcal{F}_a$, and similarly fro $\pbf_{f/b}^b$.
+Let $\pbf_f$ be the 3D position of a feature point in the world, and let $\pbf_{f/a}^a$ be the position vector of the feature point relative to frame $\mathcal{F}_a$ expressed in frame $\mathcal{F}_a$, and similarly for $\pbf_{f/b}^b$.
 	\begin{figure}
 		\includegraphics[width=\linewidth]{chap8_scene_reconstruction/figures/epipolar_geometry_quad}
 		\caption{Epipolar Geometry}
@@ -165,15 +164,15 @@ where we have used the fact that $\ss{\pbf_{a/b}^b}\pbf_{a/b}^b = \pbf_{a/b}^b \
 \end{equation}
 Dividing Equation~\eqref{eq:scene_epipolar_1} by the norm of $\pbf_{a/b}^b$, and defining
 \[
-\tbf_{a/b}^b\defeq \frac{\pbf_{a/b}^b}{\norm{\pbf_{a/b}^b}}
+\nbf_{a/b}^b\defeq \frac{\pbf_{a/b}^b}{\norm{\pbf_{a/b}^b}}
 \]
 gives
 \begin{equation}\label{eq:scene_epipolar_2}
-\pbf_{f/b}^{b\top} \ss{\tbf_{a/b}^b} R_a^b \pbf_{f/a}^a = 0.
+\pbf_{f/b}^{b\top} \ss{\nbf_{a/b}^b} R_a^b \pbf_{f/a}^a = 0.
 \end{equation}
 The matrix 
 \begin{equation}\label{eq:scene_essential_matrix}
-E = \ss{\tbf_{a/b}^b} R_a^b
+E = \ss{\nbf_{a/b}^b} R_a^b
 \end{equation}
 is called the essential matrix, and is completely defined by the relative pose $(R_a^b, \pbf_{a/b}^b)$.  
 \begin{theorem}
@@ -212,21 +211,21 @@ There is a related result for uncalibrated coordinates.
 The essential matrix invokes several interesting geometrical relationships.  For example, consider the relationship
 \begin{align*}
 \ellbf_a &= E^\top \bar{\epsilonbf}^b\\
-	&= R_a^{b\top} \ss{\tbf_{a/b}^b}^\top \bar{\epsilonbf}^b \\
-	&= R_b^a (\bar{\epsilonbf}^b \times \tbf_{a/b}^b),
+	&= R_a^{b\top} \ss{\nbf_{a/b}^b}^\top \bar{\epsilonbf}^b \\
+	&= R_b^a (\bar{\epsilonbf}^b \times \nbf_{a/b}^b),
 \end{align*}
-from which it is clear that $\ellbf_a$ is a vector (expressed in frame $a$) that is perpendicular to both $\bar{\epsilonbf}^b$ and $\tbf_{a/b}^b$.  Therefore $\ellbf_a$ is perpendicular to the epipolar plane containing $\pbf_{a/b}$, $\pbf_{f/a}$ and $\pbf_{f/b}$.  Since $\ellbf_a$ is in homogenous coordinates, it defines the line in image $a$ where the epipolar plane intersects image $a$.  
+from which it is clear that $\ellbf_a$ is a vector (expressed in frame $a$) that is perpendicular to both $\bar{\epsilonbf}^b$ and $\nbf_{a/b}^b$.  Therefore $\ellbf_a$ is perpendicular to the epipolar plane containing $\pbf_{a/b}$, $\pbf_{f/a}$ and $\pbf_{f/b}$.  Since $\ellbf_a$ is in homogenous coordinates, it defines the line in image $a$ where the epipolar plane intersects image $a$.  
 %
 Similarly, consider the relationship
 \begin{align*}
 \ell_b &= E \bar{\epsilonbf}^a \\
-       &= \ss{\tbf_{a/b}^b}R_a^b \bar{\epsilonbf}^a \\
-       &= R_a^b R_a^{b\top} \ss{\tbf_{a/b}^b}R_a^b \bar{\epsilonbf}^a \\
-       &= R_a^b \ss{R_a^{b\top}\tbf_{a/b}^b} \bar{\epsilonbf}^a\\
-       &= R_a^b \ss{\tbf_{a/b}^a} \bar{\epsilonbf}^a \\
-       &= R_a^b (\tbf_{a/b}^a \bar{\epsilonbf}^a),
+       &= \ss{\nbf_{a/b}^b}R_a^b \bar{\epsilonbf}^a \\
+       &= R_a^b R_a^{b\top} \ss{\nbf_{a/b}^b}R_a^b \bar{\epsilonbf}^a \\
+       &= R_a^b \ss{R_a^{b\top}\nbf_{a/b}^b} \bar{\epsilonbf}^a\\
+       &= R_a^b \ss{\nbf_{a/b}^a} \bar{\epsilonbf}^a \\
+       &= R_a^b (\nbf_{a/b}^a \bar{\epsilonbf}^a),
 \end{align*}
-from which it is clear that $\ell_b$ is a vector (expressed in frame $b$) that is perpendicular to both $\bar{\epsilonbf}^a$ and $\tbf_{a/b}^a$.  Therefore $\ellbf_b$ is also perpendicular to the epipolar plane containing $\pbf_{a/b}$, $\pbf_{f/a}$ and $\pbf_{f/b}$.  Since $\ellbf_b$ is in homogenous coordinates, it defines the line in image $b$ where the epipolar plane intersects image $b$.  
+from which it is clear that $\ell_b$ is a vector (expressed in frame $b$) that is perpendicular to both $\bar{\epsilonbf}^a$ and $\nbf_{a/b}^a$.  Therefore $\ellbf_b$ is also perpendicular to the epipolar plane containing $\pbf_{a/b}$, $\pbf_{f/a}$ and $\pbf_{f/b}$.  Since $\ellbf_b$ is in homogenous coordinates, it defines the line in image $b$ where the epipolar plane intersects image $b$.  
 %
 The lines $\ellbf_a$ and $\ellbf_b$ are called the epipolar lines.  
 
@@ -236,7 +235,7 @@ As shown in Figure~\ref{fig:epipolar_geometry}, the vector $\pbf_{a/b}^b$ inters
 \ellbf_b &= \bar{\epsilonbf}^b \times \bar{\ebf}^b.
 \end{align*}
 
-\rwbcomment{Add:  (1) How to compute $E$ from matching image points. (2) Given $E$, how to fine $R$ and $\tbf$. (3) Other interesting facts about epipolar geometry.}  
+\rwbcomment{Add:  (1) How to compute $E$ from matching image points. (2) Given $E$, how to fine $R$ and $\nbf$. (3) Other interesting facts about epipolar geometry.}  
 	
 %-------------------------------------------------------
 \subsection{Point Triangulation}
