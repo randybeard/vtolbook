@@ -69,7 +69,7 @@ We begin by developing a sampled-data version of the equations of motion.
 \end{proof}
 Since the relative pose does not include the inertial frame, we would like to remove references to the inertial frame in Equations~\eqref{eq:p_imu_int_1}--\eqref{eq:R_imu_int_1}.  The next lemma does so.
 \begin{lemma}
-	Suppose that the camera evolves according to \eqref{eq:camera_motion_p}--\eqref{eq:cam_motion_R} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution from IMU sample $\ell$ to IMU sample $\ell+1$ is given by
+	Suppose that the camera evolves according to \eqref{eq:camera_motion_p}--\eqref{eq:camera_motion_R} and suppose that over one sample period $(t_\ell, t_{\ell+1})$ of length $T_s=t_{\ell+1}-t_\ell$, that the angular velocity $\omegabf_{\ell/i}^{\ell}\defeq\omegabf_{c/i}^c(t_\ell)$ and the specific acceleration $\abf_{\ell/i}^{\ell}\defeq \abf_{c/i}^c(t_\ell)$ are constant.  Then the discrete evolution from IMU sample $\ell$ to IMU sample $\ell+1$ is given by
 	\begin{align}
 	R_{\ell}^{\ell+1} &= \exp\left(-\ss{\omegabf_{\ell/i}^{\ell}} T_s \right)
 		\label{eq:R_imu_int_2} \\
@@ -132,6 +132,8 @@ When $\ell=m$, then $t_m=t_k$ and the algorithm has determined the relative pose
 
 \rwbcomment{Note that this is different than other IMU integration methods in that the method uses the difference of accelerometer measurements.  It will be interesting to see if this work!}
 
+\rwbcomment{Add a description of a VIO approach.  The above is just inertial odometry (IO), to correct for biases, need to add the visual correction.}
+
 %------------------------------------------------
 \section{Essential Matrix}
 \label{sec:essential_matrix}
@@ -185,7 +187,7 @@ is called the essential matrix, and is completely defined by the relative pose $
 The normalized pixel coordinates of the feature point projected on to image $a$ and image $b$ satisfy
 \begin{align*}
 \lambda_a \bar{\epsilonbf}_{f/a}^a &= \pbf_{f/a}^a \\
-\lambda_b \bar{\epsilonbf}_{f/b}^b & \ pbf_{f/b}^b,
+\lambda_b \bar{\epsilonbf}_{f/b}^b &= \pbf_{f/b}^b,
 \end{align*}
 where $\lambda_a$ and $\lambda_b$ are the distances to the feature point along the optical axes in frame $a$ and $b$, respectively.  Substituting into Equation~\eqref{eq:scene_epipolar_2} gives
 \begin{equation}\label{eq:scene_epipolar_3}
@@ -223,13 +225,13 @@ Similarly, consider the relationship
        &= R_a^b R_a^{b\top} \ss{\nbf_{a/b}^b}R_a^b \bar{\epsilonbf}^a \\
        &= R_a^b \ss{R_a^{b\top}\nbf_{a/b}^b} \bar{\epsilonbf}^a\\
        &= R_a^b \ss{\nbf_{a/b}^a} \bar{\epsilonbf}^a \\
-       &= R_a^b (\nbf_{a/b}^a \bar{\epsilonbf}^a),
+       &= R_a^b (\nbf_{a/b}^a \cross \bar{\epsilonbf}^a),
 \end{align*}
 from which it is clear that $\ell_b$ is a vector (expressed in frame $b$) that is perpendicular to both $\bar{\epsilonbf}^a$ and $\nbf_{a/b}^a$.  Therefore $\ellbf_b$ is also perpendicular to the epipolar plane containing $\pbf_{a/b}$, $\pbf_{f/a}$ and $\pbf_{f/b}$.  Since $\ellbf_b$ is in homogenous coordinates, it defines the line in image $b$ where the epipolar plane intersects image $b$.  
 %
 The lines $\ellbf_a$ and $\ellbf_b$ are called the epipolar lines.  
 
-As shown in Figure~\ref{fig:epipolar_geometry}, the vector $\pbf_{a/b}^b$ intersects the two image planes (typically outside the field-of-view) at the points $\bar{\ebf}_a$ and $\bar{\ebf}_b$ which are called the epipoles.  Since any line the image can be defined by the cross product of two points on the line, the epipoles are defined by the relationship
+As shown in Figure~\ref{fig:epipolar_geometry}, the vector $\pbf_{a/b}^b$ intersects the two image planes (typically outside the field-of-view) at the points $\bar{\ebf}_a$ and $\bar{\ebf}_b$ which are called the epipoles.  Since any line in the image can be defined by the cross product of two points on the line, the epipoles are defined by the relationship
 \begin{align*}
 \ellbf_a &= \bar{\epsilonbf}^a \times \bar{\ebf}^a \\
 \ellbf_b &= \bar{\epsilonbf}^b \times \bar{\ebf}^b.
@@ -298,68 +300,65 @@ In this section we will describe a simple method for point triangulation when th
 
 \rwbcomment{Revise stuff below to fit notation.}
 
+	Let $\pbf_{f/a}^a$ and $\pbf_{f/b}^b$ be the position vector of a feature in frames $a$ and $b$ respectively.  Then
+	\[
+	\pbf_{f/b}^b = R_a^b \pbf_{f/a}^a + \pbf_{a/b}^b.
+	\]
+	In terms of calibrated pixel coordinates we have
+	\[
+	\lambda_b \epsilonbf_{f/b}^b = \lambda_a R_a^b \epsilonbf_{f/a}^a + \gamma \nbf_{a/b}^b,
+	\]	
+	where $\lambda_a$, $\lambda_b$, and $\gamma$ are unknown scales.  Multiplying both sides by $\ss{\epsilonbf_{f/b}^b}$ gives
+	\begin{align*}
+	& \lambda_a \ss{\epsilonbf_{f/b}^b} R_a^b \epsilonbf_{f/a}^a + \gamma \ss{\epsilonbf_{f/b}^b} \nbf_{a/b}^b = 0 \\
+	\implies & \begin{pmatrix} \ss{\epsilonbf_{f/b}^b} R_a^b \epsilonbf_{f/a}^a & \ss{\epsilonbf_{f/b}^b} \nbf_{a/b}^b\end{pmatrix}\begin{pmatrix} \lambda_a \\  \gamma \end{pmatrix}  = 0.
+	\end{align*}
 	
-	
-	Defining $\mathbf{X_a} = [p_a^\top, 1]^\top, \mathbf{X_b} = [p_b^\top, 1]^\top$, from Euclidean geometry, we have that
-	\begin{equation}
-	\mathbf{X_b} = \left[\begin{matrix} R_a^b & t_{a/b}^b \\ \mathbf{0} & 1 \end{matrix}\right] \mathbf{X_a}.
-	\end{equation}
-	so
-	\begin{equation}
-	p_b = R_a^b p_a + t_{a/b}^b.
-	\label{eq:point_trans}
-	\end{equation}
-	Assuming the translation between the two camera frames is only known up to some scale $\gamma$, and assuming normalized homogeneous image coordinates,
-	\begin{equation}
-	z_b \mathbf{\bar{x}_b} = z_a R_a^b \mathbf{\bar{x}_a} + \gamma t_{a/b}^b,
-	\label{eq:homo_trans}
-	\end{equation}
-	where we have used the relationship given in Eq. \ref{eq:norm} \cite{Ma2003}. Note that if either $z_a$ or $z_b$ is known, the other can easily be found using Eq. \ref{eq:point_trans}. We can therefore eliminate the dependence on one of them, which is done by multiplying both sides of Eq. \ref{eq:homo_trans} by $\ss{\mathbf{\bar{x}_b}}$, and we get
-	\begin{equation}
-	z_a \ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} + \gamma \ss{\mathbf{\bar{x}_b}} t_{a/b}^b = \left[\begin{matrix}\ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} & \ss{\mathbf{\bar{x}_b}} t_{a/b}^b \end{matrix}\right] \left[\begin{matrix} z_a \\ \gamma \end{matrix}\right] = M\lambda = 0,
-	\label{eq:triang2}
-	\end{equation}
-	with $M \in \mathbb{R}^{3\times 2}$ and $\lambda \in \mathbb{R}^2$. Note that $\lambda$ must be in the null space of $M$, so for Eq. \ref{eq:triang2} to have a nontrivial solution that is unique, $M$ must be of rank 1. Also, if $\lambda$ is a solution, then so is $k\lambda$, with $k \in \mathbb{R}$. So $\lambda$ is a solution up to some arbitrary scale.
-	
+	Suppose not that there are $n$ features tracked between frames $a$ and $b$, and let $\epsilonbf_{f_i/b}^b$ and $\epsilonbf_{f_{i/a}}^a$ be the corresponding feature locations in normalized calibrated pixels.  Then the depth factors $\lambda_{i/a}$ relative to frame $a$ and the depth factor $\gamma$ satisfy
+	\[
+	M\lambdabf \defeq \begin{pmatrix}
+ 					  	\ss{\epsilonbf_{f_1/b}^b} R_a^b \epsilonbf_{f_1/a}^a & \mathbf{0} & \cdots & \mathbf{0} & \ss{\epsilonbf_{f_1/b}^b} \nbf_{a/b}^b \\
+ 					  	\mathbf{0} & \ss{\epsilonbf_{f_2/b}^b} R_a^b \epsilonbf_{f_2/a}^a & \cdots & \mathbf{0} & \ss{\epsilonbf_{f_2/b}^b} \nbf_{a/b}^b \\
+ 					  	\vdots & \vdots & \ddots & \vdots & \vdots \\
+ 					  	\mathbf{0} & \mathbf{0} & \cdots & \ss{\epsilonbf_{f_n/b}^b} R_a^b \epsilonbf_{f_n/a}^a & \ss{\epsilonbf_{f_n/b}^b} \nbf_{a/b}^b
+ 					  \end{pmatrix}
+ 					  \begin{pmatrix} \lambda_{1/a} \\ \lambda_{2/a} \\ \vdots \\ \lambda_{n/a} \\ \gamma \end{pmatrix} = \mathbf{0}.
+	\]
+	Therefore, the unknown scale factors $\lambdabf$ are in the null space of the $n\times(n+1)$ matrix $M$.  Let
+	\[
+		M = \begin{pmatrix}U_1 & U_2 \end{pmatrix}\begin{pmatrix}\Sigma & 0 \\ 0 & 0 \end{pmatrix} \begin{pmatrix} V_1^\top \\ V_2^\top \end{pmatrix}
+	\]
+	be the singular value decomposition of $M$, then $\lambdabf = V_2\in\mathbb{R}^{(n+1)\times 1}$.  Note that any scaled version of $V_2$ is also a solution.  Therefore, to use this method we require one of the parameters $\lambda_{1/a}, \dots, \lambda_{n/a}, \gamma$ to be known.  If for example, the translation $\gamma$ is known via, e.g., IMU integration, then $V_2$ is scaled so that its last element equals $\gamma$, and the rest of the scale factors are recovered.
+		
 	\begin{theorem}
-		Eq. \ref{eq:triang2} has a nontrivial solution that is unique if $\mathbf{\bar{x}_a}$ and $\mathbf{\bar{x}_b}$ satisfy the epipolar constraint, and the point $p_a$ does not lie along the epipolar baseline.
+		The matrix $M$ defined above has a null space with dimension one if and only iff the pixel pairs $(\epsilonbf_{f_i/b}^b, \epsilonbf_{f_{i/a}}^a)$ satisfy the epipolar constraint, and the originating point $\mathbf{p}_f$ does not lie along the epipolar baseline.
 	\end{theorem}
 	
 	\begin{proof}
-		1. Imagine that $\mathbf{\bar{x}_a}$ and $\mathbf{\bar{x}_b}$ do not satisfy the epipolar constraint, i.e.
-		\begin{equation}
-		\mathbf{\bar{x}_b}^\top E_{ab} \mathbf{\bar{x}_a} = \epsilon, \qquad \epsilon \neq 0.
-		\end{equation}
-		In order for $M$ to be rank 1, we must be able to write its columns as a linear combination of one another, i.e.
-		\begin{equation}
-		c_1 \ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} + c_2 \ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0,
-		\label{eq:rank1_cons}
-		\end{equation}
-		where $c_1$ and $c_2$ are not both 0. Multiplying both sides of Eq. \ref{eq:rank1_cons} by $t_{a/b}^{b\top}$, and using the result in \ref{eq:left_skew}, we get 
-		\begin{align}
-		&c_1 t_{a/b}^{b\top} \ss{\mathbf{\bar{x}_b}} R_a^b \mathbf{\bar{x}_a} + c_2 t_{a/b}^{b\top} \ss{\mathbf{\bar{x}_b}} t_{a/b}^b \\
-		&\quad = -c_1 \mathbf{\bar{x}_b}^\top \ss{t_{a/b}^b} R_a^b \mathbf{\bar{x}_a} - c_2 \mathbf{\bar{x}_b}^\top \ss{t_{a/b}^b} t_{a/b}^b \\
-		&\quad = -c_1 \mathbf{\bar{x}_b}^\top E_{ab} \mathbf{\bar{x}_a} \\
-		&\quad = -c_1 \epsilon = 0.
-		\end{align}
-		Therefore, if the epipolar constraint is not satisfied, then $c_1$ must be 0 to satisfy this relationship. Plugging $c_1 = 0$ into Eq. \ref{eq:rank1_cons}, we have
-		\begin{equation}
-		c_2 \ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0.
-		\label{eq:rank1_cons2}
-		\end{equation}
-		Note that $\ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0$ only when $\mathbf{\bar{x}_b}$ is imaged at the epipole in frame $\mathcal{B}$. In any other case, Eq. \ref{eq:rank1_cons2} is only satisfied if $c_2 = 0$. Therefore, if $\mathbf{\bar{x}_a}$ and $\mathbf{\bar{x}_b}$ do not satisfy the epipolar constraint, $M$ has rank 2 and Eq. \ref{eq:triang2} has only the trivial solution.
-		
-		Also note that if the epipolar constraint is satisfied and the imaged point $p$ lies along the epipolar baseline (i.e. $\ss{\mathbf{\bar{x}_b}} t_{a/b}^b = 0$), then $M$ will have rank 0, and any $\lambda$ will be a solution of Eq. \ref{eq:triang2}.
+		If $(\epsilonbf_{f_i/b}^b, \epsilonbf_{f_{i/a}}^a)$ do not satisfy the epipolar constraint, i.e.
+		\[
+		\epsilonbf_{f_{i/b}}^{b\top} E_{a}^b \epsilonbf_{f_{i/a}}^a = \mu, 
+		\]
+		where $\mu \neq 0$.  It is clear that the first $n$ columns of $M$ are linearly independent.  Therefore $M$ is at least rank $n$, and will be rank $n+1$ iff the last column can be written as linear combination of the first $n$ columns.  		
+		 Considering only rows associated with the $i^{th}$ pixel pair,  there must exist a non-zero constant $c$ such that 
+		\[
+		c \ss{\epsilonbf_{f_{i/b}}^b} R_a^b \epsilonbf_{{f_i}/a}^a = \ss{\epsilonbf_{f_{i/b}}^b} \nbf_{a/b}^b.
+		\]
+		Multiplying both sides by $\nbf_{a/b}^{b\top}$ gives
+		\begin{align*}
+		&c \nbf_{a/b}^{b\top} \ss{\epsilonbf_{f_i/b}^b} R_a^b \epsilonbf_{f_{i/a}}^a = \nbf_{a/b}^{b\top}\ss{\epsilonbf_{f_i/b}^b} \nbf_{a/b}^b \\
+		\implies & = -c \epsilonbf_{f_i/b}^{b\top} \ss{\nbf_{a/b}^{b}} R_a^b \epsilonbf_{f_{i/a}}^a = 0 \\
+		&\quad = -c \epsilonbf_{f_i/b}^{b\top} E_a^b \epsilonbf_{f_{i/a}}^a = 0  \\
+		&\quad = -c \mu = 0.
+		\end{align*}
+		Therefore, if the epipolar constraint is not satisfied for the $i^{th}$, then $c$ must be 0 to satisfy this relationship. 
+		If $c=0$, then we must have that
+		\[
+		\ss{\epsilonbf_{f_i/b}^b} \nbf_{a/b}^b = 0
+		\]
+		which is true only when $\epsilonbf_{f_i/b}^b$ is imaged at the epipole in frame $b$. 		
 	\end{proof}
-	
-	\marginnote{
-		If the translation between frame $t_{a/b}^b$ is known to scale, then forcing $\gamma=1$ will result in point triangulations that are also to scale. 
-	} % end marginnote
-	
-	If we wish to resolve $n$ points from two images, the value of $\gamma$ remains the same for each. Defining the vector $\Lambda = [z_a^1, z_a^2, \cdots, z_a^n, \gamma]^\top$, we get
-	\begin{equation}
-	A\Lambda = \left[\begin{matrix}\ss{\mathbf{\bar{x}_b^1}} R_a^b \mathbf{\bar{x}_a^1} & \mathbf{0} & \cdots & \mathbf{0} & \ss{\mathbf{\bar{x}_b^1}} t_{a/b}^b \\ \mathbf{0} & \ss{\mathbf{\bar{x}_b^2}} R_a^b \mathbf{\bar{x}_a^2} & \cdots & \mathbf{0} & \ss{\mathbf{\bar{x}_b^2}} t_{a/b}^b \\ \vdots & \vdots & \ddots & \vdots & \vdots \\ \mathbf{0} & \mathbf{0} & \cdots & \ss{\mathbf{\bar{x}_b^n}} R_a^b \mathbf{\bar{x}_a^n} & \ss{\mathbf{\bar{x}_b^n}} t_{a/b}^b \end{matrix}\right] \left[ \begin{matrix} z_a^1 \\ z_a^2 \\ \vdots \\ \gamma \end{matrix}\right] = \mathbf{0}.
-	\end{equation}
+		
 	
 %--------------------------------------------------------	
 	\subsection{Point Triangulation Using Maximum Likelihood Estimation}
@@ -402,8 +401,21 @@ The point reconstruction problem is depicted graphically in Figure~\ref{fig:scen
 
 
 %------------------------------------------------
-\section{Updating the rolling voxel map}
+\clearpage
+\section{Inverse Depth Parametrization for Monocular SLAM, TRO, 2008}
+\includepdf[pages=-,scale=.8,pagecommand={}]{chap8_scene_reconstruction/papers/CiveraDavisonMartinez08.pdf}
+
+%------------------------------------------------
+\clearpage
+\section{Visual Inertial Odometry:  Robust Visual Inertial Odometry Using a Direct EKF-Based Approach, IROS, 2015}
+\includepdf[pages=-,scale=.8,pagecommand={}]{chap8_scene_reconstruction/papers/BloeschOmariHutter15.pdf}
+
+%------------------------------------------------
+\section{Building a Voxel Map}
 \label{sec:voxel_map_updates}
+
+\rwbcomment{Need to rewrite this section.}
+
 \marginnote{This section is inspired by a similar discussion in (Thrun, 2006)\cite{ThrunBurgardFox06}.}
 Associated with every voxel in the rolling voxel world is a probability that the voxel is occupied by an object.  The probability that a voxel is occupied at time $k$ will be a function of the output of the vision sensor at times $k, k-1, \dots, 0$.  Let $X_\ell[k]$ be a binary random variable representing the state of the $\ell^{th}$ voxel at time $k$, with the following possible values:
 \[
@@ -512,10 +524,8 @@ In summary we have the following result.
 
 
 
-%------------------------------------------------
-\clearpage
-\section{Inverse Depth Parametrization for Monocular SLAM, TRO, 2008}
-\includepdf[pages=-,scale=.8,pagecommand={}]{chap8_scene_reconstruction/papers/CiveraDavisonMartinez08.pdf}
+
+
 
 
 
