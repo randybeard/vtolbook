@@ -403,6 +403,60 @@ The point reconstruction problem is depicted graphically in Figure~\ref{fig:scen
 \section{Visual Inertial Odometry }
 \label{sec:vio}
 
+%----------------------------
+\subsection{Error State EKF}
+
+Sometimes called indirect Kalman filter, or multiplicative Kalman filter.
+
+\begin{figure}[h]
+	\includegraphics[width=0.99\linewidth]{chap8_scene_reconstruction/figures/indirectEKF}
+	\caption{Block diagram for the error state extended Kalman filter (ESEKF).}
+	\label{fig:indirectEKF}
+\end{figure}
+
+The algorithm is implemented as follows:
+\par\noindent{\bf Between Measurements}
+	\begin{itemize}
+		\item Propagate the state estimate for $t\in[t_{k-1}, t_k)$:
+			\[ 
+			\dot{\hat{x}} = f(\hat{x}, w),
+			\]
+			with initial conditions $\hat{x}(t_{k-1}) = \hat{x}_{k-1}^+$.
+			The solution at time $t=t_k$ is $\hat{x}_k^-$.
+		\item The error state is propagated as $\tilde{x}(t)=0$. ($\dot{\tilde{x}}=A\tilde{x}$ with initial conditions $\tilde{x}(t_{k-1})=0$)
+		\item Propagate the error covariance for $t\in[t_{k-1}, t_k)$:
+			\[
+			\dot{\Sigma} = A\left(\hat{x}(t), w(t)\right)\Sigma + \Sigma A\left(\hat{x}(t), w(t)\right)) + G\left(\hat{x}(t), w(t)\right)) Q G\left(\hat{x}(t), w(t)\right))^\top
+			\]
+			with initial condition $\Sigma(t_{k-1}) = \Sigma_{k-1}^+$. 
+			The solution at time $t=t_k$ is $\Sigma_k^-$.
+	\end{itemize}
+\par\noindent{\bf At the Measurement of sensor $s$:}
+	\begin{itemize}
+		\item Compute the Kalman gain:
+			\[ 
+			K_s = \Sigma_k^- H_s^\top(\hat{x}_k^-)\left(H_s(\hat{x}_k^-)\Sigma_k^-H_s^\top(\hat{x}_k^-)+R_k\right)^{-1}
+			\]
+		\item Compute the predicted measurement $\hat{y}_s = h_s(\hat{x}_k^-)$
+		\item Update the error state:
+			\[
+			\tilde{x}_k^+ = K_x \left( y_s(t_k) - \hat{y}_s \right)
+			\]
+		\item Update the error covariance:
+			\[
+			\Sigma_k^+ = \left(I-K_s H_s(\hat{x}_k^-)\right)\Sigma_k^-
+			\]
+		\item Update the state estimate:
+			\[
+			\hat{x}_k^+ = \hat{x}_k^- \boxplus \tilde{x}_k^+
+			\]
+	\end{itemize}
+
+
+
+%----------------------------
+\subsection{Almost-Invariant EKF for VIO}
+
 In this section we outline a method for combining visual and IMU measurements to estimate the position of the vehicle as well as the position of features in the environment, assuming no IMU biases.  We will assume that the camera moves according to \eqref{eq:camera_motion_p}--\eqref{eq:camera_motion_R} which we repeat here for convenience
 \begin{align*}
 \dot{\pbf}_{b/i}^i &= \vbf_{b/i}^i   \\
@@ -481,16 +535,35 @@ The evolution of a landmark error is given by
 \end{align*}
 Therefore, the error state satisfies
 \[
-\begin{pmatrix} \dot{\tilde{\pbf}}^{\hat{i}} \\ \dot{\tilde{\vbf}}^{\hat{i}} \\ \dot{\tilde{\rbf}} \\ \dot{\tilde{\bbf}}_a} \\ \dot{\tilde{\bbf}}_\omega} \\  \dot{\tilde{\ellbf}}_1 \\ \vdots \\ \dot{\tilde{\ellbf}}_N \end{pmatrix}
+\begin{pmatrix} 
+	\dot{\tilde{\pbf}}^{\hat{i}} \\ 
+	\dot{\tilde{\vbf}}^{\hat{i}} \\ 
+	\dot{\tilde{\rbf}} \\ 
+	\dot{\tilde{\bbf}}_a \\ 
+	\dot{\tilde{\bbf}}_\omega \\  
+	\dot{\tilde{\ellbf}}_1 \\ 
+	\vdots \\ 
+	\dot{\tilde{\ellbf}}_N 
+\end{pmatrix}
     = \begin{pmatrix} 0 & I & 0 & 0 & \ss{\hat{\pbf}}\hat{R}_b^{\hat{i}} & 0 & \dots & 0 \\ 
                       0 & 0 & -\ss{\gbf^i} & \hat{R}_b^{\hat{i}} & \ss{\hat{\vbf}^i} \hat{R}_b^{\hat{i}} & 0 & \dots & 0 \\ 
                       0 & 0 & 0 & 0 & \hat{R}_b^{\hat{i}} & 0 & \dots & 0 \\ 
                       0 & 0 & 0 & 0 & 0 & 0 & \dots & 0 \\
+                      0 & 0 & 0 & 0 & 0 & 0 & \dots & 0 \\
                       0 & 0 & 0 & 0 & -\ss{\hat{\ellbf}_1^i}\hat{R}_b^{\hat{i}} & 0 & \dots & 0 \\
-                      \vdots &  &  &  & \dots & \vdots \\ 
+                      \vdots &  &  & & &  & \dots & \vdots \\ 
                       0 & 0 & 0 & 0 & -\ss{\hat{\ellbf}_N^i}\hat{R}_b^{\hat{i}} & 0 & \dots & 0 
       \end{pmatrix}
-      \begin{pmatrix} \tilde{\pbf}^{\hat{i}} \\ \tilde{\vbf}^{\hat{i}} \\ \tilde{\rbf}_r \\ \tilde{\bbf}_a \\ \tilde{\bbf}_\omega \\ \tilde{\ellbf}_1 \\ \vdots \\ \tilde{\ellbf}_N \end{pmatrix}.
+      \begin{pmatrix} 
+      	\tilde{\pbf}^{\hat{i}} \\ 
+      	\tilde{\vbf}^{\hat{i}} \\ 
+      	\tilde{\rbf}_r \\ 
+      	\tilde{\bbf}_a \\ 
+      	\tilde{\bbf}_\omega \\ 
+      	\tilde{\ellbf}_1 \\ 
+      	\vdots \\ 
+      	\tilde{\ellbf}_N 
+      \end{pmatrix}.
 \]
 
 For the measurement update, we assume that at each sample we observe a subset of the landmarks through the camera.  Therefore, if the $j^{th}$ landmark is observed, then the associated measurement model is
@@ -512,6 +585,29 @@ where $\hat{\zbf}_j \triangleq \hat{R}_b^{\hat{i}\top} (\hat{\ellbf}_j - \hat{\p
 \[
 \frac{\partial\pi}{\partial\zbf}((p_x, p_y, p_z)^\top) = \begin{pmatrix} \frac{1}{p_z} & 0 & -\frac{p_x}{p_z^2} \\ 0 & \frac{1}{p_y} & -\frac{p_y}{p_z^2} \end{pmatrix}.
 \]
+Defining the matrix
+\[
+\Pi_j \triangleq \frac{\partial\pi}{\partial \zbf}\Big|_{\zbf=\hat{\zbf}_j},
+\]
+and letting $\tilde{\epsilonbf}_j = \hat{\epsilonbf}_j - \epsilonbf_j$, 
+the output equation can be expressed as
+\[
+\tilde{\epsilonbf}_j 
+    = \begin{pmatrix} 
+    	-\Pi_j \hat{R}_b^{\hat{i}\top} & 0 & 0 & 0 & 0 & \dots & \Pi_j\hat{R}_b^{\hat{i}\top} & \dots 
+      \end{pmatrix}
+      \begin{pmatrix} 
+      	\tilde{\pbf}^{\hat{i}} \\ 
+      	\tilde{\vbf}^{\hat{i}} \\ 
+      	\tilde{\rbf}_r \\ 
+      	\tilde{\bbf}_a \\ 
+      	\tilde{\bbf}_\omega \\ 
+      	\vdots \\
+      	\tilde{\ellbf}_j \\ 
+      	\vdots 
+      \end{pmatrix}.
+\]
+
 
 
 %------------------------------------------------
