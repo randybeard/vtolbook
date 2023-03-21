@@ -6,18 +6,44 @@ import numpy as np
 from math import ceil
 from scipy.interpolate import BSpline
 from scipy.linalg import norm
+from scipy.integrate import quad
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
-def uniformKnots(t0, tf, order, num_segments):
-    knots = np.concatenate((
-        t0 * np.ones(order),
-        np.concatenate((
-            np.arange(t0, tf, (tf-t0)/(num_segments)),
-            tf * np.ones(order+1)),
-            axis=0)
-        ), axis=0)
-    return knots
+
+class SplinePlanner:
+    def __init__(self):
+        self.order = 4  # order of spline k=degree-1
+        self.M = 6 # valid time is [0, M]
+        self.knots = clampedUniformKnots()
+        self.ctrl_pts = np.zeros((2, self.M+self.k-1))
+        self.W = grammian(j)
+
+    def grammian(self, j):
+        W = np.zeros((order+M-1, order+M-1))
+        for i in range(0, order+M-1):
+            for j in range(0, order+M-1):
+                W[i][j] = quad(lambda t: ..., 0, M)
+        return W
+
+    def clampedUniformKnots(self):
+        # the order is k and the number of time segments is M
+        knots = np.concatenate((
+            0 * np.ones(self.order - 1),
+            np.concatenate((
+                np.arange(0, self.M + 1, 1),
+                self.M * np.ones(self.order - 1)),
+                axis=0)
+            ), axis=0)
+        return knots
+    
+    def uniformKnots(self):
+        # the order is k and the number of time segments is M
+        knots = np.arange(-(self.order - 1), self.M + self.order, 1)
+        return knots
+    
+    def minSnap(self, p0, v0, vf, pf):
+
 
 def controlPointsPosVel(p0, v0, pf, vf, knots, order, num_segments):
     N = num_segments + order

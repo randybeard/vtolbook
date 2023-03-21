@@ -6,6 +6,7 @@ from animation import Animation
 import numpy as np
 from intruderDynamics import IntruderDynamics
 from ownshipDynamics import OwnshipDynamics
+from splinePlanner import SplinePlanner
 #from ctrlPID import CtrlPID
 
 #from dataPlotter import dataPlotter
@@ -19,6 +20,7 @@ from ownshipDynamics import OwnshipDynamics
 animation = Animation()
 ownship = OwnshipDynamics()
 intruder = IntruderDynamics()
+planner = SplinePlanner
 
 
 t = P.t_start  # time starts at t_start
