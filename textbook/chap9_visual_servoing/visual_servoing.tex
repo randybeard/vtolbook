@@ -264,7 +264,7 @@ Since the origin of the body-level frame is coincident with the origin of the bo
 \end{align*}
 
 \begin{lemma} \label{lem:pixels_in_level_frame}
-	The normalized pixel coordinates in the camera frame $\bar{\epsilonbf}_f^c$, and the scaling factor $\lambda_f^c$ are transformed to the level frame as 
+	The normalized pixel coordinates in the camera frame $\bar{\epsilonbf}_f^c$, and the scaling factor $\lambda_f^c$ are transformed to the body-level frame as 
 	\begin{align*}
 	\bar{\epsilonbf}_f^\ell &= \frac{R_b^\ell R_c^b \bar{\epsilonbf}_f^c}{\ebf_3^\top R_b^\ell R_c^b \bar{\epsilonbf}_f^c} \\
 	\lambda_f^\ell &= \lambda_f^c \ebf_3^\top R_b^\ell R_c^b \bar{\epsilonbf}_f^c,
@@ -356,7 +356,7 @@ be a set of feature point and let
 \end{equation}
 be the set of time-varying desired feature locations, and let $\tilde{\sbf} \defeq \sbf - \sbf_d$.  Differentiating $\tilde{\sbf}$ gives
 \begin{align*}
-\dot{\sbf} &= \dot{\sbf} - \dot{\sbf}_d \\
+\dot{\tilde{\sbf}} &= \dot{\sbf} - \dot{\sbf}_d \\
 		   &= \begin{pmatrix} G_{f_1} \\ \dots \\ G_{f_m} \end{pmatrix} \nubf^\ell - \dot{\sbf}_d \\
 		   &= G_m \nubf^\ell - \dot{\sbf}_d,
 \end{align*}
@@ -441,16 +441,16 @@ We can now state the main result for visual servoing control.
 \begin{proof}
 	Defining the Lyapunov function $V = \frac{1}{2}\norm{\tilde{s}}$ and differentiating gives
 	\begin{align*}
-	\dot{V} &= \tilde{\sbf}\top\dot{\tilde{\sbf}} \\
-			&= G_2\nubf^\ell - \dot{\sbf}_d.
+	\dot{V} &= \tilde{\sbf}^\top\dot{\tilde{\sbf}} \\
+			&= \tilde{\sbf}^\top(G_2\nubf^\ell - \dot{\sbf}_d).
 	\end{align*}
 	Since the feature points are not co-linear, $G_2$ is invertible by Lemma~\ref{lem:G_rank_4}.  
 	Selecting $\nubf^\ell$ according to Equation~\eqref{eq:visual_servoing_nubf}
 	gives $\dot{V} = -\tilde{\sbf}^\top K \tilde{\sbf}$ from which we conclude that $\tilde{\sbf}\to 0$.
 	Since $\nubf^\ell = (\vbf_{b/i}^{i\top}, \omega_z)^\top$ we have that
 	\begin{align*}
-	\vbf_{b/i}^i &= \begin{pmatrix} I, 0 \end{pmatrix} \nubf^\ell \\
-	\omegabf_{\ell/i}^i &= \begin{pmatrix} 0_{3\times 3}, \ebf_3 \end{pmatrix}\nubf^\ell.
+	\vbf_{b/i}^i &= \begin{pmatrix} I & 0 \end{pmatrix} \nubf^\ell \\
+	\omegabf_{\ell/i}^i &= \begin{pmatrix} 0_{3\times 3} & \ebf_3 \end{pmatrix}\nubf^\ell.
 	\end{align*}
     The theorem is completed by noting that 
     \[
