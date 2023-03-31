@@ -12,7 +12,7 @@ In this chapter we will consider the problem of reconstruction a local voxel gri
 %
 The camera image at time $k-1$ is used to identify good features in the image.  Those features are then tracked to the image $I_k$ to produce a set of feature pairs in calibrated normalized homogeneous coordinates, denoted $\mathcal{P}_k = \{(\bar{\epsilonbf}_i^{k-1},\bar{\epsilonbf}_i^{k}), i=1,\dots, N\}$.  The feature pairs are then used to reconstruct the 3D points corresponding to the feature points.  In this chapter we will assume that the camera's rotation and translation between images is known, and therefore the 3D reconstruction algorithm as access to these quantities denoted in Figure~\ref{fig:scene_reconstruction_architecture} as $(R_{k-1}^k \pbf_{k-1/k}^k)$.  The 3D scene points are used to update the rolling voxel grid described in Chapter~\ref{chap:trajectory_planning}.
 	
-In Section~\ref{sec:imu_integration} we review how IMU integration can be used to obtain the relative pose $(R_{k-1}^k \pbf_{k-1/k}^k)$.  
+In Section~\ref{sec:imu_integration} we review how IMU integration can be used to obtain the relative pose $(R_{k-1}^k, \pbf_{k-1/k}^k)$.  
 %	
 Section~\ref{sec:essential_matrix} derives  the essential matrix and discusses some of its properties. 
 %
@@ -324,7 +324,7 @@ In this section we will describe a simple method for point triangulation when th
  					  \end{pmatrix}
  					  \begin{pmatrix} \lambda_{1/a} \\ \lambda_{2/a} \\ \vdots \\ \lambda_{n/a} \\ \gamma \end{pmatrix} = \mathbf{0}.
 	\]
-	Therefore, the unknown scale factors $\lambdabf$ are in the null space of the $n\times(n+1)$ matrix $M$.  Let
+	Therefore, the unknown scale factors $\lambdabf$ are in the null space of the $3n\times(n+1)$ matrix $M$.  Let
 	\[
 		M = \begin{pmatrix}U_1 & U_2 \end{pmatrix}\begin{pmatrix}\Sigma & 0 \\ 0 & 0 \end{pmatrix} \begin{pmatrix} V_1^\top \\ V_2^\top \end{pmatrix}
 	\]
