@@ -457,17 +457,18 @@ The algorithm is implemented as follows:
 %----------------------------
 \subsection{Almost-Invariant EKF for VIO}
 
-In this section we outline a method for combining visual and IMU measurements to estimate the position of the vehicle as well as the position of features in the environment, assuming no IMU biases.  We will assume that the camera moves according to \eqref{eq:camera_motion_p}--\eqref{eq:camera_motion_R} which we repeat here for convenience
+In this section we outline a method for combining visual and IMU measurements to estimate the position of the vehicle as well as the position of features in the environment, assuming no IMU biases.  We will assume that the camera moves according to \eqref{eq:camera_motion_p}--\eqref{eq:camera_motion_R}.  We also assume that the gyro measurements are corrupted by unknown biases and zero mean Gaussian noise to get
 \begin{align*}
 \dot{\pbf}_{b/i}^i &= \vbf_{b/i}^i   \\
-\dot{\vbf}_{b/i}^i &= \gbf^i \ebf_3 + R_b^i (\abf_{b/i}^b-\bbf_a),  \\
-\dot{R}_b^i &= R_b^i \ss{\omegabf_{b/i}^b-\bbf_\omega} \\
+\dot{\vbf}_{b/i}^i &= \gbf^i \ebf_3 + R_b^i (\abf_{b/i}^b-\bbf_a - \nubf_a),  \\
+\dot{R}_b^i &= R_b^i \ss{\omegabf_{b/i}^b-\bbf_\omega - \nubf_\omega} \\
 \dot{\bbf}_a &= 0 \\
 \dot{\bbf}_\omega &= 0 \\
 \dot{\ellbf}_1 &= 0 \\
 &\vdots \\ 
 \dot{\ellbf}_N &= 0,
 \end{align*}
+where $\nubf_a\sim\mathcal{N}(0, \Sigma_a)$, $\nubf_\omega\sim\mathcal{N}(0, \Sigma_\omega)$, and
 where we assumed that the body and camera frames are aligned, and where we have assumed a set of $N$ stationary landmarks in the environment $\{\ellbf_i\}_{i=1}^N$, where $\ellbf_i\in\mathbb{R}^3$.
 
 In this section we derive an error state extended Kalman filter that uses the state prediction equations
@@ -493,20 +494,25 @@ Following the development of the Invariant Kalman Filter~\cite{}, we define the 
 Differentiating the position errors gives
 \begin{align*}
     \dot{\tilde{\pbf}} &= \dot{\hat{\pbf}}^{\hat{i}}-\dot{\hat{R}}_b^{\hat{i}} R_b^{i\top}\pbf^i - \hat{R}_b^{\hat{i}}\frac{d}{dt}(R_b^{i\top}) \pbf^i - \hat{R}_b^{\hat{i}}R_b^{i\top} \dot{\pbf}^i \\
-     &= \hat{\vbf}^{\hat{i}} - \hat{R}_b^{\hat{i}}\ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} \pbf^i + \hat{R}_b^{\hat{i}} R_b^{i\top} R_b^i\ss{\omega^b-\bbf_\omega} R_b^{i\top} \pbf^i - \hat{R}_b^{\hat{i}} R_b^{i\top} \vbf^i \\
-     &= \hat{\vbf}^{\hat{i}} - \hat{R}_b^{\hat{i}}R^{i\top} \vbf^i   - \hat{R}_b^{\hat{i}}\ss{\tilde{\bbf}_\omega} R_b^{i\top} \pbf^i \\ 
-    &= \tilde{\vbf}^{\hat{i}}  - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\hat{R}_b^{\hat{i}}R^{i\top} (\hat{R}_b^{\hat{i}}R^{i\top})^\top(\hat{\pbf}-\tilde{\pbf}) \\
-    &= \tilde{\vbf}^{\hat{i}}  - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\hat{\pbf} + \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\tilde{\pbf} \\   
-    &\approx \tilde{\vbf}^{\hat{i}}  + \ss{\hat{\pbf}} \hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega \\     
+     &= \hat{\vbf}^{\hat{i}} - \hat{R}_b^{\hat{i}}\ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} \pbf^i + \hat{R}_b^{\hat{i}} R_b^{i\top} R_b^i\ss{\omega^b-\bbf_\omega-\nubf_\omega} R_b^{i\top} \pbf^i - \hat{R}_b^{\hat{i}} R_b^{i\top} \vbf^i \\
+     &= \hat{\vbf}^{\hat{i}} - \hat{R}_b^{\hat{i}}R^{i\top} \vbf^i   - \hat{R}_b^{\hat{i}}\ss{\tilde{\bbf}_\omega} R_b^{i\top} \pbf^i + \hat{R}_b^{\hat{i}}\ss{\nubf_\omega}R_b^{i\top}\mathbf{p}^i \\ 
+    &= \tilde{\vbf}^{\hat{i}}  - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\hat{R}_b^{\hat{i}}R^{i\top} (\hat{R}_b^{\hat{i}}R^{i\top})^\top(\hat{\pbf}-\tilde{\pbf}) + \ss{\hat{R}_b^{\hat{i}}\nubf_\omega}\hat{R}_b^{\hat{i}}R^{i\top} (\hat{R}_b^{\hat{i}}R^{i\top})^\top(\hat{\pbf}-\tilde{\pbf}) \\
+    &= \tilde{\vbf}^{\hat{i}}  - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\hat{\pbf} + \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\tilde{\pbf}
+    	+ \ss{\hat{R}_b^{\hat{i}}\nubf_\omega}\hat{\pbf} - \ss{\hat{R}_b^{\hat{i}}\nubf_\omega}\tilde{\pbf} \\   
+    &\approx \tilde{\vbf}^{\hat{i}}  + \ss{\hat{\pbf}} \hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega - \ss{\hat{\pbf}} \hat{R}_b^{\hat{i}}\nubf_\omega \\     
 \end{align*}
 Differentiating the velocity errors gives
 \begin{align*}
     \dot{\tilde{\vbf}}^{\hat{i}} &= \dot{\hat{\vbf}}^{\hat{i}}-\dot{\hat{R}}_b^{\hat{i}} R_b^{i\top} \vbf^i - \hat{R}_b^{\hat{i}} \frac{d}{dt}(R_b^{i\top}) \vbf^i -\hat{R}_b^{\hat{i}} R_b^{i\top} \dot{\vbf}^i \\
-    &= (\gbf^i + \hat{R}_b^{\hat{i}} (\abf^b+\hat{\bbf}_a)-\hat{R}_b^{\hat{i}} \ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} \vbf^i - \hat{R}_b^{\hat{i}} R_b^{i\top} R_b^i \ss{\omegabf^b-\bbf_\omega} R_b^{i\top} \vbf^i -\hat{R}_b^{\hat{i}} R_b^{i\top}(\gbf^i + R_b^i (\abf^b-\bbf_a) \\
-    &= (I-\hat{R}_b^{\hat{i}}R_b^{i\top})\gbf^i + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a - \hat{R}_b^{\hat{i}}\ss{\tilde{\bbf}_\omega} R_b^{i\top} \vbf^i  \\
-    &\approx (I - \exp(\ss{\tilde{\rbf}}) ) \gbf^i + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega} \hat{R}_b^{\hat{i}} R_b^{i\top} (\hat{R}_b^{\hat{i}} R_b^{i\top})^\top ( \hat{\vbf}^i - \tilde{\vbf})  \\
-    &\approx -\ss{\tilde{\rbf}} \gbf^i + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\hat{\vbf}^i  \\
-    &= \ss{\gbf^i} \tilde{\rbf} + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a + \ss{\hat{\vbf}^i} \hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega.
+    &= (\gbf^i + \hat{R}_b^{\hat{i}} (\abf^b+\hat{\bbf}_a)-\hat{R}_b^{\hat{i}} \ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} \vbf^i - \hat{R}_b^{\hat{i}} R_b^{i\top} R_b^i \ss{\omegabf^b-\bbf_\omega-\nubf_\omega} R_b^{i\top} \vbf^i -\hat{R}_b^{\hat{i}} R_b^{i\top}(\gbf^i + R_b^i (\abf^b-\bbf_a-\nubf_a) \\
+    &= (I-\hat{R}_b^{\hat{i}}R_b^{i\top})\gbf^i + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a - \hat{R}_b^{\hat{i}}\ss{\tilde{\bbf}_\omega} R_b^{i\top} \vbf^i 
+    	- \hat{R}_b^{\hat{i}}\nubf_a + \hat{R}_b^{\hat{i}}\ss{\nubf_\omega} R_b^{i\top} \vbf^i  \\
+    &\approx (I - \exp(\ss{\tilde{\rbf}}) ) \gbf^i + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega} \hat{R}_b^{\hat{i}} R_b^{i\top} (\hat{R}_b^{\hat{i}} R_b^{i\top})^\top ( \hat{\vbf}^i - \tilde{\vbf})
+    	- \hat{R}_b^{\hat{i}}\nubf_a - \ss{\hat{R}_b^{\hat{i}}\nubf_\omega} \hat{R}_b^{\hat{i}} R_b^{i\top} (\hat{R}_b^{\hat{i}} R_b^{i\top})^\top ( \hat{\vbf}^i - \tilde{\vbf})  \\
+    &\approx -\ss{\tilde{\rbf}} \gbf^i + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a - \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega}\hat{\vbf}^i
+    	- \hat{R}_b^{\hat{i}}\nubf_a + \ss{\hat{R}_b^{\hat{i}}\nubf_\omega}\hat{\vbf}^i  \\
+    &= \ss{\gbf^i} \tilde{\rbf} + \hat{R}_b^{\hat{i}}\tilde{\bbf}_a + \ss{\hat{\vbf}^i} \hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega
+     - \hat{R}_b^{\hat{i}}\nubf_a - \ss{\hat{\vbf}^i} \hat{R}_b^{\hat{i}}\nubf_\omega.
 \end{align*} 
 For the evolution of the attitude error we use the fact that
 \[
@@ -517,21 +523,21 @@ to get that
 \begin{align*}
     \dot{\tilde{\rbf}}
         &= \left(\dot{\hat{R}}_b^i R_b^{i\top} + \hat{R}_b^i\frac{d}{dt}(R_b^{i\top})\right)^\vee \\
-        &= \left(\hat{R}_b^i\ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} - \hat{R}_b^iR_b^{i\top} R_b^i \ss{\omegabf^b-\bbf_\omega} R_b^{i\top}\right)^\vee \\
-        &= -\left(\hat{R}_b^i\ss{\hat{\bbf}_\omega} R_b^{i\top} + \hat{R}_b^i \ss{\bbf_\omega} R_b^{i\top}\right)^\vee \\
-        &= -\left(\ss{\hat{R}_b^i\tilde{\bbf}_\omega} \hat{R}_b^i R_b^{i\top}\right)^\vee \\        
-        &\approx -\left(\ss{\hat{R}_b^i\tilde{\bbf}_\omega} (I + \ss{\tilde{\rbf}})\right)^\vee \\
-        &\approx -\left(\ss{\hat{R}_b^i\tilde{\bbf}_\omega} \right)^\vee \\
-        &= \hat{R}_b^i\tilde{\bbf}_\omega
+        &= \left(\hat{R}_b^i\ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} - \hat{R}_b^iR_b^{i\top} R_b^i \ss{\omegabf^b-\bbf_\omega-\nubf_\omega} R_b^{i\top}\right)^\vee \\
+        &= -\left(\hat{R}_b^i\ss{\hat{\bbf}_\omega} R_b^{i\top} + \hat{R}_b^i \ss{\bbf_\omega} R_b^{i\top} + \hat{R}_b^i \ss{\nubf_\omega} R_b^{i\top}\right)^\vee \\
+        &= -\left(\ss{\hat{R}_b^i\tilde{\bbf}_\omega} \hat{R}_b^i R_b^{i\top} - \ss{\hat{R}_b^i\nubf_\omega} \hat{R}_b^i R_b^{i\top}\right)^\vee \\        
+        &\approx -\left(\ss{\hat{R}_b^i\tilde{\bbf}_\omega} (I + \ss{\tilde{\rbf}}) - \ss{\hat{R}_b^i\nubf_\omega} (I + \ss{\tilde{\rbf}}) \right)^\vee \\
+        &\approx -\left(\ss{\hat{R}_b^i\tilde{\bbf}_\omega} - \ss{\hat{R}_b^i\nubf_\omega} \right)^\vee \\
+        &= \hat{R}_b^i\tilde{\bbf}_\omega - \hat{R}_b^i\nubf_\omega
 \end{align*}
 The evolution of a landmark error is given by
 \begin{align*}
     \dot{\tilde{\ellbf}} &= \dot{\hat{\ellbf}}^{\hat{i}}-\dot{\hat{R}}_b^{\hat{i}} R_b^{i\top}\ellbf^i - \hat{R}_b^{\hat{i}}\frac{d}{dt}(R_b^{i\top}) \ellbf^i - \hat{R}_b^{\hat{i}}R_b^{i\top} \dot{\ellbf}^i \\
-     &=  -\hat{R}_b^{\hat{i}}\ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} \ellbf^i + \hat{R}_b^{\hat{i}} R_b^{i\top} R_b^i\ss{\omega^b-\bbf_\omega} R_b^{i\top} \ellbf^i  \\
-     &=  \hat{R}_b^{\hat{i}}\ss{\tilde{\bbf}_\omega} R_b^{i\top} \ellbf^i  \\
-     &=  \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega} \hat{R}_b^{\hat{i}}R_b^{i\top} (\hat{R}_b^{\hat{i}}R_b^{i\top})^\top (\hat{\ellbf}^i - \tilde{\ellbf})  \\
-     &\approx  \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega} \hat{\ellbf}^i  \\
-     &\approx  -\ss{\hat{\ellbf}^i} \hat{R}_b^{\hat{i}} \tilde{\bbf}_\omega.
+     &=  -\hat{R}_b^{\hat{i}}\ss{\omegabf^b-\hat{\bbf}_\omega} R_b^{i\top} \ellbf^i + \hat{R}_b^{\hat{i}} R_b^{i\top} R_b^i\ss{\omega^b-\bbf_\omega-\nubf_\omega} R_b^{i\top} \ellbf^i  \\
+     &=  \hat{R}_b^{\hat{i}}\ss{\tilde{\bbf}_\omega} R_b^{i\top} \ellbf^i - \hat{R}_b^{\hat{i}}\ss{\nubf_\omega} R_b^{i\top} \ellbf^i  \\
+     &=  \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega} \hat{R}_b^{\hat{i}}R_b^{i\top} (\hat{R}_b^{\hat{i}}R_b^{i\top})^\top (\hat{\ellbf}^i - \tilde{\ellbf}) - \ss{\hat{R}_b^{\hat{i}}\nubf_\omega} \hat{R}_b^{\hat{i}}R_b^{i\top} (\hat{R}_b^{\hat{i}}R_b^{i\top})^\top (\hat{\ellbf}^i - \tilde{\ellbf})  \\
+     &\approx  \ss{\hat{R}_b^{\hat{i}}\tilde{\bbf}_\omega} \hat{\ellbf}^i - \ss{\hat{R}_b^{\hat{i}}\nubf_\omega} \hat{\ellbf}^i  \\
+     &\approx  -\ss{\hat{\ellbf}^i} \hat{R}_b^{\hat{i}} \tilde{\bbf}_\omega + \ss{\hat{\ellbf}^i} \hat{R}_b^{\hat{i}} \nubf_\omega.
 \end{align*}
 Therefore, the error state satisfies
 \[
@@ -563,8 +569,26 @@ Therefore, the error state satisfies
       	\tilde{\ellbf}_1 \\ 
       	\vdots \\ 
       	\tilde{\ellbf}_N 
+      \end{pmatrix}
+      + \begin{pmatrix} 0 & -\ss{\hat{\pbf}}\hat{R}_b^{\hat{i}}  \\ 
+                      -\hat{R}_b^{\hat{i}} & -\ss{\hat{\vbf}^i} \hat{R}_b^{\hat{i}}  \\ 
+                      0 & -\hat{R}_b^{\hat{i}} &  \\ 
+                      0 & 0  \\
+                      0 & 0  \\
+                      0 & \ss{\hat{\ellbf}_1^i}\hat{R}_b^{\hat{i}} \\
+                      \vdots & \vdots \\ 
+                      0 & \ss{\hat{\ellbf}_N^i}\hat{R}_b^{\hat{i}} 
+      \end{pmatrix}
+      \begin{pmatrix} 
+      	\nubf_a \\ 
+      	\nubf_\omega 
       \end{pmatrix}.
 \]
+These equations can be summarized as
+\[
+\dot{\tilde{x}} = A(\hat{x}(t))\tilde{x} + G(\hat{x}(t))\nubf,
+\]
+where $A(\cdot)$ and $G(\cdot)$ are appropriately defined.
 
 For the measurement update, we assume that at each sample we observe a subset of the landmarks through the camera.  Therefore, if the $j^{th}$ landmark is observed, then the associated measurement model is
 \[
