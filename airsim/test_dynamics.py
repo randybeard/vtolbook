@@ -3,7 +3,7 @@ import math
 import time
 import sys
 import numpy as np
-sys.path.insert(1,"..")
+sys.path.insert(0,"../..")
 
 import parameters.quadrotor_parameters as QUAD
 import parameters.simulation_parameters as SIM
@@ -12,7 +12,7 @@ from dynamics.quad_dynamics import QuadDynamics
 from message_types.msg_delta import MsgDelta
 
 airsim_viz = QuadViewer()
-quadrotor = QuadDynamics(SIM.ts_simulation)
+quadrotor = QuadDynamics(SIM.ts_simulation, QUAD)
 delta = MsgDelta()
 sim_time = SIM.start_time
 

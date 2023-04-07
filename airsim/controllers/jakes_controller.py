@@ -3,14 +3,14 @@ from numpy import concatenate
 from scipy.linalg import solve_continuous_are, norm
 from tools.dirty_derivative import DirtyDerivative
 from tools.rotations import vee, hat, logR, leftJacobianInv
-import parameters.quadrotor_parameters as QUAD
 from message_types.msg_state import MsgState
 from message_types.msg_delta import MsgDelta
 from message_types.msg_autopilot import MsgAutopilot
 
 
 class Autopilot:
-    def __init__(self, ts_control):
+    def __init__(self, ts_control, QUAD):
+        self.QUAD = QUAD
         self.Ts = ts_control
         self.integrator_pos = np.zeros((3,1))
         self.pos_error_delay = np.zeros((3,1))
@@ -48,8 +48,8 @@ class Autopilot:
         self.pos_error_delay = pos_error
 
         x_e = concatenate((pos_error, vel_error, self.integrator_pos), axis=0)
-        f_d = QUAD.mass * (trajectory.accel - QUAD.gravity * e3) - self.K_lqr @ x_e
-        thrust = saturate(norm(f_d), 0, QUAD.Tmax)
+        f_d = self.QUAD.mass * (trajectory.accel - self.QUAD.gravity * e3) - self.K_lqr @ x_e
+        thrust = saturate(norm(f_d), 0, self.QUAD.Tmax)
 
         k_d = -f_d / (norm(f_d) + 0.01)
         s_d = np.array([[np.cos(trajectory.heading), np.sin(trajectory.heading), 0.]]).T
@@ -64,7 +64,7 @@ class Autopilot:
         r_tilde = vee(logR(state.rot.T @ R_d))
         w_tilde = state.rot.T @ R_d @ w_d - state.omega
 
-        torque = hat(state.omega)@QUAD.J@state.omega + QUAD.J@state.rot.T@R_d@w_d_dot \
+        torque = hat(state.omega)@self.QUAD.J@state.omega + self.QUAD.J@state.rot.T@R_d@w_d_dot \
                    + leftJacobianInv(r_tilde).T@self.Kr@r_tilde + self.Komega@w_tilde
 
         delta = MsgDelta(force=thrust, torque=torque)

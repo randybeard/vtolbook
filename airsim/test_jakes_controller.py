@@ -5,6 +5,7 @@ import sys
 import numpy as np
 sys.path.insert(0,"..")
 
+import parameters.quadrotor_parameters as QUAD
 import parameters.simulation_parameters as SIM
 from viz.quad_viewer import QuadViewer
 from dynamics.quad_dynamics import QuadDynamics
@@ -13,8 +14,8 @@ from trajectory_generators.circular_trajectory import TrajectoryGenerator
 from message_types.msg_delta import MsgDelta
 
 airsim_viz = QuadViewer()
-quadrotor = QuadDynamics(SIM.ts_simulation)
-autopilot = Autopilot(SIM.ts_simulation)
+quadrotor = QuadDynamics(SIM.ts_simulation, QUAD)
+autopilot = Autopilot(SIM.ts_simulation, QUAD)
 traj_gen = TrajectoryGenerator(SIM.ts_simulation)
 delta = MsgDelta()
 sim_time = SIM.start_time

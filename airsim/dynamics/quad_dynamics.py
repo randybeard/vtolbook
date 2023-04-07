@@ -11,31 +11,31 @@ import numpy as np
 # load message types
 from message_types.msg_state import MsgState
 
-import parameters.quadrotor_parameters as QUAD
 from tools.rotations import rotation_to_quaternion, quaternion_to_rotation
 from tools.rotations import hat, quat_hat
 
 
 class QuadDynamics:
-    def __init__(self, Ts):
+    def __init__(self, Ts, QUAD):
+        self.QUAD = QUAD
         self._ts_simulation = Ts
         # set initial states based on parameter file
 
-        quat0 = rotation_to_quaternion(QUAD.rot0)
+        quat0 = rotation_to_quaternion(self.QUAD.rot0)
 
-        self._state = np.array([[QUAD.pos0.item(0)],    # (0)
-                               [QUAD.pos0.item(1)],     # (1)
-                               [QUAD.pos0.item(2)],     # (2)
-                               [QUAD.vel0.item(0)],     # (3)
-                               [QUAD.vel0.item(1)],     # (4)
-                               [QUAD.vel0.item(2)],     # (5)
+        self._state = np.array([[self.QUAD.pos0.item(0)],    # (0)
+                               [self.QUAD.pos0.item(1)],     # (1)
+                               [self.QUAD.pos0.item(2)],     # (2)
+                               [self.QUAD.vel0.item(0)],     # (3)
+                               [self.QUAD.vel0.item(1)],     # (4)
+                               [self.QUAD.vel0.item(2)],     # (5)
                                [quat0.item(0)],         # (6)
                                [quat0.item(1)],         # (7)
                                [quat0.item(2)],         # (8)
                                [quat0.item(3)],         # (9)
-                               [QUAD.omega0.item(0)],   # (10)
-                               [QUAD.omega0.item(1)],   # (11)
-                               [QUAD.omega0.item(2)]])  # (12)
+                               [self.QUAD.omega0.item(0)],   # (10)
+                               [self.QUAD.omega0.item(1)],   # (11)
+                               [self.QUAD.omega0.item(2)]])  # (12)
 
         # initialize true_state message
         self.true_state = MsgState()
@@ -84,10 +84,10 @@ class QuadDynamics:
 
         pos_dot = R@vel
         force = np.array([[0.], [0.], [-delta.force]])
-        vel_dot = QUAD.gravity * e3 + R@force/QUAD.mass
+        vel_dot = self.QUAD.gravity * e3 + R@force/self.QUAD.mass
 
         quat_dot = 0.5 * quat_hat(omega) @ quat
-        omega_dot = QUAD.Jinv @ (-hat(omega) @ QUAD.J @ omega + delta.torque)
+        omega_dot = self.QUAD.Jinv @ (-hat(omega) @ self.QUAD.J @ omega + delta.torque)
         x_dot = np.concatenate((pos_dot, vel_dot, quat_dot, omega_dot), axis=0)
         return x_dot
 
