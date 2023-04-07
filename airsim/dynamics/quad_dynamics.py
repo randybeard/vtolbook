@@ -3,9 +3,6 @@ quadDynamics
     - this file implements the dynamic equations of motion for quadrotor
     - use unit quaternion for the attitude state
 """
-import sys
-
-sys.path.append('..')
 import numpy as np
 
 # load message types

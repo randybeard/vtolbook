@@ -1,6 +1,4 @@
 import airsim
-import sys
-sys.path.insert(1,'..')
 from message_types.msg_state import MsgState
 from tools.rotations import rotation_to_quaternion
 

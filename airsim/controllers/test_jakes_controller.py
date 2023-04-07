@@ -1,9 +1,13 @@
-import airsim
-import math
 import time
-import sys
 import numpy as np
-sys.path.insert(0,"..")
+import pathlib
+import sys
+
+# this line gets the parent folder of the parent folder of the current file
+# i.e. vtolbook/airsim/. If your sim file is in the airsim folder, you don't need this
+directory = pathlib.Path(__file__).parent.parent
+# this is so we can have the base folder of the project (vtolbook/airsim) in the path
+sys.path.append(str(directory))
 
 import parameters.quadrotor_parameters as QUAD
 import parameters.simulation_parameters as SIM
