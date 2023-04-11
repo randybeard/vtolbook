@@ -154,3 +154,17 @@ __MACOSX/
 
 # LaTeX generated, production files
 vtolbook.pdf
+
+# Copy of much of the above for the airsim directory
+airsim/.idea
+airsim/.vscode
+airsim/.env
+airsim/.venv
+airsim/env/
+airsim/venv/
+airsim/ENV/
+airsim/env.bak/
+airsim/venv.bak/
+airsim/.DS_Store
+airsim/__MACOSX/
+airsim/__pycache__/
