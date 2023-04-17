@@ -2,10 +2,12 @@ import airsim
 from message_types.msg_state import MsgState
 from tools.rotations import rotation_to_quaternion
 import numpy as np
+import time
+import os
 
 class QuadViewer:
     def __init__(self):
-        self._client = airsim.VehicleClient()
+        self._client = airsim.MultirotorClient()
         self._client.confirmConnection()
 
     def update(self, state):
@@ -37,3 +39,36 @@ class QuadViewer:
         # img_rgb = np.flipud(img_rgb)
 
         return img_rgb
+    
+    def spawn_target(self):
+        # print(os.getcwd())
+        # # spawn red sphere in front of quadrotor
+        self.target_name = "my_red_object"
+
+
+
+        pose = self._client.simGetVehiclePose()
+        pose.position.z_val = pose.position.z_val - 2
+        pose.position.x_val = pose.position.x_val + 2
+        scale = airsim.Vector3r(1, 1, 1)
+        # spawn a cube a meter below the vehicle
+        if np.isnan(self._client.simGetObjectPose(self.target_name).position.x_val):
+            mycube = self._client.simSpawnObject(self.target_name, 'sphere', pose, scale, physics_enabled=True)
+        else:
+            self._client.simDestroyObject(self.target_name)
+            time.sleep(.1)
+            self._client.simSpawnObject(self.target_name, 'sphere', pose, scale, physics_enabled=True)
+
+
+        self._client.simSetObjectMaterialFromTexture(self.target_name,"/home/aaron/Downloads/red.jpg")
+        time.sleep(1)
+
+    def update_target(self,velocity,dt):
+        velocity = np.array(velocity)
+
+        pose = self._client.simGetObjectPose(self.target_name)
+        pose.position.x_val = pose.position.x_val + velocity.item(0)*dt
+        pose.position.y_val = pose.position.y_val + velocity.item(1)*dt
+        pose.position.z_val = pose.position.z_val + velocity.item(2)*dt
+        
+        self._client.simSetObjectPose(self.target_name, pose, True)
