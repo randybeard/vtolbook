@@ -79,7 +79,7 @@ class QuadDynamics:
         R = quaternion_to_rotation(quat)
         e3 = np.array([[0.], [0.], [1.]])
 
-        pos_dot = R@vel
+        pos_dot = vel
         force = np.array([[0.], [0.], [-delta.force]])
         vel_dot = self.QUAD.gravity * e3 + R@force/self.QUAD.mass
 
