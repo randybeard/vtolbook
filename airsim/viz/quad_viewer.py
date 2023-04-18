@@ -45,7 +45,7 @@ class QuadViewer:
         # # spawn red sphere in front of quadrotor
         self.target_name = "my_red_object"
 
-
+        # test
 
         pose = self._client.simGetVehiclePose()
         pose.position.z_val = pose.position.z_val - 2
