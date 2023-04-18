@@ -3,6 +3,7 @@
     "SimMode": "Multirotor",
     "ClockType": "SteppableClock", 
     "PhysicsEngineName": "ExternalPhysicsEngine",
+    "ViewMode": "FlyWithMe",
     "CameraDirector": {
       "FollowDistance": -3,
       "X": -3, "Y": 0, "Z": -2,
@@ -19,6 +20,8 @@
             "TcpPort": 4560,
             "ControlPortLocal": 14540,
             "ControlPortRemote": 14580,
+            "X": 0, "Y": 0, "Z": -2,
+            "Pitch": 0, "Roll": 0, "Yaw": 0,
             "Sensors":{
                 "Barometer":{
                     "SensorType": 1,
@@ -60,6 +63,23 @@
                   ],
                   "X": 0.3, "Y": 0, "Z": 0,
                   "Pitch": 0, "Roll": 0, "Yaw": 0
+                },
+                "angled": {
+                  "CaptureSettings": [
+                    {
+                      "PublishToRos": 0,
+                      "ImageType": 0,
+                      "Width": 640,
+                      "Height": 480,
+                      "FOV_Degrees": 90,
+                      "DepthOfFieldFstop": 2.8,
+                      "DepthOfFieldFocalDistance": 200.0, 
+                      "DepthOfFieldFocalRegion": 200.0,
+                      "TargetGamma": 1.5
+                    }
+                  ],
+                  "X": 0.3, "Y": 0, "Z": 0,
+                  "Pitch": -45, "Roll": 0, "Yaw": 0
                 }
             }
           
@@ -68,6 +88,7 @@
 
     "SubWindows": [
       {"WindowID": 0, "ImageType": 0, "CameraName": "down", "Visible": true},
-      {"WindowID": 1, "ImageType": 0, "CameraName": "forward", "Visible": true}
+      {"WindowID": 1, "ImageType": 0, "CameraName": "forward", "Visible": true},
+      {"WindowID": 2, "ImageType": 0, "CameraName": "angled", "Visible": true}
     ]
   }

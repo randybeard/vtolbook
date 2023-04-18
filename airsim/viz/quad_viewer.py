@@ -45,11 +45,21 @@ class QuadViewer:
         # # spawn red sphere in front of quadrotor
         self.target_name = "my_red_object"
 
-        # test
+        filename = "red.jpg"
+
+        for root,dir,files in os.walk(os.getcwd()):
+            if filename in files:
+                path = os.path.join(root,filename)
+        
+        if path is None:
+            for root,dir,files in os.walk(os.getcwd() + ".."):
+                "here"
+                if filename in files:
+                    path = os.path.join(root,filename)
 
         pose = self._client.simGetVehiclePose()
-        pose.position.z_val = pose.position.z_val - 2
-        pose.position.x_val = pose.position.x_val + 2
+        pose.position.z_val = pose.position.z_val + 5
+        pose.position.x_val = pose.position.x_val + 10
         scale = airsim.Vector3r(1, 1, 1)
         # spawn a cube a meter below the vehicle
         if np.isnan(self._client.simGetObjectPose(self.target_name).position.x_val):
@@ -60,8 +70,8 @@ class QuadViewer:
             self._client.simSpawnObject(self.target_name, 'sphere', pose, scale, physics_enabled=True)
 
 
-        self._client.simSetObjectMaterialFromTexture(self.target_name,"/home/aaron/Downloads/red.jpg")
-        time.sleep(1)
+        self._client.simSetObjectMaterialFromTexture(self.target_name, path)
+        time.sleep(2)
 
     def update_target(self,velocity,dt):
         velocity = np.array(velocity)
