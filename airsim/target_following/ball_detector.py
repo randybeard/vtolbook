@@ -43,8 +43,8 @@ class BallDetector:
 
         mask = cv2.inRange(hsv_image, green_lower, green_upper)
 
-        # cv2.imshow("mask",mask)
-        # cv2.waitKey(1)
+        cv2.imshow("mask",mask)
+        cv2.waitKey(1)
 
         # # kernel=np.ones((3,3),np.uint8)
         # # dilated=cv2.dilate(output,kernel,iterations=3)
