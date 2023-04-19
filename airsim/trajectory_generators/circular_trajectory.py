@@ -10,9 +10,9 @@ class TrajectoryGenerator:
         msg = MsgAutopilot()
         
         planar_amplitude = 5
-        planar_frequency = 1./5*2*np.pi
+        planar_frequency = 1./10*2*np.pi
 
-        vertical_amplitude = 0.5
+        vertical_amplitude = 0.0
         vertical_frequency = planar_amplitude/20
 
         msg.pos = np.array([[planar_amplitude*np.sin(planar_frequency*self.time), planar_amplitude*np.cos(planar_frequency*self.time), -5 + vertical_amplitude*np.sin(vertical_frequency*self.time)]]).T

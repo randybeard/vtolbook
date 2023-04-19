@@ -37,6 +37,7 @@ class QuadDynamics:
         # initialize true_state message
         self.true_state = MsgState()
         self._update_true_state()
+        self.acceleration = np.zeros((3,1))
 
     ###################################
     # public functions
@@ -63,6 +64,10 @@ class QuadDynamics:
 
         # update the message class for the true state
         self._update_true_state()
+
+        # take the acceleration (in the inertial frame) and rotate it into the body frame
+        avg = (k1 + 2*k2 + 2*k3 + k4)/6
+        self.acceleration = self.true_state.rot.T @ (avg[3:6] - np.array([[0.,0.,1.]]).T*self.QUAD.gravity)
 
     ###################################
     # private functions

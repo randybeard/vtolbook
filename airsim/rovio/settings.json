@@ -1,0 +1,74 @@
+{
+    "SettingsVersion": 1.2,
+    "ViewMode":"NoDisplay",
+    "SimMode": "Multirotor",
+    "ClockType": "SteppableClock", 
+    "PhysicsEngineName": "ExternalPhysicsEngine",
+    "CameraDirector": {
+      "FollowDistance": -3,
+      "X": -3, "Y": 0, "Z": -2,
+      "Pitch": 0, "Roll": 0, "Yaw": 0
+    },
+    "Vehicles": {
+        "rover": {
+            "VehicleType": "SimpleFlight",
+            "UseSerial": false,
+            "LockStep": true,
+            "EnableCollisionPassthrogh": true,
+            "EnableCollisions": false,
+            "UseTcp": true,
+            "TcpPort": 4560,
+            "ControlPortLocal": 14540,
+            "ControlPortRemote": 14580,
+            "Sensors":{
+                "Barometer":{
+                    "SensorType": 1,
+                    "Enabled": true,
+                    "PressureFactorSigma": 0.0001825
+                }
+            },
+            "Cameras": {
+                "down": {
+                  "CaptureSettings": [
+                    {
+                      "PublishToRos": 0,
+                      "ImageType": 0,
+                      "Width": 640,
+                      "Height": 480,
+                      "FOV_Degrees": 90,
+                      "DepthOfFieldFstop": 2.8,
+                      "DepthOfFieldFocalDistance": 200.0, 
+                      "DepthOfFieldFocalRegion": 200.0,
+                      "TargetGamma": 1.5
+                    }
+                  ],
+                  "X": 0, "Y": 0, "Z": 0,
+                  "Pitch": -90, "Roll": 0, "Yaw": 0
+                },
+                "forward": {
+                  "CaptureSettings": [
+                    {
+                      "PublishToRos": 0,
+                      "ImageType": 0,
+                      "Width": 640,
+                      "Height": 480,
+                      "FOV_Degrees": 90,
+                      "DepthOfFieldFstop": 2.8,
+                      "DepthOfFieldFocalDistance": 200.0, 
+                      "DepthOfFieldFocalRegion": 200.0,
+                      "TargetGamma": 1.5
+                    }
+                  ],
+                  "X": 0.3, "Y": 0, "Z": 0,
+                  "Pitch": 0, "Roll": 0, "Yaw": 0
+                }
+            }
+          
+        }
+    },
+
+    "SubWindows_bak": [
+      {"WindowID": 0, "ImageType": 0, "CameraName": "down", "Visible": true},
+      {"WindowID": 1, "ImageType": 0, "CameraName": "forward", "Visible": true}
+    ]
+  }

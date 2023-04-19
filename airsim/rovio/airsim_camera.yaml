@@ -1,0 +1,13 @@
+###### Camera Calibration File For Cam 0 of AirSim cameras ######
+image_width: 640
+image_height: 480
+camera_name: cam0
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [320.0, 0.0, 320.0, 0.0, 320.0, 240.0, 0.0, 0.0, 1.0]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data:  [-0.0, 0.0, 0.0, 0.0, 0.0]
