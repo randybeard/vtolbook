@@ -168,3 +168,4 @@ airsim/venv.bak/
 airsim/.DS_Store
 airsim/__MACOSX/
 airsim/__pycache__/
+.vscode/*
