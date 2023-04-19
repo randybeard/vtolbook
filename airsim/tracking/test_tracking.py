@@ -3,7 +3,7 @@ import numpy as np
 import pathlib
 import sys
 import cv2
-
+import keyboard
 
 # this line gets the parent folder of the parent folder of the current file
 # i.e. vtolbook/airsim/. If your sim file is in the airsim folder, you don't need this
@@ -40,9 +40,23 @@ airsim_viz.spawn_target()
 
     
 np.set_printoptions(precision=4,suppress=True)
-alpha = np.deg2rad(0)
+alpha = np.deg2rad(-45)
+
+psi = 0.0
 
 while sim_time < SIM.end_time:
+    velocity = np.array([[0],[0],[0]])
+
+    val = 4
+
+    if keyboard.is_pressed('left_arrow'):
+        velocity[1] = -val
+    if keyboard.is_pressed('right_arrow'):
+        velocity[1] = val
+    if keyboard.is_pressed('up_arrow'):
+        velocity[0] = val
+    if keyboard.is_pressed('down_arrow'):
+        velocity[0] = -val
     
     state = quadrotor.true_state
     
@@ -74,6 +88,7 @@ while sim_time < SIM.end_time:
 
     # e_f_l_bar /= np.linalg.norm(e_f_l_bar)
     
+    
     m_t = gamma_f_l * e_f_l_bar / np.linalg.norm(gamma_f_l * e_f_l_bar)
 
     # m_t[2] *= -1
@@ -85,8 +100,8 @@ while sim_time < SIM.end_time:
     # print(m_t)
 
     
-    # m_d = np.array([-np.cos(alpha), 0, np.sin(alpha)]).reshape(-1,1)
-    m_d = np.array([[1],[0],[0]])
+    m_d = np.array([np.cos(alpha), 0, -np.sin(alpha)]).reshape(-1,1)
+    # m_d = np.array([[0],[0],[0]])
     # m_d = np.array([[-.8],[.2],[0.0025]])
 
     gamma_m_d = np.eye(3,3) - m_d@ m_d.T
@@ -96,14 +111,22 @@ while sim_time < SIM.end_time:
     
     nu_1 = gamma_m_d @ m_t
     
-    nu = 5* gamma_e_3 @ gamma_m_d @ m_t
+    nu = 10 * gamma_e_3 @ gamma_m_d @ m_t
+
+    if np.linalg.norm(gamma_e_3 @ velocity) > 0:
+        heading_vector = gamma_e_3 @ velocity / np.linalg.norm(gamma_e_3 @ velocity)
+        if heading_vector.item(0) > 0:
+            psi = np.arccos(heading_vector.item(0))
+        else:
+            psi = np.arcsin(heading_vector.item(1))
     # nu[0] = 0
     # print("M_t: ",m_t)
     # print("M_d: ",m_d)
     print()
-    print(m_t)
+    print(nu)
 
     traj_msg.vel = nu
+    traj_msg.heading = psi
     # traj_msg = traj_gen.update()
 
 
@@ -112,8 +135,11 @@ while sim_time < SIM.end_time:
     delta, commanded_states = autopilot.update(traj_msg, estimated_state)
     quadrotor.update(delta)
 
-    airsim_viz.update_target([0,0,0],SIM.ts_simulation)
+    
+    airsim_viz.update_target(velocity,SIM.ts_simulation)
     airsim_viz.update(quadrotor.true_state)
+
+    
 
 
  

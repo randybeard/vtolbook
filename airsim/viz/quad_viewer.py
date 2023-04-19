@@ -8,7 +8,7 @@ import keyboard
 
 class QuadViewer:
     def __init__(self):
-        self._client = airsim.MultirotorClient()
+        self._client = airsim.MultirotorClient("10.32.114.170")
         self._client.confirmConnection()
 
     def update(self, state):
@@ -76,18 +76,7 @@ class QuadViewer:
         time.sleep(2)
 
     def update_target(self,velocity,dt):
-        velocity = np.array(velocity)
-        val = 2
-
-        if keyboard.is_pressed('left_arrow'):
-            velocity[1] = -val
-        elif keyboard.is_pressed('right_arrow'):
-            velocity[1] = val
-        elif keyboard.is_pressed('up_arrow'):
-            velocity[0] = val
-        elif keyboard.is_pressed('down_arrow'):
-            velocity[0] = -val
-            
+        velocity = np.array(velocity)           
 
         pose = self._client.simGetObjectPose(self.target_name)
         pose.position.x_val = pose.position.x_val + velocity.item(0)*dt
