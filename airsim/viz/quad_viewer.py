@@ -4,6 +4,7 @@ from tools.rotations import rotation_to_quaternion
 import numpy as np
 import time
 import os
+import keyboard
 
 class QuadViewer:
     def __init__(self):
@@ -60,7 +61,7 @@ class QuadViewer:
         pose = self._client.simGetVehiclePose()
         pose.position.z_val = pose.position.z_val
         pose.position.x_val = pose.position.x_val + 10
-        pose.position.y_val = pose.position.y_val + 5
+        pose.position.y_val = pose.position.y_val
         scale = airsim.Vector3r(1, 1, 1)
         # spawn a cube a meter below the vehicle
         if np.isnan(self._client.simGetObjectPose(self.target_name).position.x_val):
@@ -76,6 +77,17 @@ class QuadViewer:
 
     def update_target(self,velocity,dt):
         velocity = np.array(velocity)
+        val = 2
+
+        if keyboard.is_pressed('left_arrow'):
+            velocity[1] = -val
+        elif keyboard.is_pressed('right_arrow'):
+            velocity[1] = val
+        elif keyboard.is_pressed('up_arrow'):
+            velocity[0] = val
+        elif keyboard.is_pressed('down_arrow'):
+            velocity[0] = -val
+            
 
         pose = self._client.simGetObjectPose(self.target_name)
         pose.position.x_val = pose.position.x_val + velocity.item(0)*dt

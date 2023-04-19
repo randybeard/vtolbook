@@ -33,7 +33,7 @@ delta = MsgDelta()
 ball_detector = BallDetector()
 sim_time = SIM.start_time
 
-quadrotor.true_state.pos[2] = -2
+quadrotor.true_state.pos[2] = -10
 airsim_viz.update(quadrotor.true_state)
 time.sleep(1)
 airsim_viz.spawn_target()
@@ -46,7 +46,7 @@ while sim_time < SIM.end_time:
     
     state = quadrotor.true_state
     
-    img = airsim_viz.get_image("forward")
+    img = airsim_viz.get_image("angled")
     # cv2.imshow("angled", img)
     # cv2.waitKey(1)
 
@@ -74,7 +74,7 @@ while sim_time < SIM.end_time:
 
     # e_f_l_bar /= np.linalg.norm(e_f_l_bar)
     
-    m_t = gamma_f_l * e_f_l_bar
+    m_t = gamma_f_l * e_f_l_bar / np.linalg.norm(gamma_f_l * e_f_l_bar)
 
     # m_t[2] *= -1
 
@@ -85,8 +85,8 @@ while sim_time < SIM.end_time:
     # print(m_t)
 
     
-    m_d = np.array([-np.cos(alpha), 0, np.sin(alpha)]).reshape(-1,1)
-    # m_d = np.array([[0],[0],[0]])
+    # m_d = np.array([-np.cos(alpha), 0, np.sin(alpha)]).reshape(-1,1)
+    m_d = np.array([[1],[0],[0]])
     # m_d = np.array([[-.8],[.2],[0.0025]])
 
     gamma_m_d = np.eye(3,3) - m_d@ m_d.T
@@ -110,7 +110,7 @@ while sim_time < SIM.end_time:
     estimated_state = quadrotor.true_state
 
     delta, commanded_states = autopilot.update(traj_msg, estimated_state)
-    # quadrotor.update(delta)
+    quadrotor.update(delta)
 
     airsim_viz.update_target([0,0,0],SIM.ts_simulation)
     airsim_viz.update(quadrotor.true_state)
