@@ -111,14 +111,15 @@ while sim_time < SIM.end_time:
     
     nu_1 = gamma_m_d @ m_t
     
-    nu = 10 * gamma_e_3 @ gamma_m_d @ m_t
+    nu = 20 * gamma_e_3 @ gamma_m_d @ m_t
 
-    if np.linalg.norm(gamma_e_3 @ velocity) > 0:
-        heading_vector = gamma_e_3 @ velocity / np.linalg.norm(gamma_e_3 @ velocity)
-        if heading_vector.item(0) > 0:
-            psi = np.arccos(heading_vector.item(0))
-        else:
-            psi = np.arcsin(heading_vector.item(1))
+    # if np.linalg.norm(gamma_e_3 @ velocity) > 0:
+    #     heading_vector = gamma_e_3 @ velocity / np.linalg.norm(gamma_e_3 @ velocity)
+    #     if heading_vector.item(1) > 0:
+    #         psi = np.arcsin(heading_vector.item(1))
+    #     elif heading_vector.item(0) > 0:
+    #         psi = np.arccos(heading_vector.item(0))
+        
     # nu[0] = 0
     # print("M_t: ",m_t)
     # print("M_d: ",m_d)
@@ -126,7 +127,7 @@ while sim_time < SIM.end_time:
     print(nu)
 
     traj_msg.vel = nu
-    traj_msg.heading = psi
+    # traj_msg.heading = psi
     # traj_msg = traj_gen.update()
 
 
