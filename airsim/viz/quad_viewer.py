@@ -43,9 +43,9 @@ class QuadViewer:
     def spawn_target(self):
         # print(os.getcwd())
         # # spawn red sphere in front of quadrotor
-        self.target_name = "my_red_object"
+        self.target_name = "my_green_object"
 
-        filename = "red.jpg"
+        filename = "green.jpg"
 
         for root,dir,files in os.walk(os.getcwd()):
             if filename in files:
@@ -58,8 +58,9 @@ class QuadViewer:
                     path = os.path.join(root,filename)
 
         pose = self._client.simGetVehiclePose()
-        pose.position.z_val = pose.position.z_val + 5
+        pose.position.z_val = pose.position.z_val
         pose.position.x_val = pose.position.x_val + 10
+        pose.position.y_val = pose.position.y_val + 5
         scale = airsim.Vector3r(1, 1, 1)
         # spawn a cube a meter below the vehicle
         if np.isnan(self._client.simGetObjectPose(self.target_name).position.x_val):

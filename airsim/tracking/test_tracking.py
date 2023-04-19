@@ -2,7 +2,7 @@ import time
 import numpy as np
 import pathlib
 import sys
-import cv2 
+import cv2
 
 
 # this line gets the parent folder of the parent folder of the current file
@@ -22,6 +22,7 @@ from message_types.msg_delta import MsgDelta
 from message_types.msg_autopilot import MsgAutopilot
 from message_types.msg_state import MsgState
 from ball_detector import BallDetector
+from tools.rotations import rotation_to_euler, rot_x, rot_y
 
 airsim_viz = QuadViewer()
 quadrotor = QuadDynamics(SIM.ts_simulation, QUAD)
@@ -32,31 +33,61 @@ delta = MsgDelta()
 ball_detector = BallDetector()
 sim_time = SIM.start_time
 
-quadrotor.true_state.pos[2] = -10
+quadrotor.true_state.pos[2] = -2
 airsim_viz.update(quadrotor.true_state)
 time.sleep(1)
 airsim_viz.spawn_target()
 
     
 np.set_printoptions(precision=4,suppress=True)
+alpha = np.deg2rad(0)
 
 while sim_time < SIM.end_time:
     
-
-    img = airsim_viz.get_image("angled")
+    state = quadrotor.true_state
+    
+    img = airsim_viz.get_image("forward")
     # cv2.imshow("angled", img)
     # cv2.waitKey(1)
 
     px_location = ball_detector.detect(img,"angled")
-    px_location = (px_location[1],px_location[0])
+    # px_location = (-px_location[1],px_location[0])
     calibrated_px = QUAD.K_inv @ np.append(px_location,1).T
-    m_t = (calibrated_px/np.linalg.norm(calibrated_px)).reshape(-1,1)
+    e_f_c_bar = (calibrated_px/np.linalg.norm(calibrated_px)).reshape(-1,1)
+
+    
+    phi,theta,psi = rotation_to_euler(state.rot)
+    R_b_l = rot_y(theta) @ rot_x(phi)
+
+    R_cam_to_ned = np.array([[0,   0,  1],
+                             [1,   0,  0],
+                             [0,   1,  0]])
+    
+    R_c_b =  R_cam_to_ned @ rot_x(alpha)
+
+    e_f_l = R_b_l @ R_c_b @ e_f_c_bar
+
+    e_f_l_bar = e_f_l / e_f_l.item(2)
+
+    gamma_f_c = 1
+    gamma_f_l = gamma_f_c * np.array([[0],[0],[1]]).T @ R_b_l @ R_c_b @ e_f_c_bar
+
+    # e_f_l_bar /= np.linalg.norm(e_f_l_bar)
+    
+    m_t = gamma_f_l * e_f_l_bar
+
+    # m_t[2] *= -1
+
     # print()
     # print(m_t)
 
-    alpha = np.deg2rad(45)
-    # m_d = np.array([np.cos(alpha), 0, np.sin(alpha)]).reshape(-1,1)
-    m_d = np.array([[0],[0],[0]])
+    # print()
+    # print(m_t)
+
+    
+    m_d = np.array([-np.cos(alpha), 0, np.sin(alpha)]).reshape(-1,1)
+    # m_d = np.array([[0],[0],[0]])
+    # m_d = np.array([[-.8],[.2],[0.0025]])
 
     gamma_m_d = np.eye(3,3) - m_d@ m_d.T
     
@@ -65,12 +96,12 @@ while sim_time < SIM.end_time:
     
     nu_1 = gamma_m_d @ m_t
     
-    nu = 10 * gamma_e_3 @ gamma_m_d @ m_t
-    nu[0] = 0
+    nu = 5* gamma_e_3 @ gamma_m_d @ m_t
+    # nu[0] = 0
     # print("M_t: ",m_t)
     # print("M_d: ",m_d)
     print()
-    print(nu)
+    print(m_t)
 
     traj_msg.vel = nu
     # traj_msg = traj_gen.update()
@@ -79,9 +110,9 @@ while sim_time < SIM.end_time:
     estimated_state = quadrotor.true_state
 
     delta, commanded_states = autopilot.update(traj_msg, estimated_state)
-    quadrotor.update(delta)
+    # quadrotor.update(delta)
 
-    airsim_viz.update_target([0,-2,0],SIM.ts_simulation)
+    airsim_viz.update_target([0,0,0],SIM.ts_simulation)
     airsim_viz.update(quadrotor.true_state)
 
 
@@ -90,3 +121,4 @@ while sim_time < SIM.end_time:
     # increment the simulation
     sim_time += SIM.ts_simulation
     # time.sleep(SIM.ts_simulation)
+

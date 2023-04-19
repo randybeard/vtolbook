@@ -213,5 +213,16 @@ def sat(x, up, low):
     else:
         y = x
     return y
+def rot_x(phi):
+    return np.array([[1,     0,            0],
+                    [0,    cos(phi), -sin(phi)],
+                    [0,    sin(phi), cos(phi)]])
+
+def rot_y(theta):
+    return np.array([[cos(theta),  0, sin(theta)],
+              [0,           1, 0         ],
+              [-sin(theta), 0, cos(theta)]])
+
+
 
 

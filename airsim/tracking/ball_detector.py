@@ -17,19 +17,28 @@ class BallDetector:
 
         hsv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
-        red_color = [0,255,255]
-        red_lower = np.array([0,20,20])
-        red_upper = np.array([10,255,255])
+        # red_color = [0,255,255]
+        # red_lower = np.array([0,20,20])
+        # red_upper = np.array([10,255,255])
     
-        mask1 = cv2.inRange(hsv_image, red_lower, red_upper)
+        # mask1 = cv2.inRange(hsv_image, red_lower, red_upper)
 
-        red_lower = np.array([170,20,20])
-        red_upper = np.array([180,255,255])
+        # red_lower = np.array([170,20,20])
+        # red_upper = np.array([180,255,255])
 
-        mask2 = cv2.inRange(hsv_image, red_lower, red_upper)
+        # mask2 = cv2.inRange(hsv_image, red_lower, red_upper)
 
-        mask = cv2.bitwise_or(mask1,mask2)
+        # mask = cv2.bitwise_or(mask1,mask2)
     
+        green_color = [60,255,255]
+        green_lower = np.array([40,0,0])
+        green_upper = np.array([65,255,255])
+    
+        # magenta_color = [100,255,255]
+        # magenta_lower = np.array([95,0,0])
+        # magenta_upper = np.array([105,255,255])
+
+        mask = cv2.inRange(hsv_image, green_lower, green_upper)
 
         cv2.imshow("mask",mask)
         cv2.waitKey(1)
