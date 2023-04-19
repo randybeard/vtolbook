@@ -36,14 +36,15 @@ class Autopilot:
         self.Rdot_der = DirtyDerivative(Ts=self.Ts, tau=5*self.Ts)
         self.omegadot_der = DirtyDerivative(Ts=self.Ts, tau=5*self.Ts)
 
-        self.Kr = 20.*np.eye(3)
-        self.Komega = 20.*np.eye(3)
+        # self.kR = np.diag([1.5,1.5,.5])
+        # self.Komega = 20.*np.eye(3)
 
         self.kx = 2  # .4
-        self.kv = 2 # .7
+        self.kv = 5 # .7
         self.kR = 1.5 # .1
-        self.kOmega = 1.5 # .1
-
+        # self.kR = np.diag([1.5,1.5,0])
+        self.kOmega = 1.5 # .1    
+        # self.kOmega = np.diag([1.5,1.5,0])
 
     def update(self, trajectory, state):
         ex = 0
@@ -73,7 +74,7 @@ class Autopilot:
         eOmega = state.omega - state.rot.T@Rd@omegad
 
         T = saturate(np.dot(-(thrustComponent).T, state.rot[:,2])[0], 0, self.QUAD.Tmax)
-        tau = -self.kR*eR - self.kOmega*eOmega + hat(state.omega) @ self.QUAD.J@state.omega \
+        tau = -self.kR*eR - self.kOmega * eOmega + hat(state.omega) @ self.QUAD.J@state.omega \
             - self.QUAD.J @ (hat(state.omega)@state.rot.T@Rd@omegad - state.rot.T@Rd@omegadDot)
         
         delta = MsgDelta(force=T, torque=tau)

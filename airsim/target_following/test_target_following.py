@@ -43,7 +43,7 @@ np.set_printoptions(precision=4,suppress=True)
 alpha = np.deg2rad(-45)
 
 psi = 0.0
-
+psi_d = 0
 while sim_time < SIM.end_time:
     velocity = np.array([[0],[0],[0]])
 
@@ -111,23 +111,26 @@ while sim_time < SIM.end_time:
     
     nu_1 = gamma_m_d @ m_t
     
-    nu = 20 * gamma_e_3 @ gamma_m_d @ m_t
+    nu = 10 * gamma_e_3 @ gamma_m_d @ m_t
 
     # if np.linalg.norm(gamma_e_3 @ velocity) > 0:
+        
     #     heading_vector = gamma_e_3 @ velocity / np.linalg.norm(gamma_e_3 @ velocity)
-    #     if heading_vector.item(1) > 0:
-    #         psi = np.arcsin(heading_vector.item(1))
-    #     elif heading_vector.item(0) > 0:
-    #         psi = np.arccos(heading_vector.item(0))
+    #     if abs(heading_vector.item(1)) > 0:
+    #         psi_d = np.arcsin(heading_vector.item(1))
+    #     elif abs(heading_vector.item(0)) > 0:
+    #         psi_d = np.arccos(heading_vector.item(0))
+        
+    #     psi_d *= (1- abs(m_t.item(1)))
         
     # nu[0] = 0
     # print("M_t: ",m_t)
     # print("M_d: ",m_d)
     print()
-    print(nu)
+    print(m_t)
 
     traj_msg.vel = nu
-    # traj_msg.heading = psi
+    # traj_msg.heading = psi_d
     # traj_msg = traj_gen.update()
 
 
