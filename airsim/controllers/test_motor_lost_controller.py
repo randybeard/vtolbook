@@ -26,16 +26,15 @@ quadrotor = QuadDynamics(SIM.ts_simulation, QUAD)
 autopilot = Autopilot(SIM.ts_simulation, QUAD)
 sim_time = SIM.start_time
 
-des_pos = np.array([[0., 0., 3.]]).T
-new_pos = np.array([[1., 1., 3.]]).T
-time_switch = 6
+positions = [np.array([[0., 0., 3.]]).T, np.array([[1., 1., 3.]]).T, np.array([[-1., -1., 5.]]).T, np.array([[3., 2., 3.]]).T]
+time_switch = 5
+next_switch = time_switch
 
 des_traj = MsgAutopilot()
-des_traj.pos = des_pos
+des_traj.pos = positions[0]
 
 while sim_time < SIM.end_time:
-    if sim_time > time_switch:
-        des_traj.pos = new_pos
+    des_traj.pos = positions[int(sim_time/time_switch)%len(positions)]
     # get the estimated state (the estimate is ground truth here)
     estimated_state = quadrotor.true_state
 
