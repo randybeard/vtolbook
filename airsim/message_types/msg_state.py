@@ -20,7 +20,7 @@ class MsgState:
                  ):
         self.pos = pos  # position in inertial frame
         self.vel = vel  # velocity in inertial frame
-        self.rot = rot  # rotation from body to to inertial
+        self.rot = rot  # rotation from body to inertial
         self.omega = omega  # angular velocity in body frame
         self.bias = bias  # gyro biases
         self.rotors = rotors  # front rotor angles
