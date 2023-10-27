@@ -156,6 +156,7 @@ __MACOSX/
 vtolbook.pdf
 
 # Copy of much of the above for the airsim directory
+.idea/
 airsim/.idea
 airsim/.vscode
 airsim/.env
@@ -169,3 +170,4 @@ airsim/.DS_Store
 airsim/__MACOSX/
 airsim/__pycache__/
 .vscode/*
+*.xml
