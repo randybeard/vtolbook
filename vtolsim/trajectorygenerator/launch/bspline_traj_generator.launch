@@ -1,8 +1,0 @@
-<launch>
-
-    <rosparam command="load" file="$(find trajectorygenerator)/params/bspline_traj.yaml"/>
-
-    <!-- Trajectory Generator -->
-    <node name="bspline_traj_generator" pkg="trajectorygenerator" type="bspline_traj_node.py" output="screen" required="true"/>
-
-</launch>

@@ -1,8 +1,0 @@
-<launch>
-
-    <rosparam command="load" file="$(find trajectorygenerator)/params/sinusoid_traj.yaml"/>
-
-    <!-- Trajectory Generator -->
-    <node name="sinusoid_traj_generator" pkg="trajectorygenerator" type="sinusoid_traj_node.py" output="screen" required="true"/>
-
-</launch>
