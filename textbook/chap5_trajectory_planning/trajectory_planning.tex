@@ -243,24 +243,24 @@ The angular velocity can now be calculated as
 
 
 %----------------------------------
-\section{An Introduction to b-Spline}
+\section{An Introduction to B-Spline}
 
 
 The objective of these notes is to explore spline methods for robotic applications. In general, the position of a robot in Euclidian space can be described by a time parametrized trajectory $\mathbf{p}(t)\in\mathbb{R}^3$, $t\in[a,b]$.  The time parametrized trajectory can be parameterized using a weighted sum of basis function as
 \[
-\mathbf{p}(t) = \sum_{m=0}^{N} \cbf_m \phi_m(t),
+\mathbf{p}(t) = \sum_{m=0}^{N-1} \cbf_m \phi_m(t),
 \]
-where $\cbf_m\in\mathbb{R}^n$, and $\phi_m(t)$ are a set of basis functions.  For example, the basis functions could be the set of polynomial power function $\phi_m(t) = t^m/m!$, or the set of sinusoidal function $\phi_m(t) = \sin(\frac{2\pi m}{N}t)$.  The disadvantage of both the polynomial power functions and sinusoidal functions is that the basis functions are defined for all $t\in[a,b]$ and so each control points $\mathbf{c}_m$ influences the entire trajectory.  Another disadvantage is that a large number of basis functions may be required to represent complicated trajectories.  
+where $\cbf_m\in\mathbb{R}^n$, and $\phi_m(t)$ are a set of basis functions.  For example, the basis functions could be the set of polynomial power function $\phi_m(t) = t^{m}/{m}|!$, or the set of sinusoidal function $\phi_m(t) = \sin(\frac{2\pi {m}}{N}t)$.  The disadvantage of both the polynomial power functions and sinusoidal functions is that the basis functions are defined for all $t\in[a,b]$ and so each control points $\mathbf{c}_m$ influences the entire trajectory.  Another disadvantage is that a large number of basis functions may be required to represent complicated trajectories.  
 
 In these notes, we will use B-spline basis functions which have a number of very nice properties that we will explore.  In particular, a {\em B-spline} trajectory has the following form
-\[
-\mathbf{p}(t) = \sum_{m=0}^{N} \cbf_m b_m^k(t;\mathbf{t}),
-\]
-where $\cbf_m\in\mathbb{R}^n$ are the control points,  $\mathbf{t}=(\tau_0, \tau_1, \tau_2, \dots, \tau_T)$ are called the knot points where $i<j \implies \tau_i\leq \tau_j$, and $b_m^k(t;\mathbf{t})$ are the B-spline basis functions of order $k$. The spline trajectories will be defined for $t$ in the span of the knot points, i.e., $t\in[\tau_0, \tau_T]$.  
+\begin{equation}\label{eq:general-b-spline}
+\mathbf{p}(t) = \sum_{m=0}^{M+d-1} \cbf_m b_m^d(t, \mathbf{t}),
+\end{equation}
+where $\cbf_m\in\mathbb{R}^n$ are the control points,  $\mathbf{t}=(\tau_0, \tau_1, \tau_2, \dots, \tau_T)$ are called the knot points where $i<j \implies \tau_i\leq \tau_j$, and $b_m^d(t, \mathbf{t})$ are the B-spline basis functions of degree $d$, given the knot sequence $\mathbf{t}$. The spline trajectories will be defined for $t$ in the interval, i.e., $t\in[\tau_d, \tau_{d+M}]$, which we will write as $t\in\text{span}(\mathbf{t})$
 
-Section~\ref{sec:b-spline-basis-functions} defines the B-spline basis function $b_m^k(t; \mathbf{t})$ and describes some of their properties that will be useful for path planning and for estimation.
-Section~...
-% overview of other sections
+%Section~\ref{sec:b-spline-basis-functions} defines the B-spline basis function $b_m^d(t,  \mathbf{t})$ and describes some of their properties that will be useful for path planning and for estimation.
+%Section~...
+%% overview of other sections
 
 %---------------------------------------------------------------
 \subsection{B-Spline Basis Functions}
@@ -268,81 +268,81 @@ Section~...
 
 The B-spline basis function are defined by the recursive formula:
 \begin{align}
-b_m^1(t; \mathbf{t}) &= \begin{cases} 1 & \text{~if~} \tau_m \leq t \leq \tau_{m+1} \\ 
+b_m^0(t, \mathbf{t}) &= \begin{cases} 1 & \text{~if~} \tau_m \leq t \leq \tau_{m+1} \\ 
  									 0 & \text{~otherwise} 
  					   \end{cases} 
 	\label{eq:spline_basis_definition_0}\\	
-b_m^k(t; \mathbf{t}) &= w_m^k(t; \mathbf{t}) b_m^{k-1}(t; \mathbf{t}) + \left[1-w_{m+1}^k(t; \mathbf{t})\right] b_{m+1}^{k-1}(t; \mathbf{t}),
+b_m^d(t, \mathbf{t}) &= w_m^d(t, \mathbf{t}) b_m^{d-1}(t, \mathbf{t}) + \left[1-w_{m+1}^d(t, \mathbf{t})\right] b_{m+1}^{d-1}(t,  \mathbf{t}),
 	\label{eq:spline_basis_definition_k} \\
-w_m^k(t; \mathbf{t}) &= \begin{cases}
-                      		\frac{t-\tau_m}{\tau_{m+k}-\tau_m}, & \tau_{m+k}\neq \tau_m \\
+w_m^d(t, \mathbf{t}) &= \begin{cases}
+                      		\frac{t-\tau_m}{\tau_{m+d}-\tau_m}, & \tau_{m+d}\neq \tau_m \\
                       		0, & \text{~otherwise} 
                         \end{cases}.
 \end{align}
 
 %+++++++++++++++++++++++++++++++
-\par\noindent{\bf First order basis}
+\par\noindent{\bf Zero degree basis}
 
 For example, if the knot vector is given by
 \[
 \mathbf{t} = [\tau_0, \tau_1, \tau_2] \defeq [0, 1, 2],
 \]
-then there are two basis function of order $k=1$ given by
+then there are two basis function of degree $d=0$ given by
 \begin{align*}
-b_0^1(t; \mathbf{t}) &= \begin{cases} 1 & \text{~if~} \tau_0 \leq t \leq \tau_1 \\ 
+b_0^0(t,\mathbf{t}) &= \begin{cases} 1 & \text{~if~} \tau_0 \leq t \leq \tau_1 \\ 
  									 0 & \text{~otherwise} 
  			\end{cases}
 \\ 
-b_1^1(t; \mathbf{t}) &= \begin{cases} 1 & \text{~if~} \tau_1 \leq t \leq \tau_2 \\ 
+b_1^0(t,\mathbf{t}) &= \begin{cases} 1 & \text{~if~} \tau_1 \leq t \leq \tau_2 \\ 
  									 0 & \text{~otherwise}
  			\end{cases}
 \end{align*}
-where $b_0^1(t)$ and $b_1^0=1(t)$ are shown in Figure~\ref{fig:spline_basis_0}.
+where $b_0^1(t,\mathbf{t})$ and $b_1^0(t,\mathbf{t})$ are shown in Figure~\ref{fig:spline_basis_0}.
 \begin{marginfigure}[0in]
   \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_0}
-  \caption{First order spline basis}
+  \caption{Zeros degree spline basis}
   \label{fig:spline_basis_0}  
 \end{marginfigure}
-Note that $b_1^1(t; \mathbf{t}) = b_0^1(t-1; \mathbf{t})$, or in other words, all first order basis functions are shifted versions of the central first order basis function $b_0^1(t; \mathbf{t})$.  Additional first order basis function can be defined by expanding the knot vector to $\mathbf{t}=[0, \dots, M]$, where $b_m^1(t; \mathbf{t})= b_0^1(t-m; \mathbf{t})$ for $m\leq M$.
+Note that $b_1^0(t,\mathbf{t}) = b_0^0(t-1,\mathbf{t})$, or in other words, all zero degree basis functions are shifted versions of the central zero degree basis function $b_0^0(t,  \mathbf{t})$.  Additional zero degree basis function can be defined by expanding the knot vector to $\mathbf{t}=[0, \dots, M]$, where $b_m^0(t,  \mathbf{t})= b_0^0(t-m; \mathbf{t})$ for $m\leq M$.
 
 
 \clearpage
 
 
 %+++++++++++++++++++++++++++++++
-\par\noindent{\bf Second order basis}
+\par\noindent{\bf First degree basis}
 
 If the knot vector is given by
 \[
 \mathbf{t} = [\tau_0, \tau_1, \tau_2, \tau_3, \tau_4] \defeq [0, 0, 1, 2, 2],
 \]
-then there are $2k-1=3$ unique basis function of order $k=2$ given by
+then there are $2d+1=3$ unique basis function of degree $d=1$ given by
 \begin{align*}
-b_0^2(t; \mathbf{t}) &= \frac{t-\tau_0}{\tau_1-\tau_0} b_0^1(t;\mathbf{t}) + \frac{\tau_2-t}{\tau_2-\tau_1}b_1^1(t; \mathbf{t}) 
+b_0^1(t,  \mathbf{t}) &= \frac{t-\tau_0}{\tau_1-\tau_0} b_0^0(t, \mathbf{t}) + \frac{\tau_2-t}{\tau_2-\tau_1}b_1^0(t,  \mathbf{t}) 
 	= \begin{cases} 0   & \text{~if~} t_0=0 \leq t \leq t_1=0 \\
 				    1-t & \text{~if~} t_1=0 \leq t \leq t_2=1 \\ 
  	  \end{cases}
 \\ 
-b_1^2(t; \mathbf{t}) &= \frac{t-\tau_1}{\tau_2-\tau_1} b_1^1(t;\mathbf{t}) + \frac{\tau_3-t}{\tau_3-\tau_2}b_2^1(t; \mathbf{t})
+b_1^1(t,  \mathbf{t}) &= \frac{t-\tau_1}{\tau_2-\tau_1} b_1^0(t, \mathbf{t}) + \frac{\tau_3-t}{\tau_3-\tau_2}b_2^0(t,  \mathbf{t})
 	= \begin{cases} t & \text{~if~} t_1=0 \leq t \leq t_2=1 \\ 
  									2-t & t_2=1 \leq t \leq t_3=2 \\
  									0 & \text{~otherwise}
  					    \end{cases}
 \\ 
-b_2^2(t; \mathbf{t}) &= \frac{t-\tau_2}{\tau_3-\tau_2} b_2^1(t;\mathbf{t}) + \frac{\tau_4-t}{\tau_4-\tau_3}b_3^1(t; \mathbf{t})
+b_2^1(t,  \mathbf{t}) &= \frac{t-\tau_2}{\tau_3-\tau_2} b_2^0(t, \mathbf{t}) + \frac{\tau_4-t}{\tau_4-\tau_3}b_3^0(t,  \mathbf{t})
 	= \begin{cases} t-1 & \text{~if~} t_2=1 \leq t \leq t_3=2 \\ 
  					0 & \text{~if~} t_3=2 \leq t \leq t_4=2 \\
  	  \end{cases}
 \end{align*}
-where $b_0^2(t; \mathbf{t})$, $b_1^2(t; \mathbf{t})$, and $b_2^2(t; \mathbf{t})$ are shown on the left in Figure~\ref{fig:spline_basis_1}.
+where $b_0^1(t,  \mathbf{t})$, $b_1^1(t,  \mathbf{t})$, and $b_2^1(t,  \mathbf{t})$ are shown on the left in Figure~\ref{fig:spline_basis_1}.
 \begin{marginfigure}[-2in]
   	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_1}
-  \caption{Second order spline basis}
+  \caption{Degree one spline basis}
   \label{fig:spline_basis_1}  
 \end{marginfigure}
 \begin{marginfigure}[0in]
   	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_1_extra_knot}
-  \caption{Second order spline basis}
+  \caption{Degree one spline basis}
   \label{fig:spline_basis_1_extra_knot}  
 \end{marginfigure}
 If the knot vector is expanded by one time unit to
@@ -350,77 +350,77 @@ If the knot vector is expanded by one time unit to
 \mathbf{t}' = [\tau_0, \tau_1, \tau_2, \tau_3, \tau_4, \tau_5] \defeq [0, 0, 1, 2, 3, 3],
 \]
 then there are still only three unique basis vectors, but 
-$b_2^2(t; \mathbf{t}')$ is a shifted version $b_1^2(t; \mathbf{t})$ and $b_3^2(t; \mathbf{t}')$ is a shifted version $b_2^2(t; \mathbf{t})$, as shown on the right in Figure~\ref{fig:spline_basis_1}.
+$b_2^1(t,  \mathbf{t}')$ is a shifted version $b_1^1(t,  \mathbf{t})$ and $b_3^1(t,  \mathbf{t}')$ is a shifted version $b_2^1(t,  \mathbf{t})$, as shown on the right in Figure~\ref{fig:spline_basis_1}.
 
 \clearpage
 
 
 %+++++++++++++++++++++++++++++++
-\par\noindent{\bf Third order basis}
+\par\noindent{\bf Second degree basis}
 
 If the knot vector is given by
 \[
 \mathbf{t} = [\tau_0, \tau_1, \tau_2, \tau_3, \tau_4, \tau_5, \tau_6, \tau_7, \tau_8] \defeq [0, 0, 0, 1, 2, 3, 3, 3],
 \]
-then there are $2k-1=5$ unique basis function of order $k=3$ given by
+then there are $2d+1=5$ unique basis function of degree $d=2$ given by
 \begin{align*}
-b_0^3(t; \mathbf{t}) &= \frac{t-\tau_0}{\tau_2-\tau_0} b_0^2(t;\mathbf{t}) + \frac{\tau_3-t}{\tau_3-\tau_1}b_1^2(t; \mathbf{t}) 
+b_0^2(t,  \mathbf{t}) &= \frac{t-\tau_0}{\tau_2-\tau_0} b_0^1(t, \mathbf{t}) + \frac{\tau_3-t}{\tau_3-\tau_1}b_1^1(t,  \mathbf{t}) 
 	= \begin{cases} (1-t)^2   & \text{~if~} 0 \leq t \leq 1 \\
 				    0 & \text{~otherwise~}  \\ 
  	  \end{cases}
 \\ 
-b_1^3(t; \mathbf{t}) &= \frac{t-\tau_1}{\tau_3-\tau_1} b_1^2(t;\mathbf{t}) + \frac{\tau_4-t}{\tau_4-\tau_2}b_2^2(t; \mathbf{t})
+b_1^2(t,  \mathbf{t}) &= \frac{t-\tau_1}{\tau_3-\tau_1} b_1^1(t, \mathbf{t}) + \frac{\tau_4-t}{\tau_4-\tau_2}b_2^1(t,  \mathbf{t})
 	= \begin{cases} t(2-\frac{3}{2}t) & \text{~if~} 0 \leq t \leq 1 \\ 
  									\frac{(2-t)^2}{2} & 1 \leq t \leq 2 \\
  									0 & \text{~otherwise}
  					    \end{cases}
 \\ 
-b_2^3(t; \mathbf{t}) &= \frac{t-\tau_2}{\tau_4-\tau_2} b_2^2(t;\mathbf{t}) + \frac{\tau_5-t}{\tau_5-\tau_3}b_3^2(t; \mathbf{t})
+b_2^2(t,  \mathbf{t}) &= \frac{t-\tau_2}{\tau_4-\tau_2} b_2^1(t, \mathbf{t}) + \frac{\tau_5-t}{\tau_5-\tau_3}b_3^1(t,  \mathbf{t})
 	= \begin{cases} \frac{t^2}{2} & \text{~if~} 0 \leq t \leq 1 \\ 
  					-\frac{3}{2}t^2 + \frac{7}{2}t - \frac{3}{2} & \text{~if~} 1 \leq t \leq 2 \\
  					\frac{(3-t)^2}{2} & \text{~if~} 2 \leq t \leq 3 \\
  					0 & \text{~otherwise}
  	  \end{cases}
 \\ 
-b_3^3(t; \mathbf{t}) &= \frac{t-\tau_2}{\tau_4-\tau_2} b_2^2(t;\mathbf{t}) + \frac{\tau_5-t}{\tau_5-\tau_3}b_3^2(t; \mathbf{t})
+b_3^2(t,  \mathbf{t}) &= \frac{t-\tau_2}{\tau_4-\tau_2} b_2^1(t, \mathbf{t}) + \frac{\tau_5-t}{\tau_5-\tau_3}b_3^1(t,  \mathbf{t})
 	= \begin{cases} \frac{(t-1)^2}{2} & \text{~if~} 1 \leq t \leq 2 \\ 
  					-\frac{3}{2}t^2 + \frac{15}{2}t-\frac{15}{2} & \text{~if~} 2 \leq t \leq 3 \\
  					0 & \text{~otherwise}
  	  \end{cases}
 \\ 
-b_4^3(t; \mathbf{t}) &= \frac{t-\tau_2}{\tau_4-\tau_2} b_2^2(t;\mathbf{t}) + \frac{\tau_5-t}{\tau_5-\tau_3}b_3^2(t; \mathbf{t})
+b_4^2(t,  \mathbf{t}) &= \frac{t-\tau_2}{\tau_4-\tau_2} b_2^1(t, \mathbf{t}) + \frac{\tau_5-t}{\tau_5-\tau_3}b_3^1(t,  \mathbf{t})
 	= \begin{cases} (t-2)^2 & \text{~if~} 2 \leq t \leq 3 \\ 
  					0 & \text{~otherwise}
  	  \end{cases}.	   	  
 \end{align*}
-The the unique third order basis function are shown on the left in Figure~\ref{fig:spline_basis_2}.
+The unique second degree basis function are shown on the left in Figure~\ref{fig:spline_basis_2}.
 \begin{marginfigure}[-8in]
   	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_2}
-  \caption{Third order spline basis.}
+  \caption{Second degree spline basis.}
   \label{fig:spline_basis_2}  
 \end{marginfigure}
 \begin{marginfigure}[-2.5in]
   	\includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_2_extra_knot}
-  \caption{Third order spline basis with extra knot}
+  \caption{Second degree spline basis with extra knot}
   \label{fig:spline_basis_2}  
 \end{marginfigure}
 Expanding the knot vector by one time unit to 
 \[
 \mathbf{t}' = [\tau_0, \tau_1, \tau_2, \tau_3, \tau_4, \tau_5] \defeq [0, 0, 0, 1, 2, 3, 4, 4, 4],
 \]
-still results in $2k-1$ unique basis vectors, but $b_3^3(t; \mathbf{t}')$ is a right-shifted version of $b_2^3(t; \mathbf{t})$, and $b_4^3(t; \mathbf{t}')$ and $b_5^3(t; \mathbf{t})$ are a right-shifted versions of $b_3^3(t; \mathbf{t}')$ and $b_4^3(t; \mathbf{t})$, as shown on the right in Figure~\ref{fig:spline_basis_2}.
+still results in $2d+1$ unique basis vectors, but $b_3^2(t,  \mathbf{t}')$ is a right-shifted version of $b_2^2(t,  \mathbf{t})$, and $b_4^2(t,  \mathbf{t}')$ and $b_5^2(t,  \mathbf{t})$ are a right-shifted versions of $b_3^2(t,  \mathbf{t}')$ and $b_4^2(t,  \mathbf{t})$, as shown on the right in Figure~\ref{fig:spline_basis_2}.
 
 Similarly, the unique fourth order and ninth order basis functions are shown in Figures~\ref{fig:spline_basis_3} and~\ref{fig:spline_basis_8} respectively.
 
 \begin{marginfigure}[0in]
   \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_3}
-  \caption{Fourth order spline basis}
+  \caption{Third degree spline basis}
   \label{fig:spline_basis_3}  
 \end{marginfigure}
 
 \begin{figure}[ht]
   \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/spline_basis_8}
-  \caption{Ninth order spline basis}
+  \caption{Eight degree spline basis}
   \label{fig:spline_basis_8}  
 \end{figure}
 
@@ -434,36 +434,37 @@ Given an arbitrary knot sequence
 \[
 \mathbf{t} = [\tau_0, \tau_1, \dots \tau_T],
 \]
-an arbitrary time shift $\Delta$, and the one-sequenc $\mathbf{1}\defeq[1, 1, \dots, 1]$, the B-spline basis functions are shift invariant in the sense that
+an arbitrary time shift $\Delta$, and the one-sequence $\mathbf{1}\defeq[1, 1, \dots, 1]$, the B-spline basis functions are shift invariant in the sense that
 if 
 \[
 \mathbf{t} + \Delta\mathbf{1} = [\tau_0+\Delta, \tau_1+\Delta, \dots \tau_T+\Delta]
 \]
 then
 \[
-b_j^k(t; \mathbf{t}+\Delta\mathbf{1}) = b_j^k(t-\Delta; \mathbf{t}),
+b_j^d(t,  \mathbf{t}+\Delta\mathbf{1}) = b_j^d(t-\Delta, \mathbf{t}),
 \]
 i.e., shifting the knot sequence forward in time is identical to shifting the original B-spline forward in time.
 \end{lemma}
 \begin{proof}
-When the order is $k=1$, then equation~\eqref{eq:spline_basis_definition_0} gives
+When the degree is $d=0$, then equation~\eqref{eq:spline_basis_definition_0} gives
 \begin{align*}
-	b_j^1(t; \mathbf{t}+\Delta\mathbf{1}) &= \begin{cases} 1 & \text{~if~} \tau_j+\Delta \leq t \leq \tau_{j+1}+\Delta \\ 
- 									 				   0 & \text{~otherwise} 
- 					   					 \end{cases} \\
- 					   				   &= \begin{cases} 1 & \text{~if~} \tau_j \leq t-\Delta \leq \tau_{j+1} \\ 
- 									 				   0 & \text{~otherwise} 
- 					   					 \end{cases} \\ 	
- 					   				   &= b_j^1(t-\Delta; \mathbf{t}).
+	b_j^0(t,  \mathbf{t}+\Delta\mathbf{1}) 
+		&= \begin{cases} 1 & \text{~if~} \tau_j+\Delta \leq t \leq \tau_{j+1}+\Delta \\ 
+ 						 0 & \text{~otherwise} 
+ 		   \end{cases} \\
+ 		&= \begin{cases} 1 & \text{~if~} \tau_j \leq t-\Delta \leq \tau_{j+1} \\ 
+ 						 0 & \text{~otherwise} 
+ 		    \end{cases} \\ 	
+ 		&= b_j^0(t-\Delta, \mathbf{t}).
 \end{align*}
-Assuming that the statement holds when the order is $k-1\geq 0$, we get from 
+Assuming that the statement holds when the order is $d\geq 1$, we get from 
 Equation~\eqref{eq:spline_basis_definition_k} that
 \begin{align*}
-b_j^k(t; \mathbf{t}+\Delta\mathbf{1}) &= \frac{t-\tau_j-\Delta}{\tau_{j+k}+\Delta-
-\tau_j-\Delta} b_j^{k-1}(t; \mathbf{t}+\Delta\mathbf{1}) + \frac{\tau_{j+k+1}+\Delta-t}{\tau_{j+k+1}+\Delta-\tau_{j+1}-\Delta} b_{j+1}^{k-1}(t; \mathbf{t}+\Delta\mathbf{1}) \\
-&= \frac{(t-\Delta)-\tau_j}{\tau_{j+k}-
-\tau_j} b_j^{k-1}(t-\Delta; \mathbf{t}) + \frac{\tau_{j+k+1}-(t-\Delta)}{\tau_{j+k+1}-\tau_{j+1}} b_{j+1}^{k-1}(t-\Delta; \mathbf{t}) \\
-&= b_j^k(t-\Delta; \mathbf{t}).
+b_j^d(t,  \mathbf{t}+\Delta\mathbf{1}) &= \frac{t-\tau_j-\Delta}{\tau_{j+d}+\Delta-
+\tau_j-\Delta} b_j^{d-1}(t,  \mathbf{t}+\Delta\mathbf{1}) + \frac{\tau_{j+d+1}+\Delta-t}{\tau_{j+d+1}+\Delta-\tau_{j+1}-\Delta} b_{j+1}^{d-1}(t,  \mathbf{t}+\Delta\mathbf{1}) \\
+&= \frac{(t-\Delta)-\tau_j}{\tau_{j+d}-
+\tau_j} b_j^{d-1}(t-\Delta, \mathbf{t}) + \frac{\tau_{j+d+1}-(t-\Delta)}{\tau_{j+d+1}-\tau_{j+1}} b_{j+1}^{d-1}(t-\Delta, \mathbf{t}) \\
+&= b_j^d(t-\Delta, \mathbf{t}).
 \end{align*}
 The proof therefore follows by induction.
 \end{proof}
@@ -481,96 +482,116 @@ if
 \]
 then
 \[
-b_j^k(t; \alpha\mathbf{t}) = b_j^k(t/\alpha; \mathbf{t}),
+b_j^d(t,  \alpha\mathbf{t}) = b_j^d(t/\alpha, \mathbf{t}),
 \]
 i.e., scaling the knot sequence by $\alpha$ is identical to time scaling the original B-spline by $\frac{1}{\alpha}$.
 \end{lemma}
 \begin{proof}
-When the order is $k=1$, then equation~\eqref{eq:spline_basis_definition_0} gives
+When the degree is $d=0$, then equation~\eqref{eq:spline_basis_definition_0} gives
 \begin{align*}
-	b_j^1(t; \alpha\mathbf{t}) &= \begin{cases} 1 & \text{~if~} \alpha\tau_j \leq t \leq \alpha\tau_{j+1} \\ 
- 									 				   0 & \text{~otherwise} 
- 					   					 \end{cases} \\
- 					   				   &= \begin{cases} 1 & \text{~if~} \tau_j \leq \frac{t}{\alpha} \leq \tau_{j+1} \\ 
- 									 				   0 & \text{~otherwise} 
- 					   					 \end{cases} \\ 	
- 					   				   &= b_j^1(t/\alpha; \mathbf{t}).
+	b_j^0(t,  \alpha\mathbf{t}) 
+		&= \begin{cases} 1 & \text{~if~} \alpha\tau_j \leq t \leq \alpha\tau_{j+1} \\ 
+ 						 0 & \text{~otherwise} 
+ 			\end{cases} \\
+ 		&= \begin{cases} 1 & \text{~if~} \tau_j \leq \frac{t}{\alpha} \leq \tau_{j+1} \\ 
+ 						 0 & \text{~otherwise} 
+ 			\end{cases} \\ 	
+ 		&= b_j^0(t/\alpha, \mathbf{t}).
 \end{align*}
-Assuming that the statement holds when the order is $k-1\geq 0$, we get from 
+Assuming that the statement holds when the degree is $d\geq 1$, we get from 
 Equation~\eqref{eq:spline_basis_definition_k} that
 \begin{align*}
-b_j^k(t; \alpha\mathbf{t}) &= \frac{t-\alpha\tau_j}{\alpha\tau_{j+k}-
-\alpha\tau_j} b_j^{k-1}(t; \alpha\mathbf{t}) + \frac{\alpha\tau_{j+k+1}-t}{\alpha\tau_{j+k+1}-\alpha\tau_{j+1}} b_{j+1}^{k-1}(t; \alpha\mathbf{t}) \\
-&= \frac{(t/\alpha)-\tau_j}{\tau_{j+k}-
-\tau_j} b_j^{k-1}(t/\alpha; \mathbf{t}) + \frac{\tau_{j+k+1}-(t/\alpha)}{\tau_{j+k+1}-\tau_{j+1}} b_{j+1}^{k-1}(t/\alpha; \mathbf{t}) \\
-&= b_j^k(t/\alpha; \mathbf{t}).
+b_j^d(t,  \alpha\mathbf{t}) &= \frac{t-\alpha\tau_j}{\alpha\tau_{j+d}-
+\alpha\tau_j} b_j^{d-1}(t,  \alpha\mathbf{t}) + \frac{\alpha\tau_{j+d+1}-t}{\alpha\tau_{j+d+1}-\alpha\tau_{j+1}} b_{j+1}^{d-1}(t,  \alpha\mathbf{t}) \\
+&= \frac{(t/\alpha)-\tau_j}{\tau_{j+d}-
+\tau_j} b_j^{d-1}(t/\alpha, \mathbf{t}) + \frac{\tau_{j+d+1}-(t/\alpha)}{\tau_{j+d+1}-\tau_{j+1}} b_{j+1}^{d-1}(t/\alpha, \mathbf{t}) \\
+&= b_j^d(t/\alpha, \mathbf{t}).
 \end{align*}
 The proof therefore follows by induction.
 \end{proof}
 
 
 %---------------------------------------------------------------
-\subsection{Uniform B-Splines}
+\subsection{Uniform, Clamped, and Natural B-Splines}
 
-In the previous section we saw that there is a relationship between the knot point vector $\mathbf{t}$ and the basis functions.  We say that the knot vector $\mathbf{t}$ is {\em uniform} if the knot values are equally spaced, i.e., it has form
-\begin{multline*}
-\mathbf{t} = [\underbrace{\tau_0-(k-1)\Delta, \dots, \tau_0-\Delta,}_{(k-1)-terms} \\
-			 \underbrace{\tau_0, \tau_0+\Delta, \tau_0+2\Delta, \dots, \tau_0+M\Delta,}_{M+1-terms} \\
-			 \underbrace{\tau_0+(M+1)\Delta, \dots, \tau_0+(M+k-1)\Delta}_{(k-1)-terms}],	
-\end{multline*}
-where $\Delta>0$ and $M\geq k$.  
+In the previous section we saw that there is a relationship between the knot point vector $\mathbf{t}$ and the basis functions.  In this section we will define three different types of knot vectors that will be important in robotic applications: natural knot vectors, uniform knot vectors, and clamped knot vectors.  
+
+We say that the knot vector $\mathbf{t}_M^d = [\tau_0, \dots, \tau_{M+1+2d}]$ is a {\em natural} knot vector if $M>d$ and its first and last $d$ knot values are non-decreasing ($i<j \implies \tau_i\leq\tau_j$), and its middle $M+1$ terms are increasing ($i<j \implies \tau_i<\tau_j$), i.e., it has form
+\[}
+\mathbf{t} = [\underbrace{t_{-d}, \dots, t_{-1},}_{d-terms} \quad
+			 \underbrace{t_0, t_1, \dots, t_M,}_{(M+1)-terms} \quad
+			 \underbrace{t_{M+1}, \dots, t_{M+d}}_{d-terms}].	
+\] 
 For example, the following knot vectors are uniform:
 \begin{align*}
-	(t_0=0, k=3, \Delta=1, M=3):\quad & \mathbf{t} = [-2, -1, \vdots~ 0, 1, 2, 3, \vdots~ 4, 5] \\
-	(t_0=-3, k=4, \Delta=1, M=5):\quad & \mathbf{t} = [-6, -5, -4,\vdots~  -3, -2, -1, 0, 1, 2, \vdots~ 3, 4, 5] \\
-	(t_0=0, k=4, \Delta=\frac{1}{5}, M=5):\quad & \mathbf{t} = [-\frac{3}{5}, -\frac{2}{5}, -\frac{1}{5}, \vdots~  0, \frac{1}{5}, \frac{2}{5}, \frac{3}{5}, \frac{4}{5}, 1, \vdots~  \frac{6}{5}, \frac{7}{5}, \frac{8}{5}].	
+	(t_0=0, d=2, \Delta=1, M=3):\quad & \mathbf{t} = [-2, -1, \vdots~ 0, 1, 2, 3, \vdots~ 4, 5] \\
+	(t_0=-3, d=3, \Delta=1, M=5):\quad & \mathbf{t} = [-6, -5, -4,\vdots~  -3, -2, -1, 0, 1, 2, \vdots~ 3, 4, 5] \\
+	(t_0=0, d=3, \Delta=\frac{1}{5}, M=5):\quad & \mathbf{t} = [-\frac{3}{5}, -\frac{2}{5}, -\frac{1}{5}, \vdots~  0, \frac{1}{5}, \frac{2}{5}, \frac{3}{5}, \frac{4}{5}, 1, \vdots~  \frac{6}{5}, \frac{7}{5}, \frac{8}{5}].	
 \end{align*}
+If the knot vector is uniform, then we say that the B-spline~\eqref{eq:general-b-spline} is uniform, and we restrict the times where the spline is valid to the interval $t\in[t_0, t0+M\Delta] = [\tau_d, \tau_{d+M}]=\text{span}(\mathbf{t})$.
 
- We say that the knot vector $\bar{\mathbf{t}}$ is {\em uniform and clamped} (the overbar is used to denote clamped) if the knot values are equally spaced and the first and last $(k-1)$-terms are repeated, i.e., it has form
+
+--
+
+We say that the knot vector $\mathbf{t}_c$ is {\em uniform} if the knot values are equally spaced, i.e., it has form
 \begin{multline*}
-\bar{\mathbf{t}} = [\underbrace{\tau_0, \tau_0, \dots, \tau_0,}_{(k-1)-terms} \\
-			 \underbrace{\tau_0, \tau_0+\Delta, \tau_0+2\Delta, \dots, \tau_0+M\Delta,}_{M+1-terms} \\
-			 \underbrace{\tau_0+M\Delta, \dots, \tau_0+M\Delta}_{(k-1)-terms}],	
+\mathbf{t} = [\underbrace{t_0-d\Delta, \dots, t_0-\Delta,}_{d-terms} \\
+			 \underbrace{t_0, t_0+\Delta, t_0+2\Delta, \dots, t_0+M\Delta,}_{(M+1)-terms} \\
+			 \underbrace{t_0+(M+1)\Delta, \dots, t_0+(M+d)\Delta}_{d-terms}],	
 \end{multline*}
-where $\Delta>0$ and $M\geq k$.  
-
-For example, the following knot vectors are clamped and uniform:
+where $\Delta>0$ and $M>d$. 
+For example, the following knot vectors are uniform:
 \begin{align*}
-	(t_0=0, k=3, \Delta=1, M=3):\quad & \bar{\mathbf{t}} = [0, 0, \vdots~ 0, 1, 2, 3, \vdots~ 3, 3] \\
-	(t_0=-3, k=4, \Delta=1, M=5):\quad & \bar{\mathbf{t}} = [-3, -3, -3, \vdots~ -3, -2, -1, 0, 1, 2, \vdots~ 2, 2, 2] \\
-	(t_0=0, k=4, \Delta=\frac{1}{5}, M=5):\quad & \bar{\mathbf{t}} = [0, 0, 0, \vdots~ 0, \frac{1}{5}, \frac{2}{5}, \frac{3}{5}, \frac{4}{5}, 1, \vdots~ 1, 1, 1].	
+	(t_0=0, d=2, \Delta=1, M=3):\quad & \mathbf{t} = [-2, -1, \vdots~ 0, 1, 2, 3, \vdots~ 4, 5] \\
+	(t_0=-3, d=3, \Delta=1, M=5):\quad & \mathbf{t} = [-6, -5, -4,\vdots~  -3, -2, -1, 0, 1, 2, \vdots~ 3, 4, 5] \\
+	(t_0=0, d=3, \Delta=\frac{1}{5}, M=5):\quad & \mathbf{t} = [-\frac{3}{5}, -\frac{2}{5}, -\frac{1}{5}, \vdots~  0, \frac{1}{5}, \frac{2}{5}, \frac{3}{5}, \frac{4}{5}, 1, \vdots~  \frac{6}{5}, \frac{7}{5}, \frac{8}{5}].	
+\end{align*}
+If the knot vector is uniform, then we say that the B-spline~\eqref{eq:general-b-spline} is uniform, and we restrict the times where the spline is valid to the interval $t\in[t_0, t0+M\Delta] = [\tau_d, \tau_{d+M}]=\text{span}(\mathbf{t})$.
+
+We say that the knot vector $\mathbf{t}$ is {\em clamped} if the first and last $d$-terms are repeated in the knot vector are repeated, and the intermediate $M+1$ terms are strictly increasing, i.e., it has form
+\[
+\mathbf{t}_M^d = [\underbrace{t_0, t_0, \dots, t_0,}_{d-terms} \quad
+			 \underbrace{t_0, t_1, t_2, \dots, t_M,}_{(M+1)-terms} \quad
+			 \underbrace{t_M, \dots, t_M}_{d-terms}],	
+\]
+where $t_i<t_{i+1}$ for $i=0, \dots, M$, and where $M>d$.  
+
+For example, the following knot vectors are clamped:
+\begin{align*}
+	(t_0=0, d=2, M=3):\quad & \mathbf{t} = [0, 0, \vdots~ 0, 1, 2, 3, \vdots~ 3, 3] \\
+	(t_0=-3, d=3, M=5):\quad & \mathbf{t} = [-3, -3, -3, \vdots~ -3, -2, -1.5, 0.1, 1.6, 2, \vdots~ 2, 2, 2] \\
+	(t_0=0, d=3, M=5):\quad & \mathbf{t} = [0, 0, 0, \vdots~ 0, \frac{1}{5}, \frac{2}{5}, \frac{3}{5}, \frac{4}{5}, 1, \vdots~ 1, 1, 1].	
 \end{align*}
 Similarly, the knot vectors shown in Figures~\ref{fig:spline_basis_0}, \ref{fig:spline_basis_1}, \ref{fig:spline_basis_2}, \ref{fig:spline_basis_3}, and~\ref{fig:spline_basis_8} are all clamped and uniform.  
 
 The length of uniform, and uniform and clamped knot vectors is 
 \[
-\text{length}(\mathbf{t}) = M+1 + 2(k-1) = M+2k-1,
+\text{length}(\mathbf{t}) = M+1 + 2d = M+2d+1,
 \]
 and, in both cases, the time interval of interest is $t\in[t_0, t_0+M\Delta$, where there are $M$ evenly spaced time intervals. 
 
 B-splines associated with uniform knot vectors are called uniform b-splines, and they are only valid on the time interval $t\in[t_0, t_0+M\Delta]$, similarly B-splines associated with uniform and clamped knot vectors are called uniform and clamped b-splines, and they are also only valid on the time interval $t\in[t_0, t_0+M\Delta]$.
 
-In the rest of this tutorial, we will focus on the knot vectors
+Given the shift and scale invariance properties shown in Lemmas~\ref{lem:basis_are_shift_invariant} and~\ref{lem:bases_are_scale_invariant}, when the knot sequence is uniform, then without loss of generality we can use the knot vectors
 \begin{align}
-	\mathbf{t}^k_M &\defeq [-(k-1), \dots, -1, 0, 1, 2, \dots, M, M+1, \dots, M+k-1],
+	\mathbf{t}^d_M &\defeq [-(d), \dots, -1, 0, 1, 2, \dots, M, M+1, \dots, M+d],
 		\label{eq:knot_vector_t_M} \\ 
-	\bar{\mathbf{t}}^k_M &\defeq [\underbrace{0, 0, \dots, 0}_{(k-1)-\text{terms}}, 0, 1, 2, \dots, M, \underbrace{M, \dots, M}_{(k-1)-\text{terms}}], 
+	\bar{\mathbf{t}}^d_M &\defeq [\underbrace{0, 0, \dots, 0}_{d-\text{terms}}, 0, 1, 2, \dots, M, \underbrace{M, \dots, M}_{d-\text{terms}}].
 	\label{eq:knot_vector_tbar_M}
 \end{align}
-and use Lemmas~\ref{lem:basis_are_shift_invariant} and~\ref{lem:bases_are_scale_invariant} to adapt the results to any desired time interval by shifting and scaling.
 
 There are several important properties of the B-spline basis functions for uniform and clamped knot vectors, which we will lay out in the next several lemmas.
 
 \begin{lemma} \label{lem:shifted_central_basis}
-Let $\mathbf{t}_M^k$ be the uniform knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M\geq k$, then the basis function $b_k^{k-1}(t; \mathbf{t}_M^k)$ plays a central role in the sense that
+Let $\mathbf{t}_M^d$ be the uniform knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M>d$, then the basis function $b_d^d(t,  \mathbf{t}_M^d)$ plays a central role in the sense that
 \[
-	b_{k-1+m}^{k}(t; \mathbf{t}_M^k) = b_{k-1}^k(t-m; \mathbf{t}_M^k), \qquad m=-k, \dots, M-1.
+	b_{d+m}^d(t,  \mathbf{t}_M^k) = b_d^d(t-m; \mathbf{t}_M^d), \qquad m=-(d+1), \dots, M-1.
 \]
 \end{lemma}
 \begin{proof}
 From Equation~\eqref{eq:spline_basis_definition_0} we give that
 \begin{align*}
-	b_m^1(t; \mathbf{t}_M^k) &= \begin{cases} 1 & \text{~if~} m \leq t \leq m+1 \\ 
+	b_m^0(t,  \mathbf{t}_M^0) &= \begin{cases} 1 & \text{~if~} m \leq t \leq m+1 \\ 
  									 		  0 & \text{~otherwise} 
  					   			\end{cases} 
  					   		\\
@@ -578,16 +599,16 @@ From Equation~\eqref{eq:spline_basis_definition_0} we give that
  									 		  0 & \text{~otherwise} 
  					   			\end{cases} 
  					   		\\
- 					   		&= b_0^1(t-m; \mathbf{t}_M^k).
+ 					   		&= b_0^0(t-m; \mathbf{t}_M^k).
 \end{align*}
-Suppose that $b_{k-2+m}^{k-1}(t; \mathbf{t}_M^k) = b_{k-2}^{k-1}(t-m; \mathbf{t}_M^k)$, then
+Suppose that $b_{d-1+m}^{d-1}(t,  \mathbf{t}_M^d) = b_{d-1}^{d-1}(t-m; \mathbf{t}_M^d)$, then
 \begin{align*}
-b_{k-1+m}^{k}(t; \mathbf{t}_M^k) 
-	&= \frac{t-(k+m)}{m+2k-(m+k)} b_{k-1+m}^{k-1}(t; \mathbf{t}_M^k) + \frac{m+2k+1-t}{m+2k+1-(m+k+1)} b_{k+m}^{k-1}(t; \mathbf{t}_M^k),
+b_{d+m}^{d}(t,  \mathbf{t}_M^d) 
+	&= \frac{t-(d+m)}{m+2d-(m+d)} b_{d+m}^{d-1}(t,  \mathbf{t}_M^d) + \frac{m+2d+1-t}{m+2d+1-(m+d+1)} b_{d+m+1}^{d-1}(t,  \mathbf{t}_M^d),
 	\\	
-	&= \frac{(t-m)-k)}{k} b_{k-1}^{k-1}(t-m; \mathbf{t}_M^k) + \frac{2k+1-(t-m)}{k} b_{k1}^{k-1}(t-m; \mathbf{t}_M^k),
+	&= \frac{(t-m)-d)}{d} b_{d}^{d-1}(t-m; \mathbf{t}_M^d) + \frac{2d+1-(t-m)}{d} b_{d+1}^{d-1}(t-m; \mathbf{t}_M^d),
 	\\
-	&= b_{k-1}^k(t-m; \mathbf{t}_M^k).
+	&= b_d^d(t-m; \mathbf{t}_M^d).
 \end{align*}
 Therefore, the lemma holds by induction.
 \end{proof}
@@ -595,51 +616,54 @@ Therefore, the lemma holds by induction.
 
 
 \begin{lemma} \label{lem:nonzero_basis_vectors}
-	Let $\mathbf{t}_M^k$ be a uniform clamped knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M\geq k$.
-	Then there are exactly $M+k-1$ non-zero basis function of order $k$, namely $b_m^k(t;\mathbf{t}_M^k)$, $m=0, \dots, M+k-1$.
-	Furthermore, the basis of support for $b_m^k(t;\mathbf{t}_M^k)$, i.e., the time interval where $b_m^k(t;\mathbf{t}_M^k)$ is non-zero is given by
+	Let $\mathbf{t}_M^d$ be a uniform clamped knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M>d$.
+	Then there are exactly $M+d$ non-zero basis function of degree $d$, namely $b_m^d(t, \mathbf{t}_M^d)$, $m=0, \dots, M+d-1$.
+	Furthermore, the basis of support for $b_m^d(t, \mathbf{t}_M^d)$, i.e., the time interval where $b_m^d(t, \mathbf{t}_M^d)$ is non-zero is given by
 		\[
-				b_m^k(t;\mathbf{t}_M^k) \neq 0 
+				b_m^d(t, \mathbf{t}_M^d) \neq 0 
 				\quad \text{~if~} \quad
 				\begin{cases}
-				t \in [0, m+1] & 0\leq m \leq k-1 \\
-				t \in [m-k+1, m+1] & k \leq m \leq M-1 \\
-				t \in [m-k+1, M] & M \leq m \leq M+k-2
+				t \in [0, m+1] & 0\leq m \leq d \\
+				t \in [m-d, m+1] & d-1 \leq m \leq M-1 \\
+				t \in [m-d, M] & M \leq m \leq M+d-1
 				\end{cases}.
 		\]	
 \end{lemma}
 \begin{proof}  The proof follows from a careful, but straight-forward accounting using Equations~\eqref{eq:spline_basis_definition_0} and~\eqref{eq:spline_basis_definition_k}.	
 \end{proof}
 
-A graphical depiction of the region of support for the set of basis functions $\{b_m^k(t;\mathbf{t}_M^k)\}_{m=0}^{M+k-2}$ is shown in Figure~\ref{fig:region_of_support} for $k=4$ and $M=8$.
+A graphical depiction of the region of support for the set of basis functions $\{b_m^d(t, \mathbf{t}_M^d)\}_{m=0}^{M+d-1}$ is shown in Figure~\ref{fig:region_of_support} for $d=3$ and $M=8$.
 \begin{marginfigure}[0in]
-  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/region_of_support}
-  \caption{Region of support for the B-spline basis functions of order $k=4$ with knot vector $\mathbf{t}_8^4$.}
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/region_of_support.drawio.pdf}
+  \caption{Region of support for the B-spline basis functions of degree $d=3$ with knot vector $\mathbf{t}_8^d$.}
   \label{fig:region_of_support}  
 \end{marginfigure}
 
 \begin{lemma} \label{lem:basis_vectors_sum_to_1}
-	Let $\mathbf{t}_M^k$ be a uniform clamped knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M\geq k$. For any instant of time $t\in[0,M]$, the basis vectors at that time sum to unity, i.e., for $t\in[0, M]$,
+	Let $\mathbf{t}_M^d$ be a uniform clamped knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M>d$. For any instant of time $t\in[0,M]$, the basis vectors at that time sum to unity, i.e., for $t\in[0, M]$,
 	\[
-	\sum_{m=0}^{M+k-2} b_m^k(t; \mathbf{t}_M^k) = 1.
+	\sum_{m=0}^{M+d-1} b_m^d(t,  \mathbf{t}_M^d) = 1.
 	\]
 \end{lemma}
 \begin{proof}  The proof again follows from a careful, but straight-forward accounting using Equations~\eqref{eq:spline_basis_definition_0} and~\eqref{eq:spline_basis_definition_k}.	
 \end{proof}
+In fact Lemma~\ref{lem:basis_vectors_sum_to_1} holds even when the knot vector is not uniform or clamped.
 
 \begin{definition}
-Let $\{\cbf_0, \cbf_1, \dots, \cbf_{M+k-2}\}$ be a set of control point vectors in $\mathbb{R}^n$, and let $\mathbf{t}_M^k$ be a clamped and uniform knot vector, then the function 
+Let $\{\cbf_0, \cbf_1, \dots, \cbf_{M+d-1}\}$ be a set of control point vectors in $\mathbb{R}^n$, and let $\mathbf{t}_M^d$ be a clamped and uniform knot vector, then the function 
 \begin{equation}\label{eq:clamped_uniform_spline}
-\mathbf{p}(t) = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t; \mathbf{t}_M^k), \qquad t\in[0, M]
+\mathbf{p}(t) = \sum_{m=0}^{M+d-1} \cbf_m b_m^d(t,  \mathbf{t}_M^d), \qquad t\in[0, M]
 \end{equation}
-is said to be a $k^{th}$ order clamped and uniform B-spline. 
+is said to be a $d^{th}$ degree clamped and uniform B-spline. 
 \end{definition}
+
+%here
 
 One of the most important properties of B-splines is the so-called finite-support property, which states that at any instant of time, only a few control points influence the B-spline.  This property is formalized in the following lemma.
 \begin{lemma}\label{lem:finite_num_control_points}
 	Let $\mathbf{t}_M^k$ be a uniform clamped knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M\geq k$. If $0\leq j < M$ is an integer, then for any instant of time $t\in[j, j+1]\subset [0, M]$ we have that
 	\[
-	\mathbf{p}(t) = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t; \mathbf{t}_M^k) = \sum_{m=j}^{j+k-1} \cbf_m b_m^k(t; \mathbf{t}_M^k).
+	\mathbf{p}(t) = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t,  \mathbf{t}_M^k) = \sum_{m=j}^{j+k-1} \cbf_m b_m^k(t,  \mathbf{t}_M^k).
 	\]
 	In other words, over the interval $t\in[j, j+1]$ there are only $k$ control points that influence $\mathbf{p}(t)$, namely
 	$\{\cbf_j, \dots, \cbf_{j+k-1}\}$.
@@ -661,7 +685,7 @@ We say that the vector $\xbf$ is in the convex hull of the vectors $\{\mathbf{q}
 \begin{lemma}\label{lem:spline_in_convex_hull}
 	Let $\mathbf{t}_M^k$ be a uniform or uniform clamped knot vector defined in Equation~\eqref{eq:knot_vector_t_M} with $M\geq k$. If $0\leq j < M$ is an integer, then for any instant of time $t\in[j, j+1]\subset [0, M]$ we have that the B-spline
 	\[
-	\mathbf{p}(t) = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t; \mathbf{t}_M^k) = \sum_{m=j}^{j+k-1} \cbf_m b_m^k(t; \mathbf{t}_M^k)
+	\mathbf{p}(t) = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t,  \mathbf{t}_M^k) = \sum_{m=j}^{j+k-1} \cbf_m b_m^k(t,  \mathbf{t}_M^k)
 	\]
 	is in the convex hull of the control points $\{\cbf_j, \dots, \cbf_{j+k-1}\}$.
 \end{lemma}
@@ -673,7 +697,7 @@ Lemma~\ref{lem:spline_in_convex_hull} is an important result for path planning s
 
 To simplify notation we will stack the basis function in a vector as
 \begin{equation}\label{eq:basis_vector}
-\bbf_M^k(t) \defeq \begin{pmatrix} b_0^k(t;\mathbf{t}_M^k) \\ b_1^k(t;\mathbf{t}_M^k) \\ \vdots \\ b_{M+k-2}^k(t;\mathbf{t}_M^k) \end{pmatrix}, 
+\bbf_M^k(t) \defeq \begin{pmatrix} b_0^k(t, \mathbf{t}_M^k) \\ b_1^k(t, \mathbf{t}_M^k) \\ \vdots \\ b_{M+k-2}^k(t, \mathbf{t}_M^k) \end{pmatrix}, 
 \end{equation}
 and the control points as a matrix 
 \[
@@ -769,7 +793,7 @@ The resulting spline is shown in Figure~\ref{fig:example_spline_curve}.
 \subsection{Derivatives of B-splines}
 
 We begin this section by noting that the basis functions and the knot vector do not have to be of the same order.  In fact, if the knot vector has higher order than the basis functions, then the first several basis functions will simply be zero.  
-For example, let $\mathbf{t}_3^3 = [0, 0\vdots, 0, 1, 2, 3, \vdots 3, 3]$, then from Equation~\eqref{eq:spline_basis_definition_0} $b_0^1(t; \mathbf{t}_3^3)$, $b_1^1(t; \mathbf{t}_3^3)$, $b_5^1(t; \mathbf{t}_3^3)$, $b_1^1(t; \mathbf{t}_3^3)$, and $b_5^2(t; \mathbf{t}_3^3)$ are equal to zero since the knot intervals in the denominator for those functions are zero.  The remaining basis functions are shown in Figure~\ref{fig:shifting_property}.
+For example, let $\mathbf{t}_3^3 = [0, 0\vdots, 0, 1, 2, 3, \vdots 3, 3]$, then from Equation~\eqref{eq:spline_basis_definition_0} $b_0^1(t,  \mathbf{t}_3^3)$, $b_1^1(t,  \mathbf{t}_3^3)$, $b_5^1(t,  \mathbf{t}_3^3)$, $b_1^1(t,  \mathbf{t}_3^3)$, and $b_5^2(t,  \mathbf{t}_3^3)$ are equal to zero since the knot intervals in the denominator for those functions are zero.  The remaining basis functions are shown in Figure~\ref{fig:shifting_property}.
 \begin{marginfigure}[0in]
   \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/shifting_property}
   \caption{Shifting property of uniform clamped B-spline basis functions.}
@@ -779,11 +803,11 @@ If on the other hand, the knot vector has one order lower, i.e., $\mathbf{t}_3^2
 \begin{lemma} \label{lem:shifting_property}
 For uniform or clamped uniform knot vectors $\mathbf{t}_M^k \in \mathbb{R}^{M+2k-1}$ and $\mathbf{t}_M^{k-1}\in\mathbb{R}^{M+2k-1}$ we have
 \[
-b_m^j(t; \mathbf{t}_M^k) = b_{m-1}^j(t; \mathbf{t}_M^{k-1}), \qquad j \leq k, \qquad m = 1, \dots, 2k+M.
+b_m^j(t,  \mathbf{t}_M^k) = b_{m-1}^j(t,  \mathbf{t}_M^{k-1}), \qquad j \leq k, \qquad m = 1, \dots, 2k+M.
 \]	
 Using vector notation we have that
 \[
-\underbrace{\bbf_M^{k-1}(t; \mathbf{t}_M^{k-1})}_{(M+k-1)\times 1} = S_{M+k} \underbrace{\bbf_M^{k-1}(t; \mathbf{t}_M^k)}_{(M+k)\times 1},
+\underbrace{\bbf_M^{k-1}(t,  \mathbf{t}_M^{k-1})}_{(M+k-1)\times 1} = S_{M+k} \underbrace{\bbf_M^{k-1}(t,  \mathbf{t}_M^k)}_{(M+k)\times 1},
 \]
 where
 \[
@@ -795,7 +819,7 @@ We have the following lemma which gives the general formula for the derivative o
 \begin{lemma}\label{lem:derivative_basis_functions}
 If $\mathbf{t}$ is a general knot vector, then the $\ell^{th}$ derivative of the $k^{th}$ order spline function with  $0\leq \ell \leq k$, is given by
 \[
-\frac{d^\ell}{dt^\ell}b_m^k(t; \mathbf{t}) = (k-1)\left(\frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_m^{k-1}(t; \mathbf{t})}{\tau_{m+k-1}-\tau_m} - \frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_{m+1}^{k-1}(t; \mathbf{t})}{\tau_{m+k}-\tau_{m+1}} \right).
+\frac{d^\ell}{dt^\ell}b_m^k(t,  \mathbf{t}) = (k-1)\left(\frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_m^{k-1}(t,  \mathbf{t})}{\tau_{m+k-1}-\tau_m} - \frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_{m+1}^{k-1}(t,  \mathbf{t})}{\tau_{m+k}-\tau_{m+1}} \right).
 \]	
 \end{lemma}
 \marginnote{
@@ -826,22 +850,22 @@ is an $(M+k-2)\times(M+k-2)$ diagonal matrix.
 Noting that
 \[
 \mathbf{p}(t) = \Cbf \bbf_M^k(t)
-              = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t; \bar{\mathbf{t}}_M^k),
+              = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t,  \bar{\mathbf{t}}_M^k),
 \]
 we have that
 \[
-\frac{d\mathbf{p}}{dt} = \sum_{m=0}^{M+k-2} \cbf_m \frac{d b_m^k(t; \bar{\mathbf{t}}_M^k)}{dt}.
+\frac{d\mathbf{p}}{dt} = \sum_{m=0}^{M+k-2} \cbf_m \frac{d b_m^k(t,  \bar{\mathbf{t}}_M^k)}{dt}.
 \]
 From Lemma~\ref{lem:derivative_basis_functions} we get
 \begin{align*}
-\frac{d\mathbf{p}}{dt} &= \sum_{m=0}^{M+k-2} \cbf_m (k-1)\left(\frac{b_m^{k-1}(t; \bar{\mathbf{t}}_M^k)}{\tau_{m+k-1}-\tau_m} - \frac{b_{m+1}^{k-1}(t; \bar{\mathbf{t}}_M^k)}{\tau_{m+k}-\tau_{m+1}} \right) \\
-&= \sum_{m=0}^{M+k-2} \cbf_m \left[ \left(\frac{k-1}{\tau_{m+k-1}-\tau_m}\right) b_m^{k-1}(t; \bar{\mathbf{t}}_M^k) - \left(\frac{k-1}{\tau_{m+k}-\tau_{m+1}}\right)  b_{m+1}^{k-1}(t; \bar{\mathbf{t}}_M^k) \right] \\
-&= \left(\frac{k-1}{\tau_{k-1}-\tau_0}\right)\cbf_0 b_0^{k-1}(t; \bar{\mathbf{t}}_M^k) + \sum_{m=1}^{M+k-2} \left(\frac{k-1}{\tau_{m+k-1}-\tau_m}\right) \left(  \cbf_m - \cbf_{m-1}  \right) b_m^{k-1}(t; \bar{\mathbf{t}}_M^k) \\
-&\qquad - \left(\frac{k-1}{\tau_{M+2k-2}-\tau_{M+k-2}}\right)\cbf_{M+k-2}b_{M+k-1}^{k-1}(t; \bar{\mathbf{t}}_M^k).
+\frac{d\mathbf{p}}{dt} &= \sum_{m=0}^{M+k-2} \cbf_m (k-1)\left(\frac{b_m^{k-1}(t,  \bar{\mathbf{t}}_M^k)}{\tau_{m+k-1}-\tau_m} - \frac{b_{m+1}^{k-1}(t,  \bar{\mathbf{t}}_M^k)}{\tau_{m+k}-\tau_{m+1}} \right) \\
+&= \sum_{m=0}^{M+k-2} \cbf_m \left[ \left(\frac{k-1}{\tau_{m+k-1}-\tau_m}\right) b_m^{k-1}(t,  \bar{\mathbf{t}}_M^k) - \left(\frac{k-1}{\tau_{m+k}-\tau_{m+1}}\right)  b_{m+1}^{k-1}(t,  \bar{\mathbf{t}}_M^k) \right] \\
+&= \left(\frac{k-1}{\tau_{k-1}-\tau_0}\right)\cbf_0 b_0^{k-1}(t,  \bar{\mathbf{t}}_M^k) + \sum_{m=1}^{M+k-2} \left(\frac{k-1}{\tau_{m+k-1}-\tau_m}\right) \left(  \cbf_m - \cbf_{m-1}  \right) b_m^{k-1}(t,  \bar{\mathbf{t}}_M^k) \\
+&\qquad - \left(\frac{k-1}{\tau_{M+2k-2}-\tau_{M+k-2}}\right)\cbf_{M+k-2}b_{M+k-1}^{k-1}(t,  \bar{\mathbf{t}}_M^k).
 \end{align*}
 Now note that since the first $k$ terms in the knot vector $\mathbf{t}_M^k$ are equal to zeros, and the last $k$ terms are equal to $M$, that $\tau_{k-1}-\tau_0 = \tau_{M+2k-2}-\tau_{M+k-2} = 0$, and therefore the first and last terms are zero.  Using the shifting property from Lemma~\ref{lem:shifting_property}, and changing the index by one, we get
 \begin{equation}\label{eq:spline_deriviative_1}
-\frac{d\mathbf{p}}{dt} = \sum_{m=0}^{M+k-3} \left(\frac{k-1}{\tau_{m+k-2}-\tau_{m}}\right) \left( \cbf_{m+1} - \cbf_{m}  \right) b_{m}^{k-1}(t; \bar{\mathbf{t}}_M^{k-1}),
+\frac{d\mathbf{p}}{dt} = \sum_{m=0}^{M+k-3} \left(\frac{k-1}{\tau_{m+k-2}-\tau_{m}}\right) \left( \cbf_{m+1} - \cbf_{m}  \right) b_{m}^{k-1}(t,  \bar{\mathbf{t}}_M^{k-1}),
 \end{equation}
 where $\tau_\ast$ now corresponds to the knot vector 
 \[

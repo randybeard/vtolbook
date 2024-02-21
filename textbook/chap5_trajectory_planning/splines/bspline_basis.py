@@ -37,12 +37,10 @@ def plotSplineBasis(degree, M, clamped=True):
                 ax[i].set(ylabel=f"m={i}")
 
 plotSplineBasis(degree=0, M=2)
-#plotSplineBasis(degree=1, M=2, clamped=False)
-plotSplineBasis(degree=1, M=3, clamped=True)
-#plotSplineBasis(degree=2, M=3, clamped=False)
-plotSplineBasis(degree=2, M=4, clamped=False)
-plotSplineBasis(degree=3, M=4, clamped=False)
-plotSplineBasis(degree=8, M=9, clamped=False)
+#plotSplineBasis(degree=1, M=2, clamped=True)
+plotSplineBasis(degree=1, M=2, clamped=False)
+#plotSplineBasis(degree=2, M=3, clamped=True)
+plotSplineBasis(degree=2, M=3, clamped=False)
 plt.show()
 
 
