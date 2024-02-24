@@ -171,3 +171,4 @@ airsim/__MACOSX/
 airsim/__pycache__/
 .vscode/*
 *.xml
+*.bkp

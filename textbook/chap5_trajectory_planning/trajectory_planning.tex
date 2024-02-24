@@ -795,7 +795,7 @@ and the control points as a matrix
 \[
 \Cbf = \begin{pmatrix} \cbf_0 & \cbf_1 & \dots & \cbf_{M+d-1} \end{pmatrix}
 \]
-allowing Equation~\eqref{eq:clamped_uniform_spline} to be written as
+allowing Equation~\eqref{eq:general-b-spline} to be written as
 \[
 \mathbf{p}(t) = \Cbf \bbf_M^d(t), \qquad t\in\text{span}(\mathbf{t}_M^d).
 \]
@@ -809,18 +809,18 @@ allowing Equation~\eqref{eq:clamped_uniform_spline} to be written as
 %Abusing notation, we will use $\bbf_M^k(\sigma)$ to mean $\bbf_M^k(\sigma; \frac{1}{M}\mathbf{t}_{M}^k)$, and parameterized paths with always be defined for $\sigma\in[0,1]$
 
 
-We begin this section by noting that the basis functions and the knot vector do not have to be of the same order.  In fact, if the knot vector has higher order than the basis functions, then the first several basis functions will simply be zero.  
-For example, let $\mathbf{t}_3^3 = [0, 0\vdots, 0, 1, 2, 3, \vdots 3, 3]$, then from Equation~\eqref{eq:spline_basis_definition_0} $b_0^1(t,  \mathbf{t}_3^3)$, $b_1^1(t,  \mathbf{t}_3^3)$, $b_5^1(t,  \mathbf{t}_3^3)$, $b_1^1(t,  \mathbf{t}_3^3)$, and $b_5^2(t,  \mathbf{t}_3^3)$ are equal to zero since the knot intervals in the denominator for those functions are zero.  The remaining basis functions are shown in Figure~\ref{fig:shifting_property}.
+We begin this section by noting that the basis functions and the knot vector do not have to be of the same degree.  In fact, if the knot vector has higher degree than the basis functions, then the first several basis functions will simply be zero.  
+For example, let $\mathbf{t}_3^2 = [0, 0,\vdots 0, 1, 2, 3, \vdots 3, 3]$, then from Equation~\eqref{eq:spline_basis_definition_0} $b_0^0(t,  \mathbf{t}_3^2)$, $b_1^0(t,  \mathbf{t}_3^2)$, $b_5^0(t,  \mathbf{t}_3^2)$, $b_1^0(t,  \mathbf{t}_3^2)$, and $b_5^1(t,  \mathbf{t}_3^2)$ are equal to zero since the knot intervals in the denominator for those functions are zero.  The remaining basis functions are shown in Figure~\ref{fig:shifting_property}.
 \begin{marginfigure}[0in]
-  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/shifting_property}
+  \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/shifting_property.drawio}
   \caption{Shifting property of uniform clamped B-spline basis functions.}
   \label{fig:shifting_property}  
 \end{marginfigure}
-If on the other hand, the knot vector has one order lower, i.e., $\mathbf{t}_3^2 = [0\vdots, 0, 1, 2, 3, \vdots 3]$, then the basis vectors are also shown to the right in Figure~\ref{fig:shifting_property}.  It is clear that reducing the order of the knot vector by one, shifts the index of the basis vectors by one.  We can formalize these observations in the following lemma.
+If on the other hand, the knot vector has one degree lower, i.e., $\mathbf{t}_3^1 = [0,\vdots 0, 1, 2, 3, \vdots 3]$, then the basis vectors are also shown to the right in Figure~\ref{fig:shifting_property}.  It is clear that reducing the degree of the knot vector by one, shifts the index of the basis vectors by one.  We can formalize these observations in the following lemma.
 \begin{lemma} \label{lem:shifting_property}
-For uniform or clamped uniform knot vectors $\mathbf{t}_M^k \in \mathbb{R}^{M+2k-1}$ and $\mathbf{t}_M^{k-1}\in\mathbb{R}^{M+2k-1}$ we have
+For uniform and uniform and clamped knot vectors $\mathbf{t}_M^d \in \mathbb{R}^{M+2d+1}$ and $\mathbf{t}_M^{d-1}\in\mathbb{R}^{M+2d-1}$ we have
 \[
-b_m^j(t,  \mathbf{t}_M^k) = b_{m-1}^j(t,  \mathbf{t}_M^{k-1}), \qquad j \leq k, \qquad m = 1, \dots, 2k+M.
+b_m^j(t,  \mathbf{t}_M^d) = b_{m-1}^j(t,  \mathbf{t}_M^{d-1}), \qquad j \leq d, \qquad m = 1, \dots, M+2d-2.
 \]	
 Using vector notation we have that
 \[
