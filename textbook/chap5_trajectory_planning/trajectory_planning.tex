@@ -278,6 +278,7 @@ w_m^d(t, \mathbf{t}) &= \begin{cases}
                       		\frac{t-\tau_m}{\tau_{m+d}-\tau_m}, & \tau_{m+d}\neq \tau_m \\
                       		0, & \text{~otherwise} 
                         \end{cases}.
+     \label{eq:spline_basis_definition_w}
 \end{align}
 
 %+++++++++++++++++++++++++++++++
@@ -810,7 +811,7 @@ allowing Equation~\eqref{eq:general-b-spline} to be written as
 
 
 We begin this section by noting that the basis functions and the knot vector do not have to be of the same degree.  In fact, if the knot vector has higher degree than the basis functions, then the first several basis functions will simply be zero.  
-For example, let $\mathbf{t}_3^2 = [0, 0,\vdots 0, 1, 2, 3, \vdots 3, 3]$, then from Equation~\eqref{eq:spline_basis_definition_0} $b_0^0(t,  \mathbf{t}_3^2)$, $b_1^0(t,  \mathbf{t}_3^2)$, $b_5^0(t,  \mathbf{t}_3^2)$, $b_1^0(t,  \mathbf{t}_3^2)$, and $b_5^1(t,  \mathbf{t}_3^2)$ are equal to zero since the knot intervals in the denominator for those functions are zero.  The remaining basis functions are shown in Figure~\ref{fig:shifting_property}.
+For example, let $\mathbf{t}_3^2 = [0, 0,\vdots 0, 1, 2, 3, \vdots 3, 3]$, then from Equation~\eqref{eq:spline_basis_definition_0} $b_0^0(t,  \mathbf{t}_3^2)$, $b_1^0(t,  \mathbf{t}_3^2)$, $b_5^0(t,  \mathbf{t}_3^2)$, $b_6^0(t,  \mathbf{t}_3^2)$, $b_0^1(t,  \mathbf{t}_3^2)$, and $b_5^1(t,  \mathbf{t}_3^2)$ are equal to zero since the knot intervals in the denominator for those functions are zero.  The remaining basis functions are shown in Figure~\ref{fig:shifting_property}.
 \begin{marginfigure}[0in]
   \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/shifting_property.drawio}
   \caption{Shifting property of uniform clamped B-spline basis functions.}
@@ -818,25 +819,46 @@ For example, let $\mathbf{t}_3^2 = [0, 0,\vdots 0, 1, 2, 3, \vdots 3, 3]$, then 
 \end{marginfigure}
 If on the other hand, the knot vector has one degree lower, i.e., $\mathbf{t}_3^1 = [0,\vdots 0, 1, 2, 3, \vdots 3]$, then the basis vectors are also shown to the right in Figure~\ref{fig:shifting_property}.  It is clear that reducing the degree of the knot vector by one, shifts the index of the basis vectors by one.  We can formalize these observations in the following lemma.
 \begin{lemma} \label{lem:shifting_property}
-For uniform and uniform and clamped knot vectors $\mathbf{t}_M^d \in \mathbb{R}^{M+2d+1}$ and $\mathbf{t}_M^{d-1}\in\mathbb{R}^{M+2d-1}$ we have
+For natural knot vectors $\mathbf{t}_M^d \in \mathbb{R}^{M+2d+1}$ and $\mathbf{t}_M^{d+1}\in\mathbb{R}^{M+2d-1}$ we have for $t\in\text{span}(\mathbf{t}_M^d)=\text{span}(\mathbf{t}_M^{d+1})$,
 \[
-b_m^j(t,  \mathbf{t}_M^d) = b_{m-1}^j(t,  \mathbf{t}_M^{d-1}), \qquad j \leq d, \qquad m = 1, \dots, M+2d-2.
+b_m^j(t,  \mathbf{t}_M^d) = b_{m+1}^j(t,  \mathbf{t}_M^{d+1}), \qquad j \leq d, \qquad m = 0, \dots, M+1+2(d-j).
 \]	
 Using vector notation we have that
 \[
-\underbrace{\bbf_M^{k-1}(t,  \mathbf{t}_M^{k-1})}_{(M+k-1)\times 1} = S_{M+k} \underbrace{\bbf_M^{k-1}(t,  \mathbf{t}_M^k)}_{(M+k)\times 1},
+\underbrace{\bbf_M^{j}(t,  \mathbf{t}_M^{d})}_{(M+1+2d)\times 1} = S_{M+1+2d} \underbrace{\bbf_M^{j}(t,  \mathbf{t}_M^{d+1})}_{(M+1+2(d+1))\times 1},
 \]
 where
 \[
-	S_{N} \defeq \begin{bmatrix} \mathbf{0}_{(N-1)\times 1}, & \mathbf{I}_{(N-1) \times (N-1)} \end{bmatrix}.
+	S_{N} \defeq \begin{bmatrix} \mathbf{0}_{N\times 1}, & \mathbf{I}_{N\times N}, & \mathbf{0}_{N\times 1} \end{bmatrix}.
 \]
 \end{lemma}
+\begin{proof}
+Let
+\begin{align*}
+\mathbf{t}_M^{d+1} &= [\hat{\tau}_{0}, \hat{\tau}_{1}, \dots, \hat{\tau}_{d+1}, \dots, \hat{\tau}_{M+d+2}, \dots, \hat{\tau}_{M+2d+2}, \hat{\tau}_{M+2d+3}] \\
+				   &= [t_{-d-1}, t_{-d}, \dots, t_{0}, \dots, t_M, \dots, t_{M+d}, t_{M+d+1}] \\
+\mathbf{t}_M^{d}   &= [\tau_{0}, \dots, \tau_{d}, \dots, \tau_{M+d+1}, \dots, \tau_{M+2d+1}] \\f
+				   &= [t_{-d}, \dots, t_{0}, \dots, t_M, \dots, t_{M+d}],
+\end{align*}	
+where it is clear that $\tau_j = \hat{\tau}_{j+1}$.  Therefore, from Equations~\eqref{eq:spline_basis_definition_0}we have
+\begin{align*}
+b_m^0(t, \mathbf{t}_M^d) &= \begin{cases} 1 & \text{~if~} \tau_m \leq t \leq \tau_{m+1} \\ 
+ 									 0 & \text{~otherwise} 
+ 					   		\end{cases} \\
+ 					   	 &= \begin{cases} 1 & \text{~if~} \hat{\tau}_{m+1} \leq t \leq \hat{\tau}_{m+2} \\ 
+ 									 0 & \text{~otherwise} 
+ 					   		\end{cases} \\
+ 					   	 &= b_{m+1}^0(t, \mathbf{t}_M^{d+1}). 
+\end{align*}
+Equations~\eqref{eq:spline_basis_definition_k} and~\eqref{eq:spline_basis_definition_w} follow by similar manipulation. 
+\end{proof}
+
 
 We have the following lemma which gives the general formula for the derivative of the spline basis.
 \begin{lemma}\label{lem:derivative_basis_functions}
-If $\mathbf{t}$ is a general knot vector, then the $\ell^{th}$ derivative of the $k^{th}$ order spline function with  $0\leq \ell \leq k$, is given by
+If $\mathbf{t}_M^d$ is a natural knot vector, then the $\ell^{th}$ derivative of the degree $d$ spline function with  $0\leq \ell \leq d+1$, is given by
 \[
-\frac{d^\ell}{dt^\ell}b_m^k(t,  \mathbf{t}) = (k-1)\left(\frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_m^{k-1}(t,  \mathbf{t})}{\tau_{m+k-1}-\tau_m} - \frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_{m+1}^{k-1}(t,  \mathbf{t})}{\tau_{m+k}-\tau_{m+1}} \right).
+\frac{d^\ell}{dt^\ell}b_m^{d}(t,  \mathbf{t}_M^d) = (d-1)\left(\frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_m^{d-1}(t,  \mathbf{t}_M^d)}{\tau_{m+d-1}-\tau_m} - \frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_{m+1}^{d-1}(t,  \mathbf{t}_M^d)}{\tau_{m+d}-\tau_{m+1}} \right).
 \]	
 \end{lemma}
 \marginnote{
