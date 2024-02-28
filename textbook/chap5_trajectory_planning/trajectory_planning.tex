@@ -625,23 +625,39 @@ Therefore, the lemma holds by induction.
 
 One of the most important properties of B-splines is the so-called finite-support property, which states that at any instant of time, only a few control points influence the B-spline.  In this section, we formalize this property.  We begin by showing that for any time $t\in\text{span}(\mathbf{t}_M^d)$, there are only $d+1$ non-zero basis functions.
 
-\begin{lemma} \label{lem:nonzero_basis_vectors}
-	Let $\mathbf{t}_M^d=[t_{-d}, \dots, t_{-1}, t_0, \dots, t_M, \dots t_{M+d}]$ be a natural knot vector.  Then for any $t\in\text{span}(\mathbf{t}_M^d)$, there are exactly $d+1$ non-zero basis functions of degree $d$ at that time.  In particular, if $j\in[0, M-1]$ then
-		\[
-		t\in[t_j, t_{j+1}] \implies \left\{	b_m^d(t, \mathbf{t}_M^d) \neq 0 \iff m\in[j, j+d]\right\}.
-		\]		
+\begin{lemma} \label{lem:span_of_basis_vectors}
+	Let $\mathbf{t}_M^d=[t_{-d}, \dots, t_{-1}, t_0, \dots, t_M, \dots t_{M+d}]$ be a natural knot vector.  Then for $j\leq d$, and $0\leq m\leq M+2(d-j)$, we have that
+\begin{equation}\label{eq:span_of_basis_vectors}
+b_m^j(t, \mathbf{t}_M^d) \neq 0 \quad \iff \quad t\in [t_{m-d}, t_{m+j-d}].
+\end{equation}
 \end{lemma}
-\begin{proof}  The proof follows from a careful, but straight-forward accounting using Equations~\eqref{eq:spline_basis_definition_0} and~\eqref{eq:spline_basis_definition_k}.	
+\begin{proof}
+	Let 
+	\begin{align*}
+		\mathbf{t}_M^d
+			&=[\tau_0, \dots, \tau_{d-1}, \tau_d, \dots, \tau_{M+d}, \dots, \tau_{M+2d}] \\
+			&=[t_{-d}, \dots, t_{-1}, t_0, \dots, t_M, \dots t_{M+d}],
+	\end{align*}
+	where it is clear that $\tau_m=t_{m-d}$ for $m=0, \dots, M+2d$.
+	Then from Equations~\eqref{eq:spline_basis_definition_0} and~\eqref{eq:spline_basis_definition_k} we have that $b_m^0(t, \mathbf{t}_M^d) \neq 0 \iff t\in [\tau_{m}, \tau_{m+1}]=[t_{m-d}, t_{m+1-d}]$.  By induction, it is straightforward to show that Equation~\eqref{eq:span_of_basis_vectors} holds since incrementing the degree by one, expands the non-zero support by one time interval.
 \end{proof}
+
+
+\begin{corollary}\label{lem:nonzero_basis_vectors}
+	Let $\mathbf{t}_M^d=[t_{-d}, \dots, t_{-1}, t_0, \dots, t_M, \dots t_{M+d}]$ be a natural knot vector.  Then for any $t\in\text{span}(\mathbf{t}_M^d)$, there are exactly $j+1$ non-zero basis functions of degree $j\leq d$ at that time.  In particular, if $t\in [t_s, t_{s+1}]\subset \text{span}(\mathbf{t}_M^d),$ then
+		\[
+		b_m^j(t, \mathbf{t}_M^d) \neq 0 \iff m\in[s, s+j].
+		\]		
+\end{corollary}
 
 \begin{corollary}\label{lem:finite_num_control_points}
 	Let $\mathbf{t}_M^d=[t_{-d}, \dots, t_{-1}, t_0, \dots, t_M, \dots t_{M+d}]$ be a natural knot vector.  
-	If $0\leq j \leq M-1$ is an integer, then for any $t\in[t_j, t_{j+1}]\subset\text{span}(\mathbf{t}_M^d)$,
+	If $0\leq s \leq M-1$ is an integer, then for any $t\in[t_s, t_{s+1}]\subset\text{span}(\mathbf{t}_M^d)$,
 	\[
 	\mathbf{p}(t) = \sum_{m=0}^{M+d-1} \cbf_m b_m^d(t, \mathbf{t}_M^d) 
-	              = \sum_{m=j}^{j+d} \cbf_m b_m^d(t,  \mathbf{t}_M^d).
+	              = \sum_{m=s}^{s+d} \cbf_m b_m^d(t,  \mathbf{t}_M^d).
 	\]
-	In other words, over the interval $t\in[t_j, t_{j+1}]$ there are only $d+1$ control points that influence $\mathbf{p}(t)$, namely $\{\cbf_j, \dots, \cbf_{j+d}\}$.
+	In other words, over the interval $t\in[t_s, t_{s+1}]$ there are only $d+1$ control points that influence $\mathbf{p}(t)$, namely $\{\cbf_s, \dots, \cbf_{s+d}\}$.
 \end{corollary}
 \begin{proof}
 The proof follows directly from Lemma~\ref{lem:nonzero_basis_vectors}.	
@@ -650,7 +666,7 @@ The proof follows directly from Lemma~\ref{lem:nonzero_basis_vectors}.
 In the special case of uniform and clamped knot vectors, we get the following corollary.
 
 \begin{corollary}\label{lem:nonzero_basis_vectors}
-	Let $\mathbf{t}_M^d$ be the uniform and clamped knot vector defined in Equation~\eqref{eq:knot_vector_uniform_clamped}.
+	Let $\mathbf{t}_M^d$ be the uniform (possibly clamped) knot vector defined in Equation~\eqref{eq:knot_vector_uniform_clamped}.
 	Then there are exactly $M+d$ non-zero basis function of degree $d$, namely $b_m^d(t, \mathbf{t}_M^d)$, $m=0, \dots, M+d-1$.
 	Furthermore, the basis of support for $b_m^d(t, \mathbf{t}_M^d)$, i.e., the time interval where $b_m^d(t, \mathbf{t}_M^d)$ is non-zero is given by
 		\[
@@ -663,13 +679,13 @@ In the special case of uniform and clamped knot vectors, we get the following co
 				\end{cases}.
 		\]	
 \end{corollary} 
-\begin{proof}  Follows directly from Lemma~\ref{lem:nonzero_basis_vectors} and the definition of uniform and clamped knot vectors.
+\begin{proof}  Follows directly from Lemma~\ref{lem:nonzero_basis_vectors} and the definition of uniform knot vectors.
 \end{proof}
 
-A graphical depiction of the region of support for the set of basis functions $\{b_m^d(t, \mathbf{t}_M^d)\}_{m=0}^{M+d-1}$ is shown in Figure~\ref{fig:region_of_support} for $d=3$ and $M=8$.
+A graphical depiction of the region of support for the set of basis functions $\{b_m^d(t, \mathbf{t}_M^d)\}_{m=0}^{M+d-1}$ is shown in Figure~\ref{fig:region_of_support} for a uniform clamped knot vector with $d=3$ and $M=8$.
 \begin{marginfigure}[0in]
   \includegraphics[width=\linewidth]{./chap5_trajectory_planning/figures/region_of_support.drawio.pdf}
-  \caption{Region of support for the B-spline basis functions of degree $d=3$ with knot vector $\mathbf{t}_8^d$.}
+  \caption{Region of support for the B-spline basis functions of degree $d=3$ with uniform clamped knot vector $\mathbf{t}_8^d$.}
   \label{fig:region_of_support}  
 \end{marginfigure}
 
@@ -798,7 +814,7 @@ and the control points as a matrix
 \]
 allowing Equation~\eqref{eq:general-b-spline} to be written as
 \[
-\mathbf{p}(t) = \Cbf \bbf_M^d(t), \qquad t\in\text{span}(\mathbf{t}_M^d).
+\mathbf{p}(t) = \Cbf \bbf_M^d(t), \qquad t\ in\text{span}(\mathbf{t}_M^d).
 \]
 %1Given the shift and scale invariance of the B-spline basis functions, $\mathbf{p}(t)$ can be shifted and scaled to represent functions over arbitrary finite time intervals.
 
@@ -858,7 +874,7 @@ We have the following lemma which gives the general formula for the derivative o
 \begin{lemma}\label{lem:derivative_basis_functions}
 If $\mathbf{t}_M^d$ is a natural knot vector, then the $\ell^{th}$ derivative of the degree $d$ spline function with  $0\leq \ell \leq d+1$, is given by
 \[
-\frac{d^\ell}{dt^\ell}b_m^{d}(t,  \mathbf{t}_M^d) = (d-1)\left(\frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_m^{d-1}(t,  \mathbf{t}_M^d)}{\tau_{m+d-1}-\tau_m} - \frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_{m+1}^{d-1}(t,  \mathbf{t}_M^d)}{\tau_{m+d}-\tau_{m+1}} \right).
+\frac{d^\ell}{dt^\ell}b_m^{d}(t,  \mathbf{t}_M^d) = d\left(\frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_m^{d-1}(t,  \mathbf{t}_M^d)}{\tau_{m+d}-\tau_m} - \frac{\frac{d^{\ell-1}}{dt^{\ell-1}}b_{m+1}^{d-1}(t,  \mathbf{t}_M^d)}{\tau_{m+d+1}-\tau_{m+1}} \right).
 \]	
 \end{lemma}
 \marginnote{
@@ -867,92 +883,163 @@ The proof of Lemma~\ref{lem:derivative_basis_functions} is in~\cite{PieglTiller9
 
 Using vector notation, we have the following formula for the derivative of a spline function.
 \begin{lemma} \label{lem:derivative_of_spline}
-Given the $k^{th}$-order uniform clamped spline function
+Given the natural spline function of degree $d$
 \[
-\mathbf{p}(t) = \Cbf \bbf_M^k(t), \quad t\in[0, M]
+\mathbf{p}(t) = \Cbf \bbf_M^d(t), \quad t\in\text{span}(\mathbf{t}_M^d)
 \]
 we have that
 \[
-\frac{d\mathbf{p}}{dt}(t) = \Cbf D_M^k \bbf_M^{k-1}(t), \quad t\in[0, M]
+\frac{d\mathbf{p}}{dt}(t) = \Cbf D_M^d \bbf_M^{d-1}(t), \quad t\in\text{span}(\mathbf{t}_M^{d-1})
 \]	
-where $D_M^k$ is the $(M+k-1)\times (M+k-2)$ derivative matrix given by
-\begin{equation}\label{eq:D_k}
-D_M^k = -\begin{bmatrix}\bar{D}_M^k \\ \mathbf{0}_{1\times(M+k-2)} \end{bmatrix} + \begin{bmatrix}\mathbf{0}_{1\times(M+k-2)} \\ \bar{D}_M^k \end{bmatrix},
+where $D_M^d$ is the $(M+d)\times (M+d-1)$ derivative matrix given by
+\begin{equation}\label{eq:D_d}
+D_M^d = -\begin{bmatrix}\bar{D}_M^d \\ \mathbf{0}_{1\times(M+d-1)} \end{bmatrix} + \begin{bmatrix}\mathbf{0}_{1\times(M+d-1)} \\ \bar{D}_M^d \end{bmatrix},
 \end{equation}
 where
-\begin{equation}\label{eq:D_k_bar}
-\bar{D}_M^k = \text{diag}\left(\frac{k-1}{1}, \frac{k-1}{2}, \dots, \frac{k-2}{k-1}, \underbrace{1, \dots, 1}_{M-k}, \frac{k-1}{k-2}, \dots, \frac{k-1}{2}, \frac{k-1}{1}\right),
+\begin{equation}\label{eq:D_d_bar}
+\bar{D}_M^d = \text{diag}\left(\frac{d}{t_{-d+1}-t_1}, \frac{d}{t_{-d+2}-t_2}, \dots,  \frac{d}{t_{M+2d-2}-t_{M+d-2}}\right),
 \end{equation}
-is an $(M+k-2)\times(M+k-2)$ diagonal matrix.
+is an $(M+d-1)\times(M+d-2)$ diagonal matrix.
 \end{lemma}
 \begin{proof}
+Let
+\begin{align*}
+\mathbf{t}_M^{d} &= [\hat{\tau}_{0}, \hat{\tau}_{1}, \dots, \hat{\tau}_{d}, \dots, \hat{\tau}_{M+d}, \dots, \hat{\tau}_{M+2d-1}, \hat{\tau}_{M+2d}] \\
+				   &= [t_{-d}, t_{-d+1} \dots, t_{0}, \dots, t_M, \dots, t_{M+d-1}, t_{M+d}] \\
+\mathbf{t}_M^{d-1}   &= [\tau_{0}, \dots, \tau_{d-1}, \dots, \tau_{M+d-1}, \dots, \tau_{M+2d-2}] \\
+				   &= [t_{-d+1}, \dots, t_{0}, \dots, t_M, \dots, t_{M+d-1}],
+\end{align*}	
+where it is clear that $\tau_j = \hat{\tau}_{j+1}$, for $j=0,\dots,M+2d-2$.
+
 Noting that
 \[
-\mathbf{p}(t) = \Cbf \bbf_M^k(t)
-              = \sum_{m=0}^{M+k-2} \cbf_m b_m^k(t,  \bar{\mathbf{t}}_M^k),
+\mathbf{p}(t) = \Cbf \bbf_M^d(t)
+              = \sum_{m=0}^{M+d-1} \cbf_m b_m^d(t,  \mathbf{t}_M^d),
 \]
 we have that
 \[
-\frac{d\mathbf{p}}{dt} = \sum_{m=0}^{M+k-2} \cbf_m \frac{d b_m^k(t,  \bar{\mathbf{t}}_M^k)}{dt}.
+\frac{d\mathbf{p}}{dt} = \sum_{m=0}^{M+d-1} \cbf_m \frac{d b_m^d(t,  \mathbf{t}_M^d)}{dt}.
 \]
 From Lemma~\ref{lem:derivative_basis_functions} we get
 \begin{align*}
-\frac{d\mathbf{p}}{dt} &= \sum_{m=0}^{M+k-2} \cbf_m (k-1)\left(\frac{b_m^{k-1}(t,  \bar{\mathbf{t}}_M^k)}{\tau_{m+k-1}-\tau_m} - \frac{b_{m+1}^{k-1}(t,  \bar{\mathbf{t}}_M^k)}{\tau_{m+k}-\tau_{m+1}} \right) \\
-&= \sum_{m=0}^{M+k-2} \cbf_m \left[ \left(\frac{k-1}{\tau_{m+k-1}-\tau_m}\right) b_m^{k-1}(t,  \bar{\mathbf{t}}_M^k) - \left(\frac{k-1}{\tau_{m+k}-\tau_{m+1}}\right)  b_{m+1}^{k-1}(t,  \bar{\mathbf{t}}_M^k) \right] \\
-&= \left(\frac{k-1}{\tau_{k-1}-\tau_0}\right)\cbf_0 b_0^{k-1}(t,  \bar{\mathbf{t}}_M^k) + \sum_{m=1}^{M+k-2} \left(\frac{k-1}{\tau_{m+k-1}-\tau_m}\right) \left(  \cbf_m - \cbf_{m-1}  \right) b_m^{k-1}(t,  \bar{\mathbf{t}}_M^k) \\
-&\qquad - \left(\frac{k-1}{\tau_{M+2k-2}-\tau_{M+k-2}}\right)\cbf_{M+k-2}b_{M+k-1}^{k-1}(t,  \bar{\mathbf{t}}_M^k).
+\frac{d\mathbf{p}}{dt} &= \sum_{m=0}^{M+d-1}  \cbf_m (d) \left(\frac{b_m^{d-1}(t,  \mathbf{t}_M^d)}{\hat\tau_{m+d}-\hat\tau_m} - \frac{b_{m+1}^{d-1}(t,  \mathbf{t}_M^d)}{\hat\tau_{m+d+1}-\hat\tau_{m+1}} \right) \\
+&= \sum_{m=0}^{M+d-1} \cbf_m \left[ \left(\frac{d}{\hat\tau_{m+d}-\hat\tau_m}\right) b_m^{d-1}(t,  \mathbf{t}_M^d) - \left(\frac{d}{\hat\tau_{m+d+1}-\hat\tau_{m+1}}\right)  b_{m+1}^{d-1}(t,  \mathbf{t}_M^d) \right] \\
+&= \left(\frac{d}{\hat\tau_{d}-\hat\tau_0}\right)\cbf_0 b_0^{d-1}(t,  \mathbf{t}_M^d) + \sum_{m=1}^{M+d-1} \left(\frac{d}{\hat\tau_{m+d}-\hat\tau_m}\right) \left(  \cbf_m - \cbf_{m-1}  \right) b_m^{d-1}(t,  \mathbf{t}_M^d) \\
+&\qquad - \left(\frac{d}{\hat\tau_{M+2d}-\hat\tau_{M+d}}\right)\cbf_{M+d-1}b_{M+d}^{d-1}(t, \mathbf{t}_M^d).
 \end{align*}
-Now note that since the first $k$ terms in the knot vector $\mathbf{t}_M^k$ are equal to zeros, and the last $k$ terms are equal to $M$, that $\tau_{k-1}-\tau_0 = \tau_{M+2k-2}-\tau_{M+k-2} = 0$, and therefore the first and last terms are zero.  Using the shifting property from Lemma~\ref{lem:shifting_property}, and changing the index by one, we get
-\begin{equation}\label{eq:spline_deriviative_1}
-\frac{d\mathbf{p}}{dt} = \sum_{m=0}^{M+k-3} \left(\frac{k-1}{\tau_{m+k-2}-\tau_{m}}\right) \left( \cbf_{m+1} - \cbf_{m}  \right) b_{m}^{k-1}(t,  \bar{\mathbf{t}}_M^{k-1}),
-\end{equation}
-where $\tau_\ast$ now corresponds to the knot vector 
-\[
-\bar{\mathbf{t}}_M^{k-1} = [\underbrace{0, 0, \dots, 0}_{k-2}, 0, 1, 2, \dots, M, \underbrace{M, \dots, M}_{k-2}].
-\]
-From the definition of $\bar{\mathbf{t}}_M^{k-1}$ we note that
+From Lemma~\ref{lem:span_of_basis_vectors} we have that $b_0^{d-1}(t, \mathbf{b}_M^d)$ and $b_{M+d}^{d-1}(t, \mathbf{b}_M^d)$ are zero on $\text{span}(\mathbf{t}_M^d)$, which implies that 
 \begin{align*}
-& \frac{k-1}{\tau_{k-1}-\tau_0} = \frac{k-1}{1}, \quad
-\frac{k-1}{\tau_{k}-\tau_1} = \frac{k-1}{2}, \quad
-\dots \quad
-\frac{k-1}{\tau_{2k-3}-\tau_{k-3}} = \frac{k-1}{k-2},  \\
-&\frac{k-1}{\tau_{2k-2}-\tau_{k-2}} = \frac{k-1}{k-1}, \quad
-\dots \quad
-\frac{k-1}{\tau_{M+k-2} - \tau_{M-1}} = \frac{k-1}{k-1}, \\
-& \frac{k-1}{\tau_{M+k-1} - \tau_{M}} = \frac{k-1}{k-2}, \quad
-\dots \quad
-\frac{k-1}{\tau_{M+2k-3} - \tau_{M+k-3}} = \frac{k-1}{1}
+	\frac{d\mathbf{p}}{dt} 
+		&= \sum_{m=1}^{M+d-1} \left(\frac{d}{\hat\tau_{m+d}-\hat\tau_m}\right) \left(  \cbf_m - \cbf_{m-1}  \right) b_m^{d-1}(t,  \mathbf{t}_M^d) \\
+		&= \sum_{m=0}^{M+d-2} \left(\frac{d}{\hat\tau_{m+1+d}-\hat\tau_{m+1}}\right) \left(  \cbf_{m+1} - \cbf_{m}  \right) b_{m+1}^{d-1}(t,  \mathbf{t}_M^d) \\
+		&= \sum_{m=0}^{M+d-2} \left(\frac{d}{\tau_{m+d}-\tau_{m}}\right) \left(  \cbf_{m+1} - \cbf_{m}  \right) b_{m}^{d-1}(t,  \mathbf{t}_M^{d-1}) \\	
+		&= \Cbf D_M^d \bbf_M^{d-1}(t).	
 \end{align*}
-Define the $(M+k-2)\times(M+k-2)$ diagonal matrix $\bar{D}_M^k$ in Equation~\eqref{eq:D_k_bar}, and the $(M+k-1)\times (M+k-2)$ derivative matrix $D_M^k$ in Equation~\eqref{eq:D_k},
-then Equation~\eqref{eq:spline_deriviative_1} can be written as
-\[
-\frac{d\mathbf{p}}{dt} = \Cbf D_M^k \bbf_M^{k-1}(t).
-\]
 \end{proof}
 
-\begin{lemma} \label{lem:derivative_of_spline_not_clamped}
-Given the $k^{th}$-order uniform spline function
+Note that if $\mathbf{t}_M^d$ is the uniform knot vector in Equation~\eqref{eq:knot_vector_uniform}, then 
 \[
-\mathbf{p}(t) = \Cbf \bbf_M^k(t), \quad t\in[0, M]
+\bar{D}_M^d  = I_{M+d-2},
 \]
-we have that
+since the interval in the denominator is always equal to $d$.
+%
+Similarly, if $\mathbf{t}_M^d$ is the uniform clamped knot vector in Equation~\eqref{eq:knot_vector_uniform_clamped}, then 
 \[
-\frac{d\mathbf{p}}{dt}(t) = \Cbf D_M^k \bbf_M^{k-1}(t), \quad t\in[0, M]
-\]	
-where $D_M^k$ is the $(M+k-1)\times (M+k-2)$ derivative matrix given by
-\begin{equation}\label{eq:D_k}
-D_M^k = \begin{pmatrix} -1 & 0 & 0 & \dots & 0 & 0 \\ 
- 						 1 & -1 & 0 & \dots & 0 & 0 \\
- 						 0 & 1 & -1 & \dots & 0 & 0\\
- 						 \vdots & & & & & \vdots \\
- 						 0 & 0 & 0 & \vdots & 1 & -1 \\
- 						 0 & 0 & 0 & \vdots & 0 & 1
- 		\end{pmatrix}.
-\end{equation}
-\end{lemma}
+\bar{D}_M^d = \text{diag}\left(\frac{d}{1}, \frac{d}{2}, \dots, \frac{d}{d-1}, \underbrace{1, \dots, 1}_{M-d}, \frac{d}{d-1}, \dots, \frac{d}{2}, \frac{d}{1}\right).
+\]
+
+%
+%\begin{lemma} \label{lem:derivative_of_spline_not_clamped}
+%Given the $k^{th}$-order uniform spline function
+%\[
+%\mathbf{p}(t) = \Cbf \bbf_M^k(t), \quad t\in[0, M]
+%\]
+%we have that
+%\[
+%\frac{d\mathbf{p}}{dt}(t) = \Cbf D_M^k \bbf_M^{k-1}(t), \quad t\in[0, M]
+%\]	
+%where $D_M^k$ is the $(M+k-1)\times (M+k-2)$ derivative matrix given by
+%\begin{equation}\label{eq:D_k}
+%D_M^k = \begin{pmatrix} -1 & 0 & 0 & \dots & 0 & 0 \\ 
+% 						 1 & -1 & 0 & \dots & 0 & 0 \\
+% 						 0 & 1 & -1 & \dots & 0 & 0\\
+% 						 \vdots & & & & & \vdots \\
+% 						 0 & 0 & 0 & \vdots & 1 & -1 \\
+% 						 0 & 0 & 0 & \vdots & 0 & 1
+% 		\end{pmatrix}.
+%\end{equation}
+%\end{lemma}
 
 
 From Lemma~\ref{lem:derivative_of_spline} we can derive a number of useful results, which we summarize in the corollary below.
+\begin{corollary} \label{cor:derivatives}
+	Given the natural/uniform/clamped B-spline function of degree $d$,
+	\[
+	\mathbf{p}(t) = \Cbf \bbf_M^d(t), \quad t\in\text{span}(\mathbf{t}_M^d)
+	\]
+	we can make the following statements:
+	\begin{description}
+	\item[(i)] The derivative  $\frac{d\mathbf{p}}{dt}$ is a natural/uniform/clamped clamped B-spline function of degree $d-1$.
+	\item[(ii)] The control points of $\frac{d\mathbf{p}}{dt}$ are given by
+		\[
+		C^{'} \defeq C D_M^d = \begin{pmatrix}
+				\frac{d}{t_{-d+1}-t_1} (\cbf_1 - \cbf_0)^\top \\
+				\vdots \\
+				\frac{d}{t_{M+2d-2}-t_{M_d-2} (\cbf_{M+d-1} - \cbf_{M+d-2})^\top
+ 				\end{pmatrix}^\top
+ 			\defeq \begin{pmatrix}
+ 			        \cbf_0^{'\top} \\
+ 			        \vdots \\
+ 			        \cbf_{M+d-2}^{'\top}
+ 				   \end{pmatrix}^\top.
+		\]
+	\item[(iii)] The $\ell^{th}$ derivative of $\mathbf{p}(t)$ for $0\leq\ell\leq d-1$ is given by
+		\begin{align*}
+			\frac{d^{\ell}\mathbf{p}}{dt^{\ell}} 
+			&= C D_M^d D_M^{d-1} \dots D_M^{d-\ell} \bbf_M^{d-\ell}(t), \quad t\in \text{span}(\mathbf{t}_M^d) \\
+			&= C^{(\ell)} \bbf_M^{d-\ell}(t), \quad t\in \text{span}(\mathbf{t}_M^d) \\
+			&= C \boldsymbol{\psi}^{(\ell)}(t), \quad t\in \text{span}(\mathbf{t}_M^d) \\
+		\end{align*}
+		where the control points of the $(d-\ell)^{th}$ degree spline are given by
+		\[
+			C^{(\ell)} = C D_M^d D_M^{d-1} \dots D_M^{d-\ell-1}
+		\]
+		or alternatively, the $\ell^{th}$ derivative of the basis vector $\bbf_M^d(t)$ is given by
+		\[
+			\boldsymbol{\psi}^{(\ell)} \defeq \frac{d^{\ell}\bbf_M^d(t)}{dt^{\ell}} = D_M^d D_M^{d-1} \dots D_M^{d-\ell} \bbf_M^{d-\ell}(t), \quad t\in \text{span}(\mathbf{t}_M^d).
+		\]
+	\item[(iv)] The derivative of $\mathbf{p}(t)$ at $t=0$ is given by the difference of the first two control points as
+		\[
+			\frac{d\mathbf{p}}{dt}(0) = (k-1)(\cbf_1 - \cbf_0).
+		\]
+	\item[(v)] The derivative of $\mathbf{p}(t)$ at $t=M$ is given by the difference of the last two control points as
+		\[
+			\frac{d\mathbf{p}}{dt}(M) = (k-1)(\cbf_{M+k-2} - \cbf_{M+k-3}).
+		\]
+	\item[(vi)] If the desired B-spline trajectory with $k\geq 4$ has the following desired endpoint conditions:
+		\begin{align*}
+			\text{Initial position:} &\quad \mathbf{p}(0) \stackrel{des}{=} \mathbf{p}_0 \\	
+			\text{Final position:} &\quad \mathbf{p}(M) \stackrel{des}{=} \mathbf{p}_f \\
+			\text{Initial velocity:} &\quad \frac{d\mathbf{p}}{dt}(0) \stackrel{des}{=} \mathbf{v}_0 \\	
+			\text{Final velocity:} &\quad \frac{d\mathbf{p}}{dt}(M) \stackrel{des}{=} \mathbf{v}_f, \\
+			\text{Initial acceleration:} &\quad \frac{d^2\mathbf{p}}{dt^2}(0) \stackrel{des}{=} \mathbf{a}_0 \\	
+			\text{Final acceleration:} &\quad \frac{d^2\mathbf{p}}{dt^2}(M) \stackrel{des}{=} \mathbf{a}_f,
+		\end{align*}
+		then the first and last three control points satisfy
+		\begin{align*}
+			\cbf_0 &= \mathbf{p}_0 \\
+			\cbf_1 &= \mathbf{p}_0 + \frac{1}{k-1} \mathbf{v}_0 \\
+			\cbf_2 &= \mathbf{p}_0 + \frac{3}{k-1} \mathbf{v}_0 + \frac{2}{(k-1)(k-2)}\mathbf{a}_0 \\
+			\cbf_{M+k-4} &= \mathbf{p}_f - \frac{3}{k-1}\mathbf{v}_f + \frac{2}{(k-1)(k-2)}\mathbf{a}_f \\
+			\cbf_{M+k-3} &= \mathbf{p}_f - \frac{1}{k-1}\mathbf{v}_f \\
+			\cbf_{M+k-2} &= \mathbf{p}_f.
+		\end{align*}
+	\end{description}
+\end{corollary}
+
+
+
+
 \begin{corollary} \label{cor:derivatives_clamped_splines}
 	Given the $k^{th}$-order uniform clamped B-spline function
 	\[
