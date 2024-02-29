@@ -970,7 +970,7 @@ Similarly, if $\mathbf{t}_M^d$ is the uniform clamped knot vector in Equation~\e
 %\end{equation}
 %\end{lemma}
 
-
+%
 From Lemma~\ref{lem:derivative_of_spline} we can derive a number of useful results, which we summarize in the corollary below.
 \begin{corollary} \label{cor:derivatives}
 	Given the natural/uniform/clamped B-spline function of degree $d$,
@@ -985,7 +985,7 @@ From Lemma~\ref{lem:derivative_of_spline} we can derive a number of useful resul
 		C^{'} \defeq C D_M^d = \begin{pmatrix}
 				\frac{d}{t_{-d+1}-t_1} (\cbf_1 - \cbf_0)^\top \\
 				\vdots \\
-				\frac{d}{t_{M+2d-2}-t_{M_d-2} (\cbf_{M+d-1} - \cbf_{M+d-2})^\top
+				\frac{d}{t_{M+2d-2}-t_{M_d-2}} (\cbf_{M+d-1} - \cbf_{M+d-2})^\top
  				\end{pmatrix}^\top
  			\defeq \begin{pmatrix}
  			        \cbf_0^{'\top} \\
@@ -1008,89 +1008,47 @@ From Lemma~\ref{lem:derivative_of_spline} we can derive a number of useful resul
 		\[
 			\boldsymbol{\psi}^{(\ell)} \defeq \frac{d^{\ell}\bbf_M^d(t)}{dt^{\ell}} = D_M^d D_M^{d-1} \dots D_M^{d-\ell} \bbf_M^{d-\ell}(t), \quad t\in \text{span}(\mathbf{t}_M^d).
 		\]
-	\item[(iv)] The derivative of $\mathbf{p}(t)$ at $t=0$ is given by the difference of the first two control points as
-		\[
-			\frac{d\mathbf{p}}{dt}(0) = (k-1)(\cbf_1 - \cbf_0).
-		\]
-	\item[(v)] The derivative of $\mathbf{p}(t)$ at $t=M$ is given by the difference of the last two control points as
-		\[
-			\frac{d\mathbf{p}}{dt}(M) = (k-1)(\cbf_{M+k-2} - \cbf_{M+k-3}).
-		\]
-	\item[(vi)] If the desired B-spline trajectory with $k\geq 4$ has the following desired endpoint conditions:
-		\begin{align*}
-			\text{Initial position:} &\quad \mathbf{p}(0) \stackrel{des}{=} \mathbf{p}_0 \\	
-			\text{Final position:} &\quad \mathbf{p}(M) \stackrel{des}{=} \mathbf{p}_f \\
-			\text{Initial velocity:} &\quad \frac{d\mathbf{p}}{dt}(0) \stackrel{des}{=} \mathbf{v}_0 \\	
-			\text{Final velocity:} &\quad \frac{d\mathbf{p}}{dt}(M) \stackrel{des}{=} \mathbf{v}_f, \\
-			\text{Initial acceleration:} &\quad \frac{d^2\mathbf{p}}{dt^2}(0) \stackrel{des}{=} \mathbf{a}_0 \\	
-			\text{Final acceleration:} &\quad \frac{d^2\mathbf{p}}{dt^2}(M) \stackrel{des}{=} \mathbf{a}_f,
-		\end{align*}
-		then the first and last three control points satisfy
-		\begin{align*}
-			\cbf_0 &= \mathbf{p}_0 \\
-			\cbf_1 &= \mathbf{p}_0 + \frac{1}{k-1} \mathbf{v}_0 \\
-			\cbf_2 &= \mathbf{p}_0 + \frac{3}{k-1} \mathbf{v}_0 + \frac{2}{(k-1)(k-2)}\mathbf{a}_0 \\
-			\cbf_{M+k-4} &= \mathbf{p}_f - \frac{3}{k-1}\mathbf{v}_f + \frac{2}{(k-1)(k-2)}\mathbf{a}_f \\
-			\cbf_{M+k-3} &= \mathbf{p}_f - \frac{1}{k-1}\mathbf{v}_f \\
-			\cbf_{M+k-2} &= \mathbf{p}_f.
-		\end{align*}
 	\end{description}
 \end{corollary}
 
 
-
+For uniform clamped B-splines, we have the following.
 
 \begin{corollary} \label{cor:derivatives_clamped_splines}
-	Given the $k^{th}$-order uniform clamped B-spline function
+	Given the uniform clamped B-spline function of degree $d$
 	\[
-	\mathbf{p}(t) = \Cbf \bbf_M^k(t), \quad t\in[0, M]
+	\mathbf{p}(t) = \Cbf \bbf_M^d(t), \quad t\in[0, M]
 	\]
 	we can make the following statements:
 	\begin{description}
-	\item[(i)] The derivative  $\frac{d\mathbf{p}}{dt}$ is a $(k-1)^{th}$-order uniform clamped B-spline function.
-	\item[(ii)] The control points of $\frac{d\mathbf{p}}{dt}$ are given by
+	\item[(i)] The control points of $\frac{d\mathbf{p}}{dt}$ are given by
 		\[
 		C^{'} \defeq C D_M^k = \begin{pmatrix}
-				\frac{k-1}{1} (\cbf_1 - \cbf_0)^\top \\
+				\frac{d}{1} (\cbf_1 - \cbf_0)^\top \\
 				\vdots \\
-				\frac{k-1}{k-2} (\cbf_{k-2} - \cbf_{k-3})^\top \\
-				(\cbf_{k-1} - \cbf_{k-2})^\top \\
+				\frac{d}{d-1} (\cbf_{d-2} - \cbf_{d-3})^\top \\
+				(\cbf_{d-1} - \cbf_{d-2})^\top \\
 				\vdots \\
 				(\cbf_{M+1} - \cbf_{M})^\top \\
-				\frac{k-1}{k-2} (\cbf_{M+2}-\cbf_{M+1})^\top \\
+				\frac{d}{d-1} (\cbf_{M+2}-\cbf_{M+1})^\top \\
 				\vdots \\
-				\frac{k-1}{1} (\cbf_{M+k-2} - \cbf_{M+k-3})^\top
+				\frac{d}{1} (\cbf_{M+d-1} - \cbf_{M+d-2})^\top
  				\end{pmatrix}^\top
  			\defeq \begin{pmatrix}
  			        \cbf_0^{'\top} \\
  			        \vdots \\
- 			        \cbf_{M+k-3}^{'\top}
+ 			        \cbf_{M+d-2}^{'\top}
  				   \end{pmatrix}^\top.
 		\]
-	\item[(iii)] The $\ell^{th}$ derivative of $\mathbf{p}(t)$ for $0\leq\ell\leq k-2$ is given by
-		\begin{align*}
-			\frac{d^{\ell}\mathbf{p}}{dt^{\ell}} 
-			&= C D_M^k D_M^{k-1} \dots D_M^{k-\ell} \bbf_M^{k-\ell-1}(t), \quad t\in [0, M] \\
-			&= C^{(\ell)} \bbf_M^{k-\ell-1}(t), \quad t\in [0, M] \\
-			&= C \boldsymbol{\psi}^{(\ell)}(t), \quad t\in [0, M] \\
-		\end{align*}
-		where the control points of the $(k-\ell-1)^{th}$ order spline are given by
+	\item[(ii)] The derivative of $\mathbf{p}(t)$ at $t=0$ is given by the difference of the first two control points as
 		\[
-			C^{(\ell)} = C D_M^k D_M^{k-1} \dots D_M^{k-\ell}
+			\frac{d\mathbf{p}}{dt}(0) = (d)(\cbf_1 - \cbf_0).
 		\]
-		or alternatively, the $\ell^{th}$ derivative of the basis vector $\bbf_M^k(t)$ is given by
+	\item[(iii)] The derivative of $\mathbf{p}(t)$ at $t=M$ is given by the difference of the last two control points as
 		\[
-			\boldsymbol{\psi}^{(\ell)} \defeq \frac{d^{\ell}\bbf_M^k(t)}{dt^{\ell}} = D_M^k D_M^{k-1} \dots D_M^{k-\ell} \bbf_M^{k-\ell-1}(t), \quad t\in [0, M].
+			\frac{d\mathbf{p}}{dt}(M) = (d)(\cbf_{M+d-1} - \cbf_{M+d-2}).
 		\]
-	\item[(iv)] The derivative of $\mathbf{p}(t)$ at $t=0$ is given by the difference of the first two control points as
-		\[
-			\frac{d\mathbf{p}}{dt}(0) = (k-1)(\cbf_1 - \cbf_0).
-		\]
-	\item[(v)] The derivative of $\mathbf{p}(t)$ at $t=M$ is given by the difference of the last two control points as
-		\[
-			\frac{d\mathbf{p}}{dt}(M) = (k-1)(\cbf_{M+k-2} - \cbf_{M+k-3}).
-		\]
-	\item[(vi)] If the desired B-spline trajectory with $k\geq 4$ has the following desired endpoint conditions:
+	\item[(iv)] If the desired B-spline trajectory with $d\geq 3$ has the following desired endpoint conditions:
 		\begin{align*}
 			\text{Initial position:} &\quad \mathbf{p}(0) \stackrel{des}{=} \mathbf{p}_0 \\	
 			\text{Final position:} &\quad \mathbf{p}(M) \stackrel{des}{=} \mathbf{p}_f \\
@@ -1102,11 +1060,11 @@ From Lemma~\ref{lem:derivative_of_spline} we can derive a number of useful resul
 		then the first and last three control points satisfy
 		\begin{align*}
 			\cbf_0 &= \mathbf{p}_0 \\
-			\cbf_1 &= \mathbf{p}_0 + \frac{1}{k-1} \mathbf{v}_0 \\
-			\cbf_2 &= \mathbf{p}_0 + \frac{3}{k-1} \mathbf{v}_0 + \frac{2}{(k-1)(k-2)}\mathbf{a}_0 \\
-			\cbf_{M+k-4} &= \mathbf{p}_f - \frac{3}{k-1}\mathbf{v}_f + \frac{2}{(k-1)(k-2)}\mathbf{a}_f \\
-			\cbf_{M+k-3} &= \mathbf{p}_f - \frac{1}{k-1}\mathbf{v}_f \\
-			\cbf_{M+k-2} &= \mathbf{p}_f.
+			\cbf_1 &= \mathbf{p}_0 + \frac{1}{d} \mathbf{v}_0 \\
+			\cbf_2 &= \mathbf{p}_0 + \frac{3}{d} \mathbf{v}_0 + \frac{2}{(d)(d-1)}\mathbf{a}_0 \\
+			\cbf_{M+d-3} &= \mathbf{p}_f - \frac{3}{d}\mathbf{v}_f + \frac{2}{(d)(d-1)}\mathbf{a}_f \\
+			\cbf_{M+d-2} &= \mathbf{p}_f - \frac{1}{d}\mathbf{v}_f \\
+			\cbf_{M+d-1} &= \mathbf{p}_f.
 		\end{align*}
 	\end{description}
 \end{corollary}
